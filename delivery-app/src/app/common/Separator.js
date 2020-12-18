@@ -15,7 +15,7 @@ const Line = styled.div`
 `;
 
 const Text = styled.p`
-    font-size: 0.7rem;
+    font-size: 0.7em;
     color: white;
     margin: 0 10px;
 `;

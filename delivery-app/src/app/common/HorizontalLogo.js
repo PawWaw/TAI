@@ -3,14 +3,14 @@ import styled from "styled-components";
 
 const Wrapper = styled.div`
     display: flex;
-    flex-direction: column;
     cursor: pointer;
-    align-items: center;
+    flex-direction: row;
+    align-items: flex-end;
 `;
 
 const Logo = styled.img`
     background-color: "#F05454";
-    width: 160px;
+    height: 40px;
     alt: "logo";
 `;
 
@@ -20,22 +20,22 @@ const Title = styled.div`
 `;
 
 const Main = styled.h1`
-    font-size: 2em;
+    font-size: 1em;
     color: white;
     margin-top: -10px;
 `;
 
 const Small = styled.h2`
-    font-size: 1em;
+    font-size: 0.5em;
     color: #6B99C7;
     align-self: flex-end;
     margin-top: -1em;
 `;
 
-const VerticalLogo = () => {
+const HorizontalLogo = (props) => {
   return (
-    <Wrapper>
-        <Logo src="assets/svg/dragon.svg"/>
+    <Wrapper {...props}>
+        <Logo src="assets/svg/dragon.svg" height="38"/>
         <Title>
             <Main>DRAGORANT</Main>
             <Small>DELIVER</Small>
@@ -44,4 +44,4 @@ const VerticalLogo = () => {
   );
 };
 
-export default VerticalLogo;
+export default HorizontalLogo;

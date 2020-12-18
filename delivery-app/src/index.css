@@ -1,15 +1,13 @@
 * {
   margin: 0;
   -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-  box-sizing: border-box;         /* Opera/IE 8+ */
-  font-family: 'Palanquin', sans-serif;
+  -moz-box-sizing: border-box; /* Firefox, other Gecko */
+  box-sizing: border-box; /* Opera/IE 8+ */
+  font-family: "Palanquin", sans-serif;
   color: white;
-  font-size: 20px;
   font-weight: 400;
 }
 
 body {
   background-color: #222831;
-} 
-
+}

@@ -1,19 +1,27 @@
 import styled, { css } from "styled-components";
+import { Spinner } from "./Spinner";
 
-export const Button = styled.button`
-
-  padding: 0.3rem 1.5rem;
-  background-color: white;
+const ButtonContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid black;
+  padding: 0.3em 1.5em;
+  background-color: white;
+  box-shadow: 2px 2px 3px 1px rgba(0, 0, 0, 0.25);
   font-family: "Varela", sans-serif;
   color: #30475e;
-  font-size: 1.4rem;
   width: ${(props) => (props.fluid ? "100%" : "innerWidth")};
-  &:focus {
-    outline: none;
+  pointer-events: ${(props) => (props.disabled ? "none" : "auto")};
+  cursor: pointer;
+  font-size: ${(props) => (props.big ? "1.5em" : "1.3em")};
+
+  &:hover {
     opacity: 0.8;
   }
-
+  &:focus {
+    outline: none;
+  }
   ${(props) =>
     props.secondary &&
     css`
@@ -21,3 +29,11 @@ export const Button = styled.button`
       color: white;
     `}
 `;
+
+const Button = (props) => (
+  <ButtonContainer {...props}>
+    {props.loading ? <Spinner /> : props.children}
+  </ButtonContainer>
+);
+
+export default Button;

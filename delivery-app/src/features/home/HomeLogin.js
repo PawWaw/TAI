@@ -1,9 +1,12 @@
 import React from "react";
-import { Button } from "../../app/common/Button";
 import { Field, Form, Label, Input } from "../../app/common/Form";
 import Separator from "../../app/common/Separator";
 import VerticalLogo from "../../app/common/VerticalLogo";
 import styled from "styled-components";
+import Button from "../../app/common/Button";
+import { useRecoilState } from "recoil";
+import { modalState } from "../../app/recoil/ModalState";
+import Register from "../register/Register";
 
 const Container = styled.div`
   display: flex;
@@ -18,6 +21,13 @@ const Wrapper = styled.div`
 `;
 
 const HomeLogin = () => {
+  const [modal, setModal] = useRecoilState(modalState);
+  const openRegisterForm = () => {
+    setModal({
+      opened: true,
+      body: <Register />,
+    });
+  };
   return (
     <Container>
       <Wrapper>
@@ -36,7 +46,7 @@ const HomeLogin = () => {
           </Button>
         </Form>
         <Separator margin="10px 0px" />
-        <Button fluid secondary>
+        <Button fluid secondary onClick={openRegisterForm}>
           Register
         </Button>
       </Wrapper>
