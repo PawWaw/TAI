@@ -1,0 +1,97 @@
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.login-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+  margin: auto;
+  padding: 60px;
+  position: relative;
+  text-align: center;
+
+}
+.login-error-text{
+  position: absolute;
+  bottom: 2em;
+  color: #f44336;
+}
+
+.add-note-form h1{
+  margin: 0;
+}
+
+.login-full-width {
+  width: 100%;
+}
+
+
+td {
+  padding-right: 8px;
+}
+
+h1 {
+  margin: auto;
+  text-align: center;
+}
+
+.button {
+  display: inline-block;
+  border-radius: 5px;
+  background: #e7ecef;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #30475E;
+  text-align: center;
+  padding: 20px;
+  width: 200px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.button:hover{
+  background: #30475E;
+  color: #e7ecef;
+}
+
+.button span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.button span:after {
+  content: '\25BA';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
+.button:hover span {
+  padding-right: 25px;
+}
+
+.button:hover span:after {
+  opacity: 1;
+  right: 0;    
+}
+
+.spinner{
+  position: absolute;
+  bottom: -50px;
+  right: 0;
+}
+
+.sign-in-text {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+}
+
+.link{
+  color: #6B99C7;
+  text-decoration: none;
+}

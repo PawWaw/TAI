@@ -1,0 +1,36 @@
+<div class="toolbar" role="banner">
+    <button mat-button routerLink="" class="headerMenu">
+        Home
+    </button>
+    <button mat-button [matMenuTriggerFor]="searchTypes" class="headerMenu">
+        Search types
+    </button>
+    <button mat-button routerLink="/signup" class="signup">
+        Sign Up
+    </button>
+    <button mat-button routerLink="/signin" class="rightHeader">
+        Sign In
+    </button>
+    
+    <mat-form-field class="login-form">
+        <input matInput placeholder="Search">
+    </mat-form-field>
+
+    <mat-menu #searchTypes="matMenu">
+        <button mat-menu-item routerLink="/dish">
+            Dish
+        </button>
+        <button mat-menu-item [matMenuTriggerFor]="cuisineTypes" class="headerMenu">
+            Cuisine
+        </button>
+    </mat-menu>
+
+    <mat-menu #cuisineTypes="matMenu">
+        <button mat-menu-item routerLink="/local">
+            Mexican
+        </button>
+        <button mat-menu-item routerLink="/local">
+            American
+        </button>
+    </mat-menu>
+</div>
