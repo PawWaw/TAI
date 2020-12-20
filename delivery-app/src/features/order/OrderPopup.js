@@ -1,11 +1,9 @@
 import React from "react";
 import styled from "styled-components";
+import { ModalHeader } from "../../app/common/ModalHeader";
 import { SvgIcon } from "../../app/common/SvgIcon";
 
-const Header = styled.h1`
-  font-size: 1.3em;
-  color: black;
-`;
+
 
 const Field = styled.div`
   display: flex;
@@ -34,7 +32,7 @@ const ButtonsWrapper = styled.div`
 const OrderPopup = () => {
   return (
     <>
-      <Header>Found order!</Header>
+      <ModalHeader>Found order!</ModalHeader>
       <Field>
         <LabelHeader>Restaurant:</LabelHeader>
         <LabelData>ul. Kwiatowa 15/7 Katowice</LabelData>

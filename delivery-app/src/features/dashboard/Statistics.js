@@ -18,8 +18,8 @@ const Statistics = () => {
       value: "402",
     },
     {
-      caption: "Best time per km",
-      value: "11m 22s",
+      caption: "Max daily orders",
+      value: "12",
     },
   ];
   return (

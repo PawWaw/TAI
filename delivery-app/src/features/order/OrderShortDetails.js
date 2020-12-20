@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { history } from "../..";
 import { SvgIcon } from "../../app/common/SvgIcon";
 
 const Wrapper = styled.div`
@@ -42,8 +43,11 @@ const DataText = styled.h3`
 `;
 
 const OrderShortDetails = ({ id, startDate, restaurant, client }) => {
+  const handleItemClick = () => {
+      history.push(`/orders/${id}`)
+  };
   return (
-    <Wrapper>
+    <Wrapper onClick={handleItemClick}>
       <FirstLine>
         <DateText>{startDate}</DateText>
         <IdText>#{id}</IdText>

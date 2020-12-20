@@ -3,6 +3,7 @@ import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { history } from "../..";
 import Button from "../../app/common/Button";
+import { PageHeader } from "../../app/common/PageHeader";
 import { modalState } from "../../app/recoil/ModalState";
 import OrderPopup from "../order/OrderPopup";
 
@@ -19,10 +20,6 @@ const Text = styled.div`
   align-items: center;
 `;
 
-const Header = styled.h1`
-  font-size: 1.5em;
-  color: white;
-`;
 
 const Order = styled.h1`
   margin-top: -0.6em;
@@ -41,7 +38,6 @@ const OrderInfo = () => {
   };
 
   const handleFindOrder = () => {
-    console.log("has")
     setModal({
       opened: true,
       body: <OrderPopup/>
@@ -51,7 +47,7 @@ const OrderInfo = () => {
   return (
     <Wrapper>
       <Text>
-        <Header>Current orders:</Header>
+        <PageHeader>Current orders:</PageHeader>
         <Order id={ordersCount} onClick={handleOrderClick}>
           {ordersCount > 0 ? `${ordersCount}` : "None"}
         </Order>

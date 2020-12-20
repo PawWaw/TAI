@@ -11,9 +11,9 @@ export const Field = styled.div`
   flex: 1;
 `;
 
-export const Label = styled.div`
+export const Label = styled.h2`
   font-size: 1em;
-  color: white;
+  color: ${(props) => props.dark ? "black" : "white"};
 `;
 
 export const Input = styled.input`

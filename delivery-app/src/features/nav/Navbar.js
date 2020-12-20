@@ -2,19 +2,16 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import HorizontalLogo from "../../app/common/HorizontalLogo";
 import CashBalance from "./CashBalance";
-import { Link } from "react-router-dom";
 import Button from "../../app/common/Button";
 import { history } from "../..";
 import { SvgIcon } from "../../app/common/SvgIcon";
-
 
 const Bar = styled.nav`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  height: 6vh;
-  
+  height: 7vh;
 `;
 
 const Menu = styled.div`
@@ -23,14 +20,14 @@ const Menu = styled.div`
   width: 100%;
   height: 96vh;
   z-index: 10;
-  margin-top: 6vh;
+  margin-top: 7vh;
   padding-top: 4vh;
   flex: 1;
   flex-direction: column;
   background-color: #222831;
 `;
 
-const MenuItem = styled(Link)`
+const MenuItem = styled.h1`
   color: white;
   font-size: 1.3em;
   margin-bottom: 1em;
@@ -46,14 +43,19 @@ const Navbar = () => {
   const toggleMenu = () => {
     setOpen(!open);
   };
-  const redirectHome = () => {
+
+  const handleRoute = (path) => {
     setOpen(!open);
-    history.push("/home");
+    history.push(path);
   };
   return (
     <>
       <Bar>
-        {open ? <HorizontalLogo onClick={redirectHome} /> : <CashBalance />}
+        {open ? (
+          <HorizontalLogo onClick={() => handleRoute("/dashboard")} />
+        ) : (
+          <CashBalance />
+        )}
         <SvgIcon
           onClick={toggleMenu}
           src={`assets/svg/${open ? "whiteClose" : "menu"}.svg`}
@@ -63,10 +65,18 @@ const Navbar = () => {
       </Bar>
       {open && (
         <Menu>
-          <MenuItem to="/dashboard">Home</MenuItem>
-          <MenuItem to="/orders">Orders</MenuItem>
-          <MenuItem to="/settings">Settings</MenuItem>
-          <Button secondary>Logout</Button>
+          <MenuItem key="dashboard" onClick={() => handleRoute("/dashboard")}>
+            Home
+          </MenuItem>
+          <MenuItem key="orders" onClick={() => handleRoute("/orders")}>
+            Orders
+          </MenuItem>
+          <MenuItem key="settings" onClick={() => handleRoute("/settings")}>
+            Settings
+          </MenuItem>
+          <Button secondary onClick={() => handleRoute("/")}>
+            Logout
+          </Button>
         </Menu>
       )}
     </>

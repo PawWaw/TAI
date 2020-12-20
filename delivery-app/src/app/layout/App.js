@@ -7,6 +7,7 @@ import Dashboard from "../../features/dashboard/Dashboard";
 import Navbar from "../../features/nav/Navbar";
 import OrderDetails from "../../features/order/OrderDetails";
 import OrderList from "../../features/order/OrderList";
+import Settings from "../../features/settings/Settings";
 
 const MainContainer = styled.div`
   position: relative;
@@ -18,6 +19,13 @@ const MainContainer = styled.div`
   @media screen and (max-height: 600px) {
     font-size: 15px;
   }
+
+  @media screen and (max-width: 300px) {
+    font-size: 15px;
+  }
+  @media screen and (max-width: 300px) {
+    padding: 15px;
+  }
 `;
 
 const AppContainer = styled.div`
@@ -25,6 +33,7 @@ const AppContainer = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
+  overflow: hidden;
 `;
 
 const App = () => {
@@ -44,6 +53,7 @@ const App = () => {
                   <Route path="/dashboard" component={Dashboard} />
                   <Route exact path="/orders" component={OrderList} />
                   <Route path="/orders/:id" component={OrderDetails} />
+                  <Route path="/settings" component={Settings} />
                 </Switch>
               </>
             )}

@@ -1,17 +1,13 @@
 import React from "react";
 import styled from "styled-components";
 import Button from "../../app/common/Button";
+import { PageHeader } from "../../app/common/PageHeader";
 import { SvgIcon } from "../../app/common/SvgIcon";
 
 const Wrapper = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-`;
-
-const Header = styled.h1`
-  color: white;
-  font-size: 1.5em;
 `;
 
 const Order = styled.h2`
@@ -40,17 +36,23 @@ const DataLabel = styled.h4`
   color: ${(props) => (props.color ? props.color : "#9A9A9A")};
 `;
 
+const statusColors = {
+  Completed: "#70FF00",
+  "In progress": "#FFE600",
+  Rejected: "#FF0000",
+};
+
 const OrderDetails = ({ match }) => {
   const id = match.params.id;
   return (
     <Wrapper>
-      <Header>Order details</Header>
+      <PageHeader>Order details</PageHeader>
       <Field>
         <FirstLine>
           <HeaderLabel>Status:</HeaderLabel>
           <Order>#{id}</Order>
         </FirstLine>
-        <DataLabel>In progress</DataLabel>
+        <DataLabel color={statusColors["In progress"]}>In progress</DataLabel>
       </Field>
       <Field>
         <HeaderLabel>Start time:</HeaderLabel>
@@ -74,9 +76,15 @@ const OrderDetails = ({ match }) => {
       </Field>
       <Field>
         <HeaderLabel>Map:</HeaderLabel>
-        <SvgIcon alt="scooter" src="assets/svg/scooter.svg" width="100%"/>
+        <SvgIcon
+          alt="scooter"
+          src="assets/svg/scooter.svg"
+          width="80%"
+        />
       </Field>
-      <Button secondary margin="15px 0 0 0">Delievered</Button>
+      <Button secondary margin="0.7em 0 0 0">
+        Delievered
+      </Button>
     </Wrapper>
   );
 };

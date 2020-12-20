@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { PageHeader } from "../../app/common/PageHeader";
 import OrderShortDetails from "./OrderShortDetails";
 
 const Wrapper = styled.div`
@@ -7,10 +8,9 @@ const Wrapper = styled.div`
   flex-direction: column;
   flex: 1;
   overflow: hidden;
-`;
-const Header = styled.h1`
-  color: white;
-  font-size: 1.5em;
+  /* @media screen and (max-width: 300px) {
+    font-size: 15px;
+  }; */
 `;
 
 const MenuWrapper = styled.div`
@@ -52,7 +52,7 @@ const OrderList = () => {
   const [activeTab, setActiveTab] = useState("current");
   return (
     <Wrapper>
-      <Header>Orders</Header>
+      <PageHeader>Orders</PageHeader>
       <MenuWrapper>
         <MenuItem
           active={activeTab === "current"}
@@ -70,6 +70,7 @@ const OrderList = () => {
       <OrdersWrapper>
         {new Array(10).fill(undefined).map((i) => (
           <OrderShortDetails
+            key={i}
             id={231}
             startDate={"2020-03-22 12:30"}
             restaurant={"ul. Kwiatowa 2/18 Katowice"}
