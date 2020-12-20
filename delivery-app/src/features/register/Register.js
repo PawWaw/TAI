@@ -7,6 +7,7 @@ const Header = styled.h1`
   font-size: 1.3em;
   color: black;
   margin: 20px 0px;
+  align-self: center;
 `;
 
 const Register = () => {
@@ -15,7 +16,7 @@ const Register = () => {
       <Header>Fill up fields to register</Header>
       <Form>
         <IconInput icon="../assets/svg/user.svg" placeholder="Username" />
-        <IconInput icon="../assets/svg/lock.svg" placeholder="Password" />
+        <IconInput icon="../assets/svg/lock.svg" placeholder="Password" type="password" />
         <IconInput icon="../assets/svg/envelope.svg" placeholder="Email" />
         <IconInput
           icon="../assets/svg/credential.svg"

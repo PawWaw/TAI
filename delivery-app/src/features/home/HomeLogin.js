@@ -39,7 +39,7 @@ const HomeLogin = () => {
           </Field>
           <Field>
             <Label>Password</Label>
-            <Input />
+            <Input type="password" />
           </Field>
           <Button fluid style={{ marginTop: "20px" }}>
             Login

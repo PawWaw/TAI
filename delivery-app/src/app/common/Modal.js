@@ -22,7 +22,6 @@ const Container = styled.div`
   flex-direction: column;
   background-color: #f3f3f3;
   padding: 15px;
-  align-items: center;
   color: black;
 `;
 

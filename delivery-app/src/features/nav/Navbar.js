@@ -7,22 +7,27 @@ import Button from "../../app/common/Button";
 import { history } from "../..";
 import { SvgIcon } from "../../app/common/SvgIcon";
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
 
 const Bar = styled.nav`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  height: 6vh;
+  
 `;
 
 const Menu = styled.div`
+  position: absolute;
   display: flex;
+  width: 100%;
+  height: 96vh;
+  z-index: 10;
+  margin-top: 6vh;
+  padding-top: 4vh;
+  flex: 1;
   flex-direction: column;
-  margin-top: 2em;
+  background-color: #222831;
 `;
 
 const MenuItem = styled(Link)`
@@ -46,7 +51,7 @@ const Navbar = () => {
     history.push("/home");
   };
   return (
-    <Wrapper>
+    <>
       <Bar>
         {open ? <HorizontalLogo onClick={redirectHome} /> : <CashBalance />}
         <SvgIcon
@@ -58,13 +63,13 @@ const Navbar = () => {
       </Bar>
       {open && (
         <Menu>
-          <MenuItem>Home</MenuItem>
-          <MenuItem>History</MenuItem>
-          <MenuItem>Settings</MenuItem>
+          <MenuItem to="/dashboard">Home</MenuItem>
+          <MenuItem to="/orders">Orders</MenuItem>
+          <MenuItem to="/settings">Settings</MenuItem>
           <Button secondary>Logout</Button>
         </Menu>
       )}
-    </Wrapper>
+    </>
   );
 };
 

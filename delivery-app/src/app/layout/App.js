@@ -5,9 +5,13 @@ import Modal from "../common/Modal";
 import styled from "styled-components";
 import Dashboard from "../../features/dashboard/Dashboard";
 import Navbar from "../../features/nav/Navbar";
+import OrderDetails from "../../features/order/OrderDetails";
+import OrderList from "../../features/order/OrderList";
 
 const MainContainer = styled.div`
+  position: relative;
   display: flex;
+  padding: 30px;
   width: 100vw;
   height: 100vh;
   font-size: 20px;
@@ -17,30 +21,36 @@ const MainContainer = styled.div`
 `;
 
 const AppContainer = styled.div`
+  position: relative;
   display: flex;
   flex: 1;
-  padding: 30px;
   flex-direction: column;
 `;
 
 const App = () => {
   return (
-    <MainContainer>
+    <>
       <Modal />
-      <Route exact path="/" component={HomeLogin} />
-      <Route
-        exact
-        path="/(.+)"
-        render={() => (
-          <AppContainer>
-            <Navbar />
-            <Switch>
-              <Route path="/dashboard" component={Dashboard} />
-            </Switch>
-          </AppContainer>
-        )}
-      />
-    </MainContainer>
+      <MainContainer>
+        <AppContainer>
+          <Route exact path="/" component={HomeLogin} />
+          <Route
+            exact
+            path="/(.+)"
+            render={() => (
+              <>
+                <Navbar />
+                <Switch>
+                  <Route path="/dashboard" component={Dashboard} />
+                  <Route exact path="/orders" component={OrderList} />
+                  <Route path="/orders/:id" component={OrderDetails} />
+                </Switch>
+              </>
+            )}
+          />
+        </AppContainer>
+      </MainContainer>
+    </>
   );
 };
 
