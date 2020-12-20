@@ -21,8 +21,11 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   background-color: #f3f3f3;
-  padding: 15px;
+  padding: 25px;
   color: black;
+  @media screen and (max-width: 300px) {
+    font-size: 15px;
+  };
 `;
 
 const Modal = () => {

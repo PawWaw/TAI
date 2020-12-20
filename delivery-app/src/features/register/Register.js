@@ -13,7 +13,7 @@ const Header = styled.h1`
 const Register = () => {
   return (
     <>
-      <Header>Fill up fields to register</Header>
+      <Header>Provide valid data</Header>
       <Form>
         <IconInput icon="../assets/svg/user.svg" placeholder="Username" />
         <IconInput icon="../assets/svg/lock.svg" placeholder="Password" type="password" />
