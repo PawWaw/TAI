@@ -1,0 +1,17 @@
+.route-marker {
+  align-items: center;
+  background-size: cover;
+  display: flex;
+  height: 32px;
+  justify-content: center;
+  transition: width 0.1s, height 0.1s;
+  width: 32px;
+}
+
+.start {
+  background-image: url("./markers/startPin.svg");
+}
+
+.finish {
+  background-image: url("./markers/endPin.svg");
+}

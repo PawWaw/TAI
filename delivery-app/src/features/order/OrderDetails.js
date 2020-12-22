@@ -3,6 +3,7 @@ import styled from "styled-components";
 import Button from "../../app/common/Button";
 import { PageHeader } from "../../app/common/PageHeader";
 import { SvgIcon } from "../../app/common/SvgIcon";
+import TomTomMap from "../map/TomTomMap";
 
 const Wrapper = styled.div`
   flex: 1;
@@ -18,6 +19,10 @@ const Order = styled.h2`
 const Field = styled.div`
   display: flex;
   flex-direction: column;
+`;
+
+const MapField = styled(Field)`
+  flex: 1;
 `;
 
 const FirstLine = styled(Field)`
@@ -74,16 +79,12 @@ const OrderDetails = ({ match }) => {
         <HeaderLabel>Distance:</HeaderLabel>
         <DataLabel>15km</DataLabel>
       </Field>
-      <Field>
+      <MapField>
         <HeaderLabel>Map:</HeaderLabel>
-        <SvgIcon
-          alt="scooter"
-          src="assets/svg/scooter.svg"
-          width="80%"
-        />
-      </Field>
-      <Button secondary margin="0.7em 0 0 0">
-        Delievered
+        <TomTomMap locations="4.8786,52.3679:4.8798,52.3679"/>
+      </MapField>
+      <Button secondary margin="0.5em 0 0 0">
+        Delivered
       </Button>
     </Wrapper>
   );

@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { ModalHeader } from "../../app/common/ModalHeader";
 import { SvgIcon } from "../../app/common/SvgIcon";
+import TomTomMap from "../map/TomTomMap";
 
 
 
@@ -20,6 +21,11 @@ const LabelData = styled.h3`
   font-size: 0.8em;
   color: #9a9a9a;
   margin-top: -0.7em;
+`;
+
+const MapWrapper = styled.div`
+  border: 0.5px solid black;
+  height: 20vh;
 `;
 
 const ButtonsWrapper = styled.div`
@@ -47,7 +53,9 @@ const OrderPopup = () => {
       </Field>
       <Field>
         <LabelHeader>Map:</LabelHeader>
-        <SvgIcon src="assets/svg/scooter.svg" width="100%" />
+        <MapWrapper>
+          <TomTomMap locations="4.8786,52.3679:4.8798,52.3679"/>
+        </MapWrapper>
       </Field>
       <ButtonsWrapper>
           <SvgIcon src="assets/svg/tick.svg" height="30px"/>

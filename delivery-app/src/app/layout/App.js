@@ -37,6 +37,7 @@ const AppContainer = styled.div`
 `;
 
 const App = () => {
+
   return (
     <>
       <Modal />
