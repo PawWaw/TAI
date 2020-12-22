@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import "./TomTomMap.css"
 
-const TomTomMap = ({ locations }) => {
+const TomTomMap = ({ locations, setDistance }) => {
     const mapRef = useRef();
     const ttRef = useRef();
   
@@ -83,6 +83,8 @@ const TomTomMap = ({ locations }) => {
             );
   
             addMarkers(geojson.features[0]);
+            const summary = geojson.features[0].properties.summary;
+            setDistance(summary.lengthInMeters/1000.0)
   
             var bounds = new tt.LngLatBounds();
             geojson.features[0].geometry.coordinates.forEach(function (point) {

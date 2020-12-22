@@ -29,7 +29,8 @@ const Order = styled.h1`
 `;
 
 const OrderInfo = () => {
-  const [modal, setModal] = useRecoilState(modalState)
+  const [, setModal] = useRecoilState(modalState)
+
   const ordersCount = 2;
   const handleOrderClick = () => {
     if (ordersCount > 0) {
@@ -38,10 +39,13 @@ const OrderInfo = () => {
   };
 
   const handleFindOrder = () => {
-    setModal({
-      opened: true,
-      body: <OrderPopup/>
-    })
+      navigator.geolocation.getCurrentPosition((position) => {
+        console.log(position.coords)
+        setModal({
+          opened: true,
+          body: <OrderPopup  />
+        })
+      })
   }
 
   return (

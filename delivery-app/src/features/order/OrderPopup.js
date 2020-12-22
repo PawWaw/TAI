@@ -1,10 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { ModalHeader } from "../../app/common/ModalHeader";
 import { SvgIcon } from "../../app/common/SvgIcon";
 import TomTomMap from "../map/TomTomMap";
-
-
 
 const Field = styled.div`
   display: flex;
@@ -36,6 +34,7 @@ const ButtonsWrapper = styled.div`
 `;
 
 const OrderPopup = () => {
+  const [distance, setDistance] = useState(0);
   return (
     <>
       <ModalHeader>Found order!</ModalHeader>
@@ -49,17 +48,20 @@ const OrderPopup = () => {
       </Field>
       <Field>
         <LabelHeader>Distance:</LabelHeader>
-        <LabelData>15km</LabelData>
+        <LabelData>{distance} km</LabelData>
       </Field>
       <Field>
         <LabelHeader>Map:</LabelHeader>
         <MapWrapper>
-          <TomTomMap locations="4.8786,52.3679:4.8798,52.3679"/>
+          <TomTomMap
+            locations="4.8786,52.3679:4.8798,52.3679"
+            setDistance={(dist) => setDistance(dist)}
+          />
         </MapWrapper>
       </Field>
       <ButtonsWrapper>
-          <SvgIcon src="assets/svg/tick.svg" height="30px"/>
-          <SvgIcon src="assets/svg/reject.svg" height="30px"/>
+        <SvgIcon src="assets/svg/tick.svg" height="30px" />
+        <SvgIcon src="assets/svg/reject.svg" height="30px" />
       </ButtonsWrapper>
     </>
   );

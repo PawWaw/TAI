@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Route, Switch } from "react-router-dom";
 import HomeLogin from "../../features/home/HomeLogin";
 import Modal from "../common/Modal";
@@ -37,7 +37,7 @@ const AppContainer = styled.div`
 `;
 
 const App = () => {
-
+  
   return (
     <>
       <Modal />
