@@ -1,20 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "F:\\For_Laptop\\TAI\\Projekt\\Backend\\Backend.csproj": {}
+    "D:\\repos\\TAI\\Backend\\Backend.csproj": {}
   },
   "projects": {
-    "F:\\For_Laptop\\TAI\\Projekt\\Backend\\Backend.csproj": {
+    "D:\\repos\\TAI\\Backend\\Backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\For_Laptop\\TAI\\Projekt\\Backend\\Backend.csproj",
+        "projectUniqueName": "D:\\repos\\TAI\\Backend\\Backend.csproj",
         "projectName": "Backend",
-        "projectPath": "F:\\For_Laptop\\TAI\\Projekt\\Backend\\Backend.csproj",
-        "packagesPath": "C:\\Users\\Bartek\\.nuget\\packages\\",
-        "outputPath": "F:\\For_Laptop\\TAI\\Projekt\\Backend\\obj\\",
+        "projectPath": "D:\\repos\\TAI\\Backend\\Backend.csproj",
+        "packagesPath": "C:\\Users\\Maciek\\.nuget\\packages\\",
+        "outputPath": "D:\\repos\\TAI\\Backend\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Bartek\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Maciek\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -26,7 +29,6 @@
         },
         "frameworks": {
           "netcoreapp3.1": {
-            "targetAlias": "netcoreapp3.1",
             "projectReferences": {}
           }
         },
@@ -38,6 +40,9 @@
       },
       "frameworks": {
         "netcoreapp3.1": {
+<<<<<<< HEAD
+          "dependencies": {
+=======
           "targetAlias": "netcoreapp3.1",
           "dependencies": {
             "Microsoft.ApplicationInsights": {
@@ -48,6 +53,7 @@
               "target": "Package",
               "version": "[5.0.1, )"
             },
+>>>>>>> b8401a18b3ee83f308c6064ed5accb013234c837
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
               "version": "[5.0.1, )"
@@ -77,7 +83,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
         }
       }
     }
