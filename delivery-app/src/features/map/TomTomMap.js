@@ -4,8 +4,10 @@ import "./TomTomMap.css"
 const TomTomMap = ({ locations, setDistance }) => {
     const mapRef = useRef();
     const ttRef = useRef();
+    
   
     useEffect(() => {
+      console.log("lul")
       const tt = window.tt;
       console.log(window.tt)
       const map = tt.map({

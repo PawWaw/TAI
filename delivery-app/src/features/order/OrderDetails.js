@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import Button from "../../app/common/Button";
 import { PageHeader } from "../../app/common/PageHeader";
@@ -49,6 +49,7 @@ const statusColors = {
 
 const OrderDetails = ({ match }) => {
   const id = match.params.id;
+  const [distance, setDistance] = useState(0);
   return (
     <Wrapper>
       <PageHeader>Order details</PageHeader>
@@ -77,11 +78,14 @@ const OrderDetails = ({ match }) => {
       </Field>
       <Field>
         <HeaderLabel>Distance:</HeaderLabel>
-        <DataLabel>15km</DataLabel>
+        <DataLabel>{distance} km</DataLabel>
       </Field>
       <MapField>
         <HeaderLabel>Map:</HeaderLabel>
-        <TomTomMap locations="4.8786,52.3679:4.8798,52.3679"/>
+        <TomTomMap
+          locations="4.8786,52.3679:4.8798,52.3679"
+          setDistance={(distance) => setDistance(distance)}
+        />
       </MapField>
       <Button secondary margin="0.5em 0 0 0">
         Delivered

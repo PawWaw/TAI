@@ -68,7 +68,7 @@ const OrderList = () => {
         </MenuItem>
       </MenuWrapper>
       <OrdersWrapper>
-        {new Array(10).fill(undefined).map((i) => (
+        {new Array(10).fill(undefined).map((a, i) => (
           <OrderShortDetails
             key={i}
             id={231}

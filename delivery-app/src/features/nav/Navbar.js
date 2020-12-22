@@ -30,6 +30,7 @@ const Menu = styled.div`
 const MenuItem = styled.h1`
   color: white;
   font-size: 1.3em;
+  cursor: pointer;
   margin-bottom: 1em;
   text-decoration: none;
   align-self: center;
