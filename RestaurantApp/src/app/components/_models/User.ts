@@ -1,10 +1,10 @@
-export class User{
-    id: string;
+export class User {
+    id: number;
     username: string;
     password: string;
     email: string;
     firstName: string;
     lastName: string;
-    phoneNumber: string;
-    householdId: string;
+    cityId: number;
+    address: string;
   }

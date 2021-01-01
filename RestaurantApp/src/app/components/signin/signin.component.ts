@@ -30,7 +30,19 @@ export class SigninComponent implements OnInit {
   get password() { return this.formGroup.get('password'); }
 
   onSubmit(){
+    this.loading=true;
 
+    this.formGroup.patchValue({username: this.username.value.toString().toLowerCase()});
+
+    this.authService.authenticate(this.formGroup.value).subscribe(
+      data=>{
+        this.router.navigate(['/history']);
+      },
+      error=>{
+        this.error=true;
+        this.loading=false;
+      }
+    );
   }
 
 }

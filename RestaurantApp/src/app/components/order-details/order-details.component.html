@@ -1,0 +1,33 @@
+<div (click)='backClicked()'>
+    <img src="assets/left-arrow.svg" width='50' class="logo">
+    <img src="assets/dragon.svg" width='150' class="logoMain">
+    <br>
+    <h1>Order details:</h1>
+</div>
+<div class="background">
+    <form autocomplete="off" class="order-form">
+      <p>
+        <mat-form-field class="register-full-width">
+          <input name="ID" matInput [(ngModel)]="this.order.id" readonly>
+          <mat-hint>ID</mat-hint>
+        </mat-form-field>
+        <mat-form-field class="register-full-width">
+          <input name="orderStation" matInput [(ngModel)]="this.order.orderStation" readonly>
+          <mat-hint>Order station</mat-hint>
+        </mat-form-field>
+        <mat-form-field class="register-full-width">
+          <input name="deliverer" matInput [(ngModel)]="this.order.deliverer" readonly>
+          <mat-hint>Deliverer</mat-hint>
+        </mat-form-field>
+        <mat-form-field class="register-full-width">
+          <input name="startTime" matInput [(ngModel)]="this.order.startTime" readonly>
+          <mat-hint>Start time</mat-hint>
+        </mat-form-field>
+        <mat-form-field class="register-full-width">
+          <input name="endtime" matInput [(ngModel)]="this.order.endTime" readonly>
+          <mat-hint>End time</mat-hint>
+        </mat-form-field>
+      </p>
+    </form>
+  </div>
+  

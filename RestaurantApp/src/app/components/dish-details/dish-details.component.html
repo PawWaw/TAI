@@ -1,0 +1,31 @@
+<div (click)='backClicked()'>
+    <img src="assets/left-arrow.svg" width='50' class="logo">
+    <img src="assets/dragon.svg" width='150' class="logoMain">
+    <br>
+    <h1>Dish details:</h1>
+</div>
+<div class="background">
+    <form autocomplete="off" class="dish-form">
+      <p>
+        <mat-form-field class="dish-full-width">
+          <input name="ID" matInput [(ngModel)]="this.dish.id" readonly>
+          <mat-hint>ID</mat-hint>
+        </mat-form-field>
+        <mat-form-field class="dish-full-width">
+          <input name="name" matInput [(ngModel)]="this.dish.name" readonly>
+          <mat-hint>Name</mat-hint>
+        </mat-form-field>
+        <mat-form-field class="dish-full-width">
+          <input name="price" matInput [(ngModel)]="this.dish.price" readonly>
+          <mat-hint>Price</mat-hint>
+        </mat-form-field>
+        <mat-list role="list">
+            <mat-list-item *ngFor="let ingredient of ingredients">
+                {{ ingredient.name }}
+            </mat-list-item>
+            <mat-hint>Ingredients</mat-hint>
+        </mat-list>
+      </p>
+    </form>
+  </div>
+  

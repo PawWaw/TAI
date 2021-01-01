@@ -1,0 +1,73 @@
+.logo {
+    padding-left: 35px;
+    cursor: pointer;
+}
+
+.logoMain {
+  display: block;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+}
+
+.dish-form {
+    min-width: 150px;
+    max-width: 500px;
+    width: 100%;
+    margin: auto;
+    padding: 50px;
+    position: relative;
+    align-items: center;
+}
+
+.dish-full-width {
+  width: 100%;
+}
+
+.button {
+  display: inline-block;
+  background: #e7ecef;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #30475E;
+  text-align: center;
+  padding: 20px;
+  width: 200px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+  position: absolute;
+  left: 200px;
+}
+
+.button:hover {
+    background: #30475E;
+    color: #e7ecef;
+}
+
+.button span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.button span:after {
+  content: '\25BA';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
+.button:hover span {
+  padding-right: 25px;
+}
+
+.button:hover span:after {
+  opacity: 1;
+  right: 0;
+}

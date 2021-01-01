@@ -2,8 +2,14 @@
     <button mat-button routerLink="" class="headerMenu">
         Home
     </button>
-    <button mat-button [matMenuTriggerFor]="searchTypes" class="headerMenu">
-        Search types
+    <button mat-button routerLink="/dish" class="headerMenu">
+        Dishes
+    </button>
+    <button mat-button routerLink="/order" class="headerMenu">
+        Orders
+    </button>
+    <button mat-button routerLink="/history" class="headerMenu">
+        Order history
     </button>
     <button mat-button routerLink="/signup" class="signup">
         Sign Up
@@ -12,25 +18,7 @@
         Sign In
     </button>
     
-    <mat-form-field class="login-form">
+    <!-- <mat-form-field class="login-form">
         <input matInput placeholder="Search">
-    </mat-form-field>
-
-    <mat-menu #searchTypes="matMenu">
-        <button mat-menu-item routerLink="/dish">
-            Dish
-        </button>
-        <button mat-menu-item [matMenuTriggerFor]="cuisineTypes" class="headerMenu">
-            Cuisine
-        </button>
-    </mat-menu>
-
-    <mat-menu #cuisineTypes="matMenu">
-        <button mat-menu-item routerLink="/local">
-            Mexican
-        </button>
-        <button mat-menu-item routerLink="/local">
-            American
-        </button>
-    </mat-menu>
+    </mat-form-field> -->
 </div>

@@ -25,7 +25,10 @@ import { SignupComponent } from './components/signup/signup.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OAuthModule } from 'angular-oauth2-oidc';
 import { DishComponent } from './components/dish/dish.component';
-import { LocalComponent } from './components/local/local.component';
+import { OrderComponent } from './components/order/order.component';
+import { OrderHistoryComponent } from './components/order-history/order-history.component';
+import { OrderDetailsComponent } from './components/order-details/order-details.component';
+import { DishDetailsComponent } from './components/dish-details/dish-details.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +38,10 @@ import { LocalComponent } from './components/local/local.component';
     SigninComponent,
     SignupComponent,
     DishComponent,
-    LocalComponent,
+    OrderComponent,
+    OrderHistoryComponent,
+    OrderDetailsComponent,
+    DishDetailsComponent,
   ],
   imports: [
     BrowserModule,
