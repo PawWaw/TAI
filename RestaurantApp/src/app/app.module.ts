@@ -29,6 +29,9 @@ import { OrderComponent } from './components/order/order.component';
 import { OrderHistoryComponent } from './components/order-history/order-history.component';
 import { OrderDetailsComponent } from './components/order-details/order-details.component';
 import { DishDetailsComponent } from './components/dish-details/dish-details.component';
+import { MatIconModule } from '@angular/material';
+import { DishModifyComponent } from './components/dish-modify/dish-modify.component';
+import { AddDishComponent } from './components/add-dish/add-dish.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +45,8 @@ import { DishDetailsComponent } from './components/dish-details/dish-details.com
     OrderHistoryComponent,
     OrderDetailsComponent,
     DishDetailsComponent,
+    DishModifyComponent,
+    AddDishComponent
   ],
   imports: [
     BrowserModule,
@@ -56,6 +61,7 @@ import { DishDetailsComponent } from './components/dish-details/dish-details.com
     MatSortModule,
     MatButtonModule,
     MatMenuModule,
+    MatIconModule,
     MatSelectModule,
     HttpClientModule,
     ReactiveFormsModule,

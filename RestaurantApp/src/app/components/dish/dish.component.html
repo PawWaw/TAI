@@ -22,9 +22,18 @@
               <td mat-cell *matCellDef="let data"> {{data.price}} </td>
             </ng-container>
 
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef> Action </th>
+                <td mat-cell *matCellDef="let element">
+                  <button mat-mini-fab color="black" id="button" (click)="editRecord(element)"><mat-icon>edit</mat-icon></button>
+                  <button mat-mini-fab color="black" (click)="getRecord(element)"><mat-icon>info</mat-icon></button>
+                </td>
+            </ng-container>
+
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="getRecord(row)"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
+        <button mat-raised-button class="button" (click)="addDish()"><span>Add new</span></button>
     </div>
     <div id="footer">
         <mat-paginator

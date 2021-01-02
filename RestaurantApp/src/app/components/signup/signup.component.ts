@@ -81,6 +81,22 @@ export class SignupComponent implements OnInit {
   }
 
   onSubmit() {
+    // if (this.formGroup.invalid) {
+    //   return;
+    // }
+    // this.loading = true;
+
+    // this.formGroup.patchValue({username: this.username.value.toString().toLowerCase()});
+
+    // this.userService.postUser(this.formGroup.value).pipe(first()).subscribe(
+    //   data => {
+    //     this.router.navigate(['/signin']);
+    //   },
+    //   error => {
+    //     this.loading = false;
+    //     this.errorText = "Username and/or email are already taken!"
+    //   }
+    // )
   }
 
   matcher = new MyErrorStateMatcher();

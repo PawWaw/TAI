@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Order } from '../_models/Order';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-details',
@@ -14,6 +15,7 @@ export class OrderDetailsComponent implements OnInit {
   order: Order;
 
   constructor(
+    private router: Router,
     private _location: Location,
     private formBuilder: FormBuilder,
     ) { }

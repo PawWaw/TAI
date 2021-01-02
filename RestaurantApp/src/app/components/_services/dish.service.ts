@@ -11,37 +11,16 @@ export class DishService {
   Dishes: Dish[] = [
     {
       id: 1,
-      name: 'spaghetti',
+      name: 'Spaghetti',
       price: 16.99,
       ingredients: [
-        {
-          id: 1,
-          name: 'makaron pszenny'
-        },
-        {
-          id: 2,
-          name: 'sos pomidorowy'
-        },
-        {
-          id: 3,
-          name: 'mięso mielone'
-        }
-      ]
+          'Makaron pszenny', 'Sos pomidorowy', 'Mięso mielone']
     },
     {
       id: 2,
-      name: 'omlet',
+      name: 'Omlet',
       price: 12.99,
-      ingredients: [
-        {
-          id: 4,
-          name: 'ziemniaki'
-        },
-        {
-          id: 6,
-          name: 'jajko'
-        }
-      ]
+      ingredients: ['Ziemniaki','Jajko']
     },
     {
       id: 3,

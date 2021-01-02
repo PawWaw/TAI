@@ -13,7 +13,7 @@ export class DishDetailsComponent implements OnInit {
 
   formGroup: FormGroup;
   dish: Dish;
-  ingredients: Ingredient[];
+  ingredients: String[];
 
   constructor(
     private _location: Location,

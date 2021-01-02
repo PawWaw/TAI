@@ -14,7 +14,7 @@ export class DishComponent implements OnInit {
   dishes: Dish[];
   data: any;
   dataSource: any;
-  displayedColumns: string[] = ['id', 'name', 'price'];
+  displayedColumns: string[] = ['id', 'name', 'price', 'action'];
 
   constructor(
     private router: Router,
@@ -34,7 +34,15 @@ export class DishComponent implements OnInit {
 
   getRecord(row: Dish) {
     localStorage.setItem('row', JSON.stringify(row));
-    console.log(row);
     this.router.navigate(['/dish/details', {id: row.id}]);
+  }
+
+  editRecord(row: Dish) {
+    localStorage.setItem('row', JSON.stringify(row));
+    this.router.navigate(['dish/modify', {id: row.id}]);
+  }
+
+  addDish() {
+    this.router.navigate(['dish/create']);
   }
 }
