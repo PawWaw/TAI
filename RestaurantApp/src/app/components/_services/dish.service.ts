@@ -46,10 +46,10 @@ export class DishService {
     return this.Dishes;
   }
 
-  public getSingleDish(name: string): Dish {
+  public getSingleDish(id: number): Dish {
   // public getSingleDish(name: string): Observable<Dish> {
-  //   return this.http.get<Dish>(this.dishUrl + "/" + name, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
-    return this.Dishes.find(x => x.name == name);
+  //   return this.http.get<Dish>(this.dishUrl + "/" + id, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
+    return this.Dishes.find(x => x.id == id);
   }
 
   public postDish(dish: Dish) {
@@ -58,7 +58,7 @@ export class DishService {
   }
 
   public modifyDish(dish: Dish) {
-    this.http.patch(this.dishUrl, dish, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
+    this.http.patch(this.dishUrl + "/" + dish.id, dish, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
   }
 
   errorHandler(error: HttpErrorResponse) {

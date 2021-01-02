@@ -15,9 +15,17 @@
           <input name="orderStation" matInput [(ngModel)]="this.order.orderStation" readonly>
           <mat-hint>Order station</mat-hint>
         </mat-form-field>
-        <mat-form-field class="register-full-width">
+        <mat-form-field class="register-full-width" *ngIf="isDelivered">
           <input name="deliverer" matInput [(ngModel)]="this.order.deliverer" readonly>
           <mat-hint>Deliverer</mat-hint>
+        </mat-form-field>
+        <mat-form-field class="register-full-width" *ngIf="!isDelivered">
+          <mat-label>Choose deliverer</mat-label>
+          <mat-select (selectionChange)="selectedValue($event)">
+            <mat-option *ngFor="let deliverer of deliverers" [value]="deliverer">
+              {{deliverer}}
+            </mat-option>
+          </mat-select>
         </mat-form-field>
         <mat-form-field class="register-full-width">
           <input name="startTime" matInput [(ngModel)]="this.order.startTime" readonly>
@@ -28,6 +36,7 @@
           <mat-hint>End time</mat-hint>
         </mat-form-field>
       </p>
+      <button mat-raised-button class="button" *ngIf="!isDelivered" (click)="modifyItem()"><span>Save</span></button>
     </form>
   </div>
   

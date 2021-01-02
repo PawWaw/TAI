@@ -20,11 +20,13 @@
           <mat-hint>Price</mat-hint>
         </mat-form-field>
         <mat-list role="list">
-            <mat-list-item *ngFor="let ingredient of ingredients">
-                {{ ingredient.name }}
-            </mat-list-item>
-            <mat-hint>Ingredients</mat-hint>
-        </mat-list>
+          <mat-list-item *ngFor="let ingredient of ingredients">
+              <div>
+                  {{ ingredient }}
+              </div>
+          </mat-list-item>
+          <mat-hint>Ingredients</mat-hint>
+      </mat-list>
       </p>
     </form>
   </div>

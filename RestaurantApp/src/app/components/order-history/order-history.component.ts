@@ -16,7 +16,7 @@ export class OrderHistoryComponent implements OnInit {
   orders: Order[];
   data: any;
   dataSource: any;
-  displayedColumns: string[] = ['id', 'status', 'startTime', 'endTime'];
+  displayedColumns: string[] = ['id', 'status', 'deliverer', 'startTime', 'endTime'];
 
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 

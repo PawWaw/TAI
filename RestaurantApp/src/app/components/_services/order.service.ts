@@ -9,6 +9,8 @@ import { Order } from '../_models/Order';
   providedIn: 'root'
 })
 export class OrderService {
+  Deliverers: String[] = ['Dzidosław Żuberek', 'Andrzej Andrzejczak', 'Susan Wójcicki']
+
   Orders: Order[] = [
     {
       id: 1,
@@ -37,15 +39,16 @@ export class OrderService {
       orderStationId: 2,
       delivererId: 3,
       userId: 3,
-      status: "pending",
+      status: "waiting",
       startTime: "16:50:00",
       endTime: "-",
-      deliverer: "Andrzej Andrzejewski",
+      deliverer: "",
       orderStation: "Sosnowiec"
     }
   ]
 
   orderUrl = 'http://localhost:8080/order';
+  delivererUrl = 'http://localhost:8080/deliverer'
   temp: any;
 
   constructor(private http: HttpClient) { 
@@ -54,6 +57,12 @@ export class OrderService {
   httpHeader = new HttpHeaders({
     'Content-Type': 'application/json'
   });
+
+  public getDeliverers(): String[] {
+    // public getDeliverers(): Observable<String[]> {
+    //return this.http.get<Order[]>(this.delivererUrl, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
+    return this.Deliverers;
+  }
 
   public getOrders(): Order[] {
   // public getOrders(): Observable<Order[]> {
