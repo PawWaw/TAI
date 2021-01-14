@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(DragorantContext))]
-    [Migration("20201222184629_DragorantInitial")]
-    partial class DragorantInitial
+    [Migration("20210114155805_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,7 +20,7 @@ namespace Backend.Migrations
                 .UseIdentityColumns()
                 .HasAnnotation("Relational:Collation", "Polish_CI_AS")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.1");
+                .HasAnnotation("ProductVersion", "5.0.2");
 
             modelBuilder.Entity("Backend.Model.City", b =>
                 {

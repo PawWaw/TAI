@@ -18,7 +18,7 @@ namespace Backend.Migrations
                 .UseIdentityColumns()
                 .HasAnnotation("Relational:Collation", "Polish_CI_AS")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.1");
+                .HasAnnotation("ProductVersion", "5.0.2");
 
             modelBuilder.Entity("Backend.Model.City", b =>
                 {

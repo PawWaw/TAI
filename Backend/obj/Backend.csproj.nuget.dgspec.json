@@ -1,23 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\repos\\TAI\\Backend\\Backend.csproj": {}
+    "F:\\For_Laptop\\TAI\\TAI\\Backend\\Backend.csproj": {}
   },
   "projects": {
-    "D:\\repos\\TAI\\Backend\\Backend.csproj": {
+    "F:\\For_Laptop\\TAI\\TAI\\Backend\\Backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\repos\\TAI\\Backend\\Backend.csproj",
+        "projectUniqueName": "F:\\For_Laptop\\TAI\\TAI\\Backend\\Backend.csproj",
         "projectName": "Backend",
-        "projectPath": "D:\\repos\\TAI\\Backend\\Backend.csproj",
-        "packagesPath": "C:\\Users\\Maciek\\.nuget\\packages\\",
-        "outputPath": "D:\\repos\\TAI\\Backend\\obj\\",
+        "projectPath": "F:\\For_Laptop\\TAI\\TAI\\Backend\\Backend.csproj",
+        "packagesPath": "C:\\Users\\Bartek\\.nuget\\packages\\",
+        "outputPath": "F:\\For_Laptop\\TAI\\TAI\\Backend\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Maciek\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Bartek\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -29,6 +26,7 @@
         },
         "frameworks": {
           "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
             "projectReferences": {}
           }
         },
@@ -40,29 +38,27 @@
       },
       "frameworks": {
         "netcoreapp3.1": {
-<<<<<<< HEAD
-          "dependencies": {
-=======
           "targetAlias": "netcoreapp3.1",
           "dependencies": {
-            "Microsoft.ApplicationInsights": {
-              "target": "Package",
-              "version": "[2.16.0, )"
-            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[5.0.1, )"
+              "version": "[5.0.2, )"
             },
->>>>>>> b8401a18b3ee83f308c6064ed5accb013234c837
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[5.0.2, )"
+            },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
-              "version": "[5.0.1, )"
+              "version": "[5.0.2, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[5.0.1, )"
+              "version": "[5.0.2, )"
             }
           },
           "imports": [
@@ -83,7 +79,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.102\\RuntimeIdentifierGraph.json"
         }
       }
     }
