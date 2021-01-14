@@ -5,6 +5,11 @@
       "type": "secrets.user",
       "connectionId": null,
       "secretStore": null
+    },
+    "mssql1": {
+      "type": "mssql.local",
+      "connectionId": "DefaultConnection",
+      "secretStore": "LocalSecretsFile"
     }
   }
 }
