@@ -8,6 +8,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Model
 {
+    public class Dish
+    {
+        public string name { get; set; }
+        public double price { get; set; }
+        public string[] ingredients { get; set; }
+    }
+
     [Table("Food")]
     public partial class Food
     {
@@ -16,6 +23,12 @@ namespace Backend.Model
             FoodIngredients = new HashSet<FoodIngredient>();
             FoodOrders = new HashSet<FoodOrder>();
             FoodRates = new HashSet<FoodRate>();
+        }
+
+        public void inject_data(Dish dish)
+        { 
+            Name = dish.name;
+            Price = dish.price;
         }
 
         [Key]

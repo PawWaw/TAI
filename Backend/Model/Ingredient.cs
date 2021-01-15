@@ -25,5 +25,6 @@ namespace Backend.Model
 
         [InverseProperty(nameof(FoodIngredient.Ingredient))]
         public virtual ICollection<FoodIngredient> FoodIngredients { get; set; }
+
     }
 }

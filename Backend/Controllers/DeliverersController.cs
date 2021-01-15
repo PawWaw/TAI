@@ -27,6 +27,8 @@ namespace Backend.Controllers
             return await _context.Deliverers.ToListAsync();
         }
 
+        []
+
         // GET: api/Deliverers/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Deliverer>> GetDeliverer(long id)
