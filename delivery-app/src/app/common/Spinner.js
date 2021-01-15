@@ -18,7 +18,7 @@ export const Spinner = styled.div`
   border-bottom: 2px solid grey;
   border-left: 4px solid black;
   background: transparent;
-  width: 1.65em;
-  height: 1.65em;
+  width: 1.25em;
+  height: 1.25em;
   border-radius: 50%;
 `;

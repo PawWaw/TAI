@@ -14,7 +14,7 @@ const Value = styled.h1`
 `;
 
 const Caption = styled.h2`
-margin-top: -0.7em;
+  margin-top: -0.7em;
   color: #e5e5e5;
   font-size: 1em;
 `;
@@ -23,7 +23,7 @@ const StatisticItem = ({ statistic }) => {
   return (
     <Wrapper>
       <Value>{statistic.value}</Value>
-      <Caption>{statistic.caption}</Caption>
+      <Caption>{statistic.name}</Caption>
     </Wrapper>
   );
 };

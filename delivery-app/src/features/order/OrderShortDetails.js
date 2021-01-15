@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { history } from "../..";
 import { SvgIcon } from "../../app/common/SvgIcon";
+import {format} from "date-fns"
 
 const Wrapper = styled.div`
   display: flex;
@@ -42,14 +43,14 @@ const DataText = styled.h3`
   margin-left: 5px;
 `;
 
-const OrderShortDetails = ({ id, startDate, restaurant, client }) => {
+const OrderShortDetails = ({ id, endDate, restaurant, client }) => {
   const handleItemClick = () => {
       history.push(`/orders/${id}`)
   };
   return (
     <Wrapper onClick={handleItemClick}>
       <FirstLine>
-        <DateText>{startDate}</DateText>
+        <DateText>{ format(new Date(endDate), "HH:mm dd-MM-yyy")}</DateText>
         <IdText>#{id}</IdText>
       </FirstLine>
       <DataWrapper>

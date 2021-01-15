@@ -1,5 +1,7 @@
 import React from "react";
+import { useRecoilValue } from "recoil";
 import styled from "styled-components";
+import { infoSelector } from "../../app/recoil/DashboardState";
 import StatisticItem from "./StatisticItem";
 
 const Wrapper = styled.div`
@@ -8,24 +10,12 @@ const Wrapper = styled.div`
 `;
 
 const Statistics = () => {
-  const stats = [
-    {
-      caption: "Client rate",
-      value: "3.39",
-    },
-    {
-      caption: "Total delivery",
-      value: "402",
-    },
-    {
-      caption: "Max daily orders",
-      value: "12",
-    },
-  ];
+  const stats = useRecoilValue(infoSelector)
+    
   return (
     <Wrapper>
       {stats.map((s) => (
-        <StatisticItem key={s.caption} statistic={s} />
+        <StatisticItem key={s.name} statistic={s} />
       ))}
     </Wrapper>
   );

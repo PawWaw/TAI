@@ -8,6 +8,7 @@ import { useRecoilState } from "recoil";
 import { modalState } from "../../app/recoil/ModalState";
 import Register from "../register/Register";
 import { history } from "../..";
+import LoginForm from "./LoginForm";
 
 const Container = styled.div`
   display: flex;
@@ -23,32 +24,19 @@ const Wrapper = styled.div`
 
 const HomeLogin = () => {
   const [modal, setModal] = useRecoilState(modalState);
-  const handleLogin = () => {
-    history.push("/dashboard");
-  };
+
   const openRegisterForm = () => {
     setModal({
       opened: true,
       body: <Register />,
     });
   };
+
   return (
     <Container>
       <Wrapper>
         <VerticalLogo />
-        <Form>
-          <Field>
-            <Label>Username</Label>
-            <Input />
-          </Field>
-          <Field>
-            <Label>Password</Label>
-            <Input type="password" />
-          </Field>
-          <Button fluid style={{ marginTop: "20px" }} onClick={handleLogin}>
-            Login
-          </Button>
-        </Form>
+        <LoginForm/>
         <Separator margin="10px 0px" />
         <Button fluid secondary onClick={openRegisterForm}>
           Register

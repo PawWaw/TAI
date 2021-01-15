@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { ModalHeader } from "../../app/common/ModalHeader";
 import { SvgIcon } from "../../app/common/SvgIcon";
+import { acceptOrderSelector, declineOrderSelector, newOrderState } from "../../app/recoil/NewOrderState";
 import { findCoordinatesByAddress } from "../../app/util/util";
 import TomTomMap from "../map/TomTomMap";
 
@@ -35,19 +37,20 @@ const ButtonsWrapper = styled.div`
 `;
 
 const OrderPopup = () => {
+  const order = useRecoilValue(newOrderState)
+  const declineOrder = useSetRecoilState(declineOrderSelector)
+  const acceptOrder = useSetRecoilState(acceptOrderSelector)
   const [distance, setDistance] = useState(0);
-  const restaurant = "ul. Kwiatowa 15/7 Katowice";
   const [ready, setReady] = useState(false);
   const [restaurantCoords, setRestaurantCoords] = useState(undefined);
-  const client = "ul. Kwiatowa 15/7 Katowice";
   const [clientCoords, setClientCoords] = useState(undefined);
 
   useEffect(() => {
     const runSync = () => {
-      findCoordinatesByAddress("Mariacka 24, 40-015 Katowice").then((c) =>
+      findCoordinatesByAddress(order.restaurant).then((c) =>
         setRestaurantCoords(c.results[0].position)
       );
-      findCoordinatesByAddress("Bankowa 12, 40-007 Katowice").then((c) =>
+      findCoordinatesByAddress(order.client).then((c) =>
         setClientCoords(c.results[0].position)
       );
       setReady(true);
@@ -55,7 +58,6 @@ const OrderPopup = () => {
     runSync();
   }, []);
 
-  console.log(ready);
 
   if (!ready) {
     return <h2>Loading</h2>;
@@ -66,11 +68,11 @@ const OrderPopup = () => {
         <ModalHeader>Found order!</ModalHeader>
         <Field>
           <LabelHeader>Restaurant:</LabelHeader>
-          <LabelData>{restaurant}</LabelData>
+          <LabelData>{order.restaurant}</LabelData>
         </Field>
         <Field>
           <LabelHeader>Client:</LabelHeader>
-          <LabelData>{client}</LabelData>
+          <LabelData>{order.client}</LabelData>
         </Field>
         <Field>
           <LabelHeader>Distance:</LabelHeader>
@@ -81,12 +83,9 @@ const OrderPopup = () => {
           {console.log(restaurantCoords)}
           <MapWrapper>
             {
-              //"4.8786,52.3679:4.8798,52.3679"
-              //"50.25746,19.0279:50.26078,19.02825"
               clientCoords && restaurantCoords && (
                 <TomTomMap
                   locations={`${restaurantCoords.lon},${restaurantCoords.lat}:${clientCoords.lon},${clientCoords.lat}`}
-                  // locations="19.0279,50.25746:19.02825,50.26078"
                   setDistance={(distance) => setDistance(distance)}
                 />
               )
@@ -94,8 +93,8 @@ const OrderPopup = () => {
           </MapWrapper>
         </Field>
         <ButtonsWrapper>
-          <SvgIcon src="assets/svg/tick.svg" height="30px" />
-          <SvgIcon src="assets/svg/reject.svg" height="30px" />
+          <SvgIcon src="assets/svg/tick.svg" height="30px" onClick={acceptOrder} />
+          <SvgIcon src="assets/svg/reject.svg" height="30px" onClick={declineOrder} />
         </ButtonsWrapper>
       </>
     );

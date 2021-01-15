@@ -1,6 +1,9 @@
 import styled, { css } from "styled-components";
 import { Spinner } from "./Spinner";
 
+
+
+
 const ButtonContainer = styled.div`
   display: flex;
   align-items: center;
@@ -14,8 +17,7 @@ const ButtonContainer = styled.div`
   background-color: white;
   box-shadow: 2px 2px 3px 1px rgba(0, 0, 0, 0.25);
   font-family: "Varela", sans-serif;
-  color: #30475e;
-  width: ${(props) => (props.fluid ? "100%" : "innerWidth")};
+  color: #30475e;  
   pointer-events: ${(props) => (props.disabled ? "none" : "auto")};
   cursor: pointer;
   font-size: ${(props) => (props.big ? "1.5em" : "1.3em")};
@@ -32,6 +34,7 @@ const ButtonContainer = styled.div`
       background-color: #f05454;
       color: white;
     `}
+  width: ${(props) => (props.fluid ? "100%" : "innerWidth")};
 `;
 
 const Button = (props) => (

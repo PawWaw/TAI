@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useRecoilValue, useRecoilValueLoadable, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { PageHeader } from "../../app/common/PageHeader";
+import { fetchOrdersHistorySelector, ordersHistoryState } from "../../app/recoil/OrderHistoryState";
 import OrderShortDetails from "./OrderShortDetails";
 
 const Wrapper = styled.div`
@@ -50,6 +52,13 @@ const OrdersWrapper = styled.div`
 
 const OrderList = () => {
   const [activeTab, setActiveTab] = useState("current");
+  const orders = useRecoilValue(ordersHistoryState)
+  const fetchOrders = useSetRecoilState(fetchOrdersHistorySelector)
+
+  useEffect(() => {
+    fetchOrders(true)
+  }, [])
+
   return (
     <Wrapper>
       <PageHeader>Orders</PageHeader>
@@ -68,13 +77,13 @@ const OrderList = () => {
         </MenuItem>
       </MenuWrapper>
       <OrdersWrapper>
-        {new Array(10).fill(undefined).map((a, i) => (
+        {orders.map((order, i) => (
           <OrderShortDetails
             key={i}
-            id={231}
-            startDate={"2020-03-22 12:30"}
-            restaurant={"ul. Kwiatowa 2/18 Katowice"}
-            client={"ul. Sezamkowa 5/10 Katowice"}
+            id={order.id}
+            endDate={order.endDate}
+            restaurant={order.restaurant}
+            client={order.client}
           />
         ))}
       </OrdersWrapper>
