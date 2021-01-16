@@ -85,7 +85,7 @@ const OrderPopup = () => {
             {
               clientCoords && restaurantCoords && (
                 <TomTomMap
-                  locations={`${restaurantCoords.lon},${restaurantCoords.lat}:${clientCoords.lon},${clientCoords.lat}`}
+                  locations={`${restaurantCoords?.lon},${restaurantCoords?.lat}:${clientCoords?.lon},${clientCoords?.lat}`}
                   setDistance={(distance) => setDistance(distance)}
                 />
               )

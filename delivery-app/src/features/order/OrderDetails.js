@@ -1,8 +1,16 @@
-import React, { useState } from "react";
+import { format } from "date-fns/esm";
+import React, { useEffect, useState } from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import Button from "../../app/common/Button";
 import { PageHeader } from "../../app/common/PageHeader";
 import { SvgIcon } from "../../app/common/SvgIcon";
+import {
+  delieveredOrderSelector,
+  selectedOrderState,
+  selectOrderSelector,
+} from "../../app/recoil/SelectedOrderState";
+import { findCoordinatesByAddress } from "../../app/util/util";
 import TomTomMap from "../map/TomTomMap";
 
 const Wrapper = styled.div`
@@ -48,33 +56,63 @@ const statusColors = {
 };
 
 const OrderDetails = ({ match }) => {
-  const id = match.params.id;
   const [distance, setDistance] = useState(0);
+  const order = useRecoilValue(selectedOrderState);
+  const selectOrder = useSetRecoilState(selectOrderSelector);
+  const deliveredOrder = useSetRecoilState(delieveredOrderSelector)
+  const [restaurantCoords, setRestaurantCoords] = useState(undefined);
+  const [clientCoords, setClientCoords] = useState(undefined);
+
+  useEffect(() => {
+    selectOrder(match.params.id);
+  }, []);
+
+  useEffect(() => {
+    const runSync = () => {
+      if (order !== null) {
+        findCoordinatesByAddress(order.restaurant).then((c) =>
+          setRestaurantCoords(c.results[0].position)
+        );
+        findCoordinatesByAddress(order.client).then((c) =>
+          setClientCoords(c.results[0].position)
+        );
+      }
+    };
+    runSync();
+  }, [order]);
+
+  if (order === null) {
+    return <h2>Loading...</h2>;
+  }
   return (
     <Wrapper>
       <PageHeader>Order details</PageHeader>
       <Field>
         <FirstLine>
           <HeaderLabel>Status:</HeaderLabel>
-          <Order>#{id}</Order>
+          <Order>#{order.id}</Order>
         </FirstLine>
-        <DataLabel color={statusColors["In progress"]}>In progress</DataLabel>
+        <DataLabel color={statusColors[order.status]}>In progress</DataLabel>
       </Field>
       <Field>
         <HeaderLabel>Start time:</HeaderLabel>
-        <DataLabel>16:04 22-02-2020</DataLabel>
+        <DataLabel>
+          {format(new Date(order?.startDate), "HH:mm dd-MM-yyy")}
+        </DataLabel>
       </Field>
       <Field>
         <HeaderLabel>End time:</HeaderLabel>
-        <DataLabel>17:24 22-02-2020</DataLabel>
+        <DataLabel>
+          {format(new Date(order?.endDate), "HH:mm dd-MM-yyy")}
+        </DataLabel>
       </Field>
       <Field>
         <HeaderLabel>Restaurant:</HeaderLabel>
-        <DataLabel>ul. Kwiatowa 15/7 Katowice</DataLabel>
+        <DataLabel>{order?.restaurant}</DataLabel>
       </Field>
       <Field>
         <HeaderLabel>Client:</HeaderLabel>
-        <DataLabel>ul. Sezamkowa 5/10 Katowice</DataLabel>
+        <DataLabel>{order?.client}</DataLabel>
       </Field>
       <Field>
         <HeaderLabel>Distance:</HeaderLabel>
@@ -83,11 +121,11 @@ const OrderDetails = ({ match }) => {
       <MapField>
         <HeaderLabel>Map:</HeaderLabel>
         <TomTomMap
-          locations="4.8786,52.3679:4.8798,52.3679"
+             locations={`${restaurantCoords?.lon},${restaurantCoords?.lat}:${clientCoords?.lon},${clientCoords?.lat}`}
           setDistance={(distance) => setDistance(distance)}
         />
       </MapField>
-      <Button secondary margin="0.5em 0 0 0">
+      <Button secondary margin="0.5em 0 0 0" onClick={deliveredOrder}>
         Delivered
       </Button>
     </Wrapper>

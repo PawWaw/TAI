@@ -3,6 +3,7 @@ import { useRecoilValue, useRecoilValueLoadable, useSetRecoilState } from "recoi
 import styled from "styled-components";
 import { PageHeader } from "../../app/common/PageHeader";
 import { fetchOrdersHistorySelector, ordersHistoryState } from "../../app/recoil/OrderHistoryState";
+import { selectOrderSelector } from "../../app/recoil/SelectedOrderState";
 import OrderShortDetails from "./OrderShortDetails";
 
 const Wrapper = styled.div`
@@ -56,8 +57,8 @@ const OrderList = () => {
   const fetchOrders = useSetRecoilState(fetchOrdersHistorySelector)
 
   useEffect(() => {
-    fetchOrders(true)
-  }, [])
+    fetchOrders(activeTab === "current")
+  }, [activeTab])
 
   return (
     <Wrapper>
@@ -81,7 +82,7 @@ const OrderList = () => {
           <OrderShortDetails
             key={i}
             id={order.id}
-            endDate={order.endDate}
+            date={order.endDate}
             restaurant={order.restaurant}
             client={order.client}
           />

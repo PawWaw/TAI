@@ -2,7 +2,9 @@ import React from "react";
 import styled from "styled-components";
 import { history } from "../..";
 import { SvgIcon } from "../../app/common/SvgIcon";
-import {format} from "date-fns"
+import { format } from "date-fns";
+import { useSetRecoilState } from "recoil";
+import { selectOrderSelector } from "../../app/recoil/SelectedOrderState";
 
 const Wrapper = styled.div`
   display: flex;
@@ -43,14 +45,13 @@ const DataText = styled.h3`
   margin-left: 5px;
 `;
 
+
+
 const OrderShortDetails = ({ id, endDate, restaurant, client }) => {
-  const handleItemClick = () => {
-      history.push(`/orders/${id}`)
-  };
   return (
-    <Wrapper onClick={handleItemClick}>
+    <Wrapper onClick={() => history.push(`/orders/${id}`)}>
       <FirstLine>
-        <DateText>{ format(new Date(endDate), "HH:mm dd-MM-yyy")}</DateText>
+        <DateText>{!endDate ? "Order"  : format(new Date(endDate), "HH:mm dd-MM-yyy")}</DateText>
         <IdText>#{id}</IdText>
       </FirstLine>
       <DataWrapper>
