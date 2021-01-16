@@ -26,7 +26,7 @@ namespace Backend.Model
             this.Email = user.Email;
             this.FirstName = user.FirstName;
             this.LastName = user.LastName;
-            this.Password = user.Password;
+            this.password = user.Password;
             this.Username = user.Username;
         }
         [Key]
