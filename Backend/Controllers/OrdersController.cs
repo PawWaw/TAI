@@ -102,7 +102,7 @@ namespace Backend.Controllers
             return order;
         }
 
-        [HttpGet("isCurrent")]
+        [HttpGet("{isCurrent}")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders([FromQuery] bool current)
         {
             if (current)
@@ -116,7 +116,7 @@ namespace Backend.Controllers
 
         }
 
-        [HttpGet("position")]
+        [HttpGet("find")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrdersToRealise([FromQuery] double latitude, [FromQuery] double longitude)
         {
             //do dokonczenia

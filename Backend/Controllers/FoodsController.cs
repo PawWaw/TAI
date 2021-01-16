@@ -24,7 +24,7 @@ namespace Backend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Food>>> GetFoods()
         {
-            return await _context.Foods.ToListAsync();
+            return await _context.Foods.Include(f=>f.FoodIngredients).ToListAsync();
         }
 
         // GET: api/Foods/5

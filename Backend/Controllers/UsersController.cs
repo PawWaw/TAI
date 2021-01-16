@@ -8,6 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using Backend.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
+using Backend.RestModel;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Backend.Controllers
 {
@@ -16,7 +21,6 @@ namespace Backend.Controllers
     public class UsersController : ControllerBase
     {
         private readonly DragorantContext _context;
-
         public UsersController(DragorantContext context)
         {
             _context = context;
@@ -24,7 +28,6 @@ namespace Backend.Controllers
 
         // GET: api/Users
         [HttpGet]
-        [DisableCors]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
@@ -80,12 +83,44 @@ namespace Backend.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<User>> PostUser([Bind("address,username,password,email,firstName,lastName,city")] WsUser user)
         {
-            _context.Users.Add(user);
+            User dbUser = new User();
+            dbUser.fillProperties(user);
+            if(user.City !=null && user.City.Length > 0)
+            {
+                City temp = _context.Cities.Where(c => c.Name == user.City).SingleOrDefault();
+                if(temp == null)
+                {
+                    temp = new City();
+                    temp.Name = user.City;
+                    _context.Cities.Add(temp);
+                }
+                dbUser.CityId = temp.Id;
+                dbUser.City = temp;
+            }
+            _context.Users.Add(dbUser);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            return CreatedAtAction("GetUser", new { id = dbUser.Id }, user);
+        }
+
+        // POST: api/Users/auth
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [HttpPost("auth")]
+        public async Task<ActionResult<User>> Login(LoginRequest user)
+        {
+            if(ModelState.IsValid)
+            {
+                var findUser = await _context.Users
+                    .FirstOrDefaultAsync(m => m.Username == user.Username && m.Password == user.Password);
+                if (findUser != null)
+                {
+                    return Ok(GenerateJwtToken((int)findUser.Id));
+                }
+            }
+            return StatusCode(401); 
         }
 
         // DELETE: api/Users/5
@@ -107,6 +142,19 @@ namespace Backend.Controllers
         private bool UserExists(long id)
         {
             return _context.Users.Any(e => e.Id == id);
+        }
+        public string GenerateJwtToken(int accountId)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes("[SECRET USED TO SIGN AND VERIFY JWT TOKENS, IT CAN BE ANY STRING]");
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[] { new Claim("id", accountId.ToString()) }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
     }
 }
