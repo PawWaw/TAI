@@ -22,7 +22,7 @@ namespace Backend.Controllers
         }
 
         // GET: api/Orders
-        [HttpGet]
+        [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
             return await _context.Orders.ToListAsync();
@@ -102,7 +102,7 @@ namespace Backend.Controllers
             return order;
         }
 
-        [HttpGet]
+        [HttpGet("isCurrent")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders([FromQuery] bool current)
         {
             if (current)
@@ -116,7 +116,7 @@ namespace Backend.Controllers
 
         }
 
-        [HttpGet]
+        [HttpGet("position")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrdersToRealise([FromQuery] double latitude, [FromQuery] double longitude)
         {
             //do dokonczenia

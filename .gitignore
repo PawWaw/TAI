@@ -17,3 +17,4 @@ obj/
 
 # End of https://www.toptal.com/developers/gitignore/api/dotnetcore
 *.v2
+v16
