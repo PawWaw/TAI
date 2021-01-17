@@ -28,6 +28,13 @@
           </mat-select>
         </mat-form-field>
         <mat-form-field class="register-full-width">
+          <mat-label>Change status</mat-label>
+          <mat-select (selectionChange)="selectedStatus($event)" [value]="status">
+            <mat-option value="STARTED">STARTED</mat-option>
+            <mat-option value="READY">READY</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="register-full-width">
           <input name="startTime" matInput [(ngModel)]="this.order.startTime" readonly>
           <mat-hint>Start time</mat-hint>
         </mat-form-field>
@@ -36,7 +43,7 @@
           <mat-hint>End time</mat-hint>
         </mat-form-field>
       </p>
-      <button mat-raised-button class="button" *ngIf="!isDelivered" (click)="modifyItem()"><span>Save</span></button>
+      <button mat-raised-button class="button" (click)="modifyItem()"><span>Save</span></button>
     </form>
   </div>
   

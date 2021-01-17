@@ -20,6 +20,7 @@ export class OrderDetailsComponent implements OnInit {
   isDelivered: boolean;
   deliverers: Observable<Deliverer[]>;
   selectedData: string
+  status: string
 
   constructor(
     private router: Router,
@@ -43,7 +44,8 @@ export class OrderDetailsComponent implements OnInit {
       orderStation: '',
       startTime: '',
       endTime: '',
-      deliverer: ''
+      deliverer: '',
+      status: ''
     }, null);
   }
 
@@ -73,6 +75,7 @@ export class OrderDetailsComponent implements OnInit {
 
   modifyItem() {
     this.order.delivererId = Number(this.selectedData);
+    this.order.status = this.status;
     this.orderService.modifyOrder(this.order).subscribe(
       data=>{
         this.router.navigate(['']);
@@ -84,5 +87,9 @@ export class OrderDetailsComponent implements OnInit {
 
   selectedValue(event: MatSelectChange) {
     this.selectedData = event.value;
+  }
+
+  selectedStatus(event: MatSelectChange) {
+    this.status = event.value;
   }
 }
