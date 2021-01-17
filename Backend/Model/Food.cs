@@ -41,8 +41,8 @@ namespace Backend.Model
         [Column("price")]
         public double Price { get; set; }
 
-        //[Column("isActive")]
-        //public bool IsActive { get; set; }
+        [Column("isActive")]
+        public bool? IsActive { get; set; }
 
         [InverseProperty(nameof(FoodIngredient.Food))]
         public virtual ICollection<FoodIngredient> FoodIngredients { get; set; }

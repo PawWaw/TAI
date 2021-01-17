@@ -21,7 +21,7 @@ namespace Backend.Model
         [Column("orderStationId")]
         public long OrderStationId { get; set; }
         [Column("delivererId")]
-        public long DelivererId { get; set; }
+        public long? DelivererId { get; set; }
         [Column("userId")]
         public long UserId { get; set; }
         [Required]

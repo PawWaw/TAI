@@ -27,14 +27,12 @@ namespace Backend
         {
             services.AddCors(options =>
             {
-                options.AddPolicy(name: MyAllowSpecificOrigins,
-                                  builder =>
-                                  {
-                                      builder.WithOrigins("localhost:4200")
-                                        .AllowAnyMethod()
-                                        .AllowAnyHeader()
-                                        .AllowCredentials();
-                                  });
+                options.AddPolicy(
+                  "CorsPolicy",
+                  builder => builder.WithOrigins("http://localhost:4200")
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials());
             });
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
@@ -81,7 +79,7 @@ namespace Backend
 
             app.UseRouting();
             app.UseAuthentication();
-            app.UseCors(MyAllowSpecificOrigins);
+            app.UseCors("CorsPolicy");
             app.UseAuthorization();
 
 

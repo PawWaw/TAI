@@ -139,6 +139,10 @@ namespace Backend.Migrations
                         .HasColumnType("bigint")
                         .UseIdentityColumn();
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("isActive");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -262,7 +266,7 @@ namespace Backend.Migrations
                         .HasColumnType("bigint")
                         .UseIdentityColumn();
 
-                    b.Property<long>("DelivererId")
+                    b.Property<long?>("DelivererId")
                         .HasColumnType("bigint")
                         .HasColumnName("delivererId");
 
@@ -571,8 +575,7 @@ namespace Backend.Migrations
                     b.HasOne("Backend.Model.Deliverer", "Deliverer")
                         .WithMany("Orders")
                         .HasForeignKey("DelivererId")
-                        .HasConstraintName("FK_Order_Deliverer")
-                        .IsRequired();
+                        .HasConstraintName("FK_Order_Deliverer");
 
                     b.HasOne("Backend.Model.OrderStation", "OrderStation")
                         .WithMany("Orders")
