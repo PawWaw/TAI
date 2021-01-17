@@ -145,7 +145,8 @@ namespace Backend.Controllers
             }
             food.Name = dish.name;
             food.Price = dish.price;
-            foreach(string temp_ingredient_name in dish.ingredients)
+            await _context.SaveChangesAsync();
+            foreach (string temp_ingredient_name in dish.ingredients)
             {
                 var ingredient = await _context.Ingredients.FirstOrDefaultAsync(e => e.Name.Trim() == temp_ingredient_name.Trim());
                 if(ingredient == null)
