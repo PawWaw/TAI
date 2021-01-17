@@ -29,6 +29,7 @@ namespace Backend.Controllers
             foreach(Food food in list_food)
             {
                 Dish temp = new Dish();
+                temp.id = food.Id;
                 temp.name = food.Name;
                 temp.price = food.Price;
                 temp.ingredients = new string[food.FoodIngredients.Count()];
@@ -55,6 +56,7 @@ namespace Backend.Controllers
                 return NotFound();
             }
             Dish dish = new Dish();
+            dish.id = food.Id;
             dish.name = food.Name;
             dish.price = food.Price;
             dish.ingredients = new string[food.FoodIngredients.Count()];
@@ -135,7 +137,7 @@ namespace Backend.Controllers
         public async Task<ActionResult<Food>> PatchFood(long id, Dish dish)
         {
             List<Ingredient> ingredient_list = new List<Ingredient>();
-            var food = await _context.Foods.FindAsync(id);
+            var food = await _context.Foods.Include(x => x.FoodIngredients).FirstOrDefaultAsync(x => x.Id == id);
             if (food == null)
             {
                 return NotFound();
@@ -144,7 +146,7 @@ namespace Backend.Controllers
             food.Price = dish.price;
             foreach(string temp_ingredient_name in dish.ingredients)
             {
-                var ingredient = await _context.Ingredients.FindAsync(temp_ingredient_name);
+                var ingredient = await _context.Ingredients.FirstOrDefaultAsync(e => e.Name.Trim() == temp_ingredient_name.Trim());
                 if(ingredient == null)
                 {
                     Ingredient temp_ingredient = new Ingredient();

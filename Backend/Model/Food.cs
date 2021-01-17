@@ -10,6 +10,7 @@ namespace Backend.Model
 {
     public class Dish
     {
+        public long id { get; set; }
         public string name { get; set; }
         public double price { get; set; }
         public string[] ingredients { get; set; }
@@ -39,6 +40,9 @@ namespace Backend.Model
         public string Name { get; set; }
         [Column("price")]
         public double Price { get; set; }
+
+        //[Column("isActive")]
+        //public bool IsActive { get; set; }
 
         [InverseProperty(nameof(FoodIngredient.Food))]
         public virtual ICollection<FoodIngredient> FoodIngredients { get; set; }
