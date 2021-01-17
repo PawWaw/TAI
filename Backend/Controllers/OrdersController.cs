@@ -28,11 +28,11 @@ namespace Backend.Controllers
             return await _context.Orders.ToListAsync();
         }
 
-        // GET: api/Orders/5
+        // GET: api/Orders/5 
         [HttpGet("{id}")]
         public async Task<ActionResult<Order>> GetOrder(long id)
         {
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.Orders.Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).SingleOrDefaultAsync(e => e.Id == id); ;
 
             if (order == null)
             {
@@ -90,7 +90,7 @@ namespace Backend.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Order>> DeleteOrder(long id)
         {
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.Orders.Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e=>e.User).Include(e=>e.User.City).SingleOrDefaultAsync(e=> e.Id == id);
             if (order == null)
             {
                 return NotFound();
@@ -102,16 +102,16 @@ namespace Backend.Controllers
             return order;
         }
 
-        [HttpGet("{isCurrent}")]
+        [HttpGet("isCurrent")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders([FromQuery] bool current)
         {
             if (current)
             {
-                return await _context.Orders.Where(e => e.Status != "ENDED").ToListAsync();
+                return await _context.Orders.Where(e => e.Status != "ENDED").Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).ToListAsync();
             }
             else
             {
-                return await _context.Orders.Where(e => e.Status == "ENDED").ToListAsync();
+                return await _context.Orders.Where(e => e.Status == "ENDED").Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).ToListAsync();
             }
 
         }
@@ -124,7 +124,7 @@ namespace Backend.Controllers
 
         }
 
-        [HttpPost]
+        [HttpPost("take")]
         public async Task<ActionResult<Order>> RealizeOrder(long id)
         {
             var order = await _context.Orders.FindAsync(id);
@@ -139,7 +139,7 @@ namespace Backend.Controllers
             return order;
         }
 
-        [HttpPost]
+        [HttpPost("delivered")]
         public async Task<ActionResult<Order>> DeliverOrder(long id)
         {
             var order = await _context.Orders.FindAsync(id);

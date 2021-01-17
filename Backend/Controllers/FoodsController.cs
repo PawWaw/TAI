@@ -22,23 +22,50 @@ namespace Backend.Controllers
 
         // GET: api/Foods
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Food>>> GetFoods()
+        public async Task<ActionResult<IEnumerable<Dish>>> GetFoods()
         {
-            return await _context.Foods.Include(f=>f.FoodIngredients).ToListAsync();
+            List<Dish> dish_list = new List<Dish>();
+            IEnumerable<Food> list_food = await _context.Foods.Include(f=>f.FoodIngredients).ToListAsync();
+            foreach(Food food in list_food)
+            {
+                Dish temp = new Dish();
+                temp.name = food.Name;
+                temp.price = food.Price;
+                temp.ingredients = new string[food.FoodIngredients.Count()];
+                int i = 0;
+                foreach(FoodIngredient temp_ingredient in food.FoodIngredients)
+                {
+                    var temp_foodingredient = await _context.FoodIngredients.Include(t => t.Ingredient).SingleOrDefaultAsync(t => t.Id == temp_ingredient.Id);
+                    temp.ingredients[i]=(temp_foodingredient.Ingredient.Name.Trim());
+                    i++;
+                }
+                dish_list.Add(temp);
+            }
+            return dish_list;
         }
 
         // GET: api/Foods/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Food>> GetFood(long id)
+        public async Task<ActionResult<Dish>> GetFood(long id)
         {
-            var food = await _context.Foods.FindAsync(id);
+            var food = await _context.Foods.Include(f => f.FoodIngredients).SingleOrDefaultAsync(f => f.Id == id);
 
             if (food == null)
             {
                 return NotFound();
             }
-
-            return food;
+            Dish dish = new Dish();
+            dish.name = food.Name;
+            dish.price = food.Price;
+            dish.ingredients = new string[food.FoodIngredients.Count()];
+            int i = 0;
+            foreach (FoodIngredient temp_ingredient in food.FoodIngredients)
+            {
+                var temp_foodingredient = await _context.FoodIngredients.Include(t => t.Ingredient).SingleOrDefaultAsync(t => t.Id == temp_ingredient.Id);
+                dish.ingredients[i] = (temp_foodingredient.Ingredient.Name.Trim());
+                i++;
+            }
+            return dish;
         }
 
         // PUT: api/Foods/5

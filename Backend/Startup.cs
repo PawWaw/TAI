@@ -57,6 +57,10 @@ namespace Backend
             //    options.AddPolicy("OfficeNumberUnder200", policy => policy.Requirements.Add(new MaximumOfficeNumberRequirement(200)));
             //});
             //services.AddSingleton<IAuthorizationHandler, MaximumOfficeNumberAuthorizationHandler>();
+            services.AddControllersWithViews()
+            .AddNewtonsoftJson(options =>
+            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
 
             services.AddControllers();
             services.AddDistributedMemoryCache();
