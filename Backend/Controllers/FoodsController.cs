@@ -22,52 +22,64 @@ namespace Backend.Controllers
 
         // GET: api/Foods
         [HttpGet("{username}")]
-        public async Task<ActionResult<IEnumerable<Dish>>> GetFoods()
+        public async Task<ActionResult<IEnumerable<Dish>>> GetFoods(string username)
         {
             List<Dish> dish_list = new List<Dish>();
+            User user = await _context.Users.Where(f => f.Username == username).FirstOrDefaultAsync();
+            List<long> foodIds = await _context.FoodUsers.Where(f => f.IdUser == user.Id).Select(a => a.IdFood).ToListAsync();
+
             IEnumerable<Food> list_food = await _context.Foods.Include(f=>f.FoodIngredients).Where(f=>(bool)f.IsActive == true).ToListAsync();
             foreach(Food food in list_food)
             {
-                Dish temp = new Dish();
-                temp.id = food.Id;
-                temp.name = food.Name;
-                temp.price = food.Price;
-                temp.ingredients = new string[food.FoodIngredients.Count()];
-                int i = 0;
-                foreach(FoodIngredient temp_ingredient in food.FoodIngredients)
+                if (foodIds.Contains(food.Id))
                 {
-                    var temp_foodingredient = await _context.FoodIngredients.Include(t => t.Ingredient).SingleOrDefaultAsync(t => t.Id == temp_ingredient.Id);
-                    temp.ingredients[i]=(temp_foodingredient.Ingredient.Name.Trim());
-                    i++;
+                    Dish temp = new Dish();
+                    temp.id = food.Id;
+                    temp.name = food.Name;
+                    temp.price = food.Price;
+                    temp.ingredients = new string[food.FoodIngredients.Count()];
+                    int i = 0;
+                    foreach (FoodIngredient temp_ingredient in food.FoodIngredients)
+                    {
+                        var temp_foodingredient = await _context.FoodIngredients.Include(t => t.Ingredient).SingleOrDefaultAsync(t => t.Id == temp_ingredient.Id);
+                        temp.ingredients[i] = (temp_foodingredient.Ingredient.Name.Trim());
+                        i++;
+                    }
+                    dish_list.Add(temp);
                 }
-                dish_list.Add(temp);
             }
             return dish_list;
         }
 
         // GET: api/Foods/5
         [HttpGet("{username}/{id}")]
-        public async Task<ActionResult<Dish>> GetFood(long id)
+        public async Task<ActionResult<Dish>> GetFood(long id, string username)
         {
             var food = await _context.Foods.Include(f => f.FoodIngredients).Where(f => (bool)f.IsActive == true).SingleOrDefaultAsync(f => f.Id == id);
+            User user = await _context.Users.Where(f => f.Username == username).FirstOrDefaultAsync();
+            List<long> foodIds = await _context.FoodUsers.Where(f => f.IdUser == user.Id).Select(a => a.IdFood).ToListAsync();
 
             if (food == null)
             {
                 return NotFound();
             }
-            Dish dish = new Dish();
-            dish.id = food.Id;
-            dish.name = food.Name;
-            dish.price = food.Price;
-            dish.ingredients = new string[food.FoodIngredients.Count()];
-            int i = 0;
-            foreach (FoodIngredient temp_ingredient in food.FoodIngredients)
+            if (foodIds.Contains(food.Id))
             {
-                var temp_foodingredient = await _context.FoodIngredients.Include(t => t.Ingredient).SingleOrDefaultAsync(t => t.Id == temp_ingredient.Id);
-                dish.ingredients[i] = (temp_foodingredient.Ingredient.Name.Trim());
-                i++;
+                Dish dish = new Dish();
+                dish.id = food.Id;
+                dish.name = food.Name;
+                dish.price = food.Price;
+                dish.ingredients = new string[food.FoodIngredients.Count()];
+                int i = 0;
+                foreach (FoodIngredient temp_ingredient in food.FoodIngredients)
+                {
+                    var temp_foodingredient = await _context.FoodIngredients.Include(t => t.Ingredient).SingleOrDefaultAsync(t => t.Id == temp_ingredient.Id);
+                    dish.ingredients[i] = (temp_foodingredient.Ingredient.Name.Trim());
+                    i++;
+                }
+                return dish;
             }
-            return dish;
+            return StatusCode(404);
         }
 
         // PUT: api/Foods/5
@@ -105,8 +117,8 @@ namespace Backend.Controllers
         // POST: api/Foods
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<Food>> PostFood(Dish dish)
+        [HttpPost("{username}")]
+        public async Task<ActionResult<Food>> PostFood(Dish dish, string username)
         {
             Food food = new Food();
             food.inject_data(dish);
@@ -114,6 +126,14 @@ namespace Backend.Controllers
             food.IsActive = true;
             _context.Foods.Add(food);
             await _context.SaveChangesAsync();
+
+            User user = await _context.Users.Where(f => f.Username == username).FirstOrDefaultAsync();
+            FoodUser foodUser = new FoodUser();
+            foodUser.IdFood = food.Id;
+            foodUser.IdUser = user.Id;
+            _context.FoodUsers.Add(foodUser);
+            await _context.SaveChangesAsync();
+
             foreach (string ingredient in dish.ingredients)
             {
                 temp_ingredient = await _context.Ingredients.FirstOrDefaultAsync(e => e.Name == ingredient);

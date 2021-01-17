@@ -26,7 +26,7 @@ namespace Backend.Model
             this.Email = user.Email;
             this.FirstName = user.FirstName;
             this.LastName = user.LastName;
-            this.password = user.Password;
+            this.Password = user.Password;
             this.Username = user.Username;
         }
         [Key]
@@ -64,6 +64,8 @@ namespace Backend.Model
         public virtual ICollection<FoodRate> FoodRates { get; set; }
         [InverseProperty(nameof(Order.User))]
         public virtual ICollection<Order> Orders { get; set; }
+
+        public virtual ICollection<FoodUser> FoodUsers { get; set; }
 
         public String GenerateHash(String Input)
         {

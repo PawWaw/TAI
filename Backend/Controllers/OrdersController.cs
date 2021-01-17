@@ -105,13 +105,16 @@ namespace Backend.Controllers
         [HttpGet("{username}/isCurrent")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders([FromQuery] bool current, string username)
         {
+            User user = await _context.Users.Where(f => f.Username == username).FirstOrDefaultAsync();
+            List<long> orderIds = await _context.Orders.Where(f => f.UserId == user.Id).Select(a => a.Id).ToListAsync();
+
             if (current)
             {
-                return await _context.Orders.Where(e => e.Status != "ENDED").Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).ToListAsync();
+                return await _context.Orders.Where(e => e.Status != "ENDED").Where(f => orderIds.Contains(f.Id)).Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).ToListAsync();
             }
             else
             {
-                return await _context.Orders.Where(e => e.Status == "ENDED").Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).ToListAsync();
+                return await _context.Orders.Where(e => e.Status == "ENDED").Where(f => orderIds.Contains(f.Id)).Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).ToListAsync();
             }
 
         }

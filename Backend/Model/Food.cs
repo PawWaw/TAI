@@ -50,5 +50,7 @@ namespace Backend.Model
         public virtual ICollection<FoodOrder> FoodOrders { get; set; }
         [InverseProperty(nameof(FoodRate.Food))]
         public virtual ICollection<FoodRate> FoodRates { get; set; }
+
+        public virtual ICollection<FoodUser> FoodUsers { get; set; }
     }
 }
