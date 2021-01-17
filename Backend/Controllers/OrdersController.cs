@@ -102,8 +102,8 @@ namespace Backend.Controllers
             return order;
         }
 
-        [HttpGet("isCurrent")]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders([FromQuery] bool current)
+        [HttpGet("{username}/isCurrent")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrders([FromQuery] bool current, string username)
         {
             if (current)
             {
@@ -148,7 +148,7 @@ namespace Backend.Controllers
                 return NotFound();
             }
 
-            order.Status = "ENDED";
+            order.Status = "DELIVERED";
             order.EndTime = DateTime.Now; //mozliwe ze trzeba bedzie w bazie zmienic wartosc na datetime2 jesli nie ma teraz
             await _context.SaveChangesAsync();
 
@@ -156,32 +156,32 @@ namespace Backend.Controllers
         }
 
         [HttpPatch("{id}")]
-        public async Task<ActionResult<Order>> PatchOrderDelivery(long id, long deliverer)
+        public async Task<ActionResult<Order>> PatchOrderDelivery(Order response)
         {
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.Orders.FindAsync(response.Id);
             if (order == null)
             {
                 return NotFound();
             }
-            order.DelivererId = deliverer;
+            order.DelivererId = response.DelivererId;
             await _context.SaveChangesAsync();
 
             return order;
         }
 
-        [HttpPatch("{id}")]
-        public async Task<ActionResult<Order>> PatchOrder(long id)
-        {
-            var order = await _context.Orders.FindAsync(id);
-            if (order == null)
-            {
-                return NotFound();
-            }
-            _context.Orders.Remove(order);
-            await _context.SaveChangesAsync();
+        //[HttpPatch("{id}")]
+        //public async Task<ActionResult<Order>> PatchOrder(long id)
+        //{
+        //    var order = await _context.Orders.FindAsync(id);
+        //    if (order == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    _context.Orders.Remove(order);
+        //    await _context.SaveChangesAsync();
 
-            return order;
-        }
+        //    return order;
+        //}
         private bool OrderExists(long id)
         {
             return _context.Orders.Any(e => e.Id == id);

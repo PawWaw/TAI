@@ -21,7 +21,7 @@ namespace Backend.Controllers
         }
 
         // GET: api/Foods
-        [HttpGet]
+        [HttpGet("{username}")]
         public async Task<ActionResult<IEnumerable<Dish>>> GetFoods()
         {
             List<Dish> dish_list = new List<Dish>();
@@ -46,7 +46,7 @@ namespace Backend.Controllers
         }
 
         // GET: api/Foods/5
-        [HttpGet("{id}")]
+        [HttpGet("{username}/{id}")]
         public async Task<ActionResult<Dish>> GetFood(long id)
         {
             var food = await _context.Foods.Include(f => f.FoodIngredients).Where(f => (bool)f.IsActive == true).SingleOrDefaultAsync(f => f.Id == id);
@@ -131,7 +131,7 @@ namespace Backend.Controllers
                 _context.FoodIngredients.Add(temp_foodIngredient);
                 await _context.SaveChangesAsync();
             }
-            return CreatedAtAction("GetFood", new { id = food.Id }, food);
+            return StatusCode(200);
         }
 
         [HttpPatch("{id}")]

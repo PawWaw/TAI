@@ -21,14 +21,14 @@ namespace Backend.Controllers
         }
 
         // GET: api/Deliverers
-        [HttpGet]
+        [HttpGet("{username}")]
         public async Task<ActionResult<IEnumerable<Deliverer>>> GetDeliverers()
         {
             return await _context.Deliverers.ToListAsync();
         }
 
         // GET: api/Deliverers/5
-        [HttpGet("{id}")]
+        [HttpGet("{username}/{id}")]
         public async Task<ActionResult<Deliverer>> GetDeliverer(long id)
         {
             var deliverer = await _context.Deliverers.FindAsync(id);
