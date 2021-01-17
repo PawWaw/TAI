@@ -41,3 +41,24 @@ const requests = {
   put: (url, body) => Axios.put(url, body).then(responseBody),
   delete: (url) => Axios.delete(url).then(responseBody),
 };
+
+
+const User = {
+    login: (values) => requests.post("/user/login", values),
+    register: (values) => requests.post("/user/register", values),
+    current: () => requests.get("/user"),
+    updateSettings: (values) => requests.put("/user", values),
+    updatePassword: values => requests.put("/user/password", values),
+}
+
+const Orders = {
+    list: (param) => requests.get(`/orders?current=${param}`),
+    details: (id) => requests.get(`/orders/${id}`),
+    find: ({latitude, longitude}) => requests.get(`/orders/find?latitude=${latitude}&longitude=${longitude}`),
+    take: (id) => requests.post("/orders/take", {id}),
+    delivered: (id) => requests.post("/orders/delivered", {id}),
+}
+
+const Dashboard = {
+    statisticts: () => requests.get("/statistics"),
+}
