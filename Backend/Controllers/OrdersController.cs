@@ -148,7 +148,7 @@ namespace Backend.Controllers
                 return NotFound();
             }
 
-            order.Status = "DELIVERED";
+            order.Status = "ENDED";
             order.EndTime = DateTime.Now; //mozliwe ze trzeba bedzie w bazie zmienic wartosc na datetime2 jesli nie ma teraz
             await _context.SaveChangesAsync();
 
