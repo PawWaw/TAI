@@ -16,6 +16,11 @@ namespace Backend.Controllers
     {
         private readonly DragorantContext _context;
 
+        public class Data
+        {
+            public long id { get; set; }
+        }
+
         public OrdersController(DragorantContext context)
         {
             _context = context;
@@ -128,9 +133,9 @@ namespace Backend.Controllers
         }
 
         [HttpPost("take")]
-        public async Task<ActionResult<Order>> RealizeOrder(long id)
+        public async Task<ActionResult<Order>> RealizeOrder(Data data)
         {
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.Orders.FindAsync(data.id);
             if (order == null)
             {
                 return NotFound();
@@ -143,15 +148,15 @@ namespace Backend.Controllers
         }
 
         [HttpPost("delivered")]
-        public async Task<ActionResult<Order>> DeliverOrder(long id)
+        public async Task<ActionResult<Order>> DeliverOrder(Data data)
         {
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.Orders.FindAsync(data.id);
             if (order == null)
             {
                 return NotFound();
             }
 
-            order.Status = "DELIVERED";
+            order.Status = "ENDED";
             order.EndTime = DateTime.Now; //mozliwe ze trzeba bedzie w bazie zmienic wartosc na datetime2 jesli nie ma teraz
             await _context.SaveChangesAsync();
 
