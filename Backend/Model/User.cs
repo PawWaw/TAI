@@ -20,7 +20,7 @@ namespace Backend.Model
             FoodRates = new HashSet<FoodRate>();
             Orders = new HashSet<Order>();
         }
-        public void fillProperties(WsUser user)
+        public void FillProperties(WsUser user)
         {
             this.Address = user.Address;
             this.Email = user.Email;
@@ -64,7 +64,6 @@ namespace Backend.Model
         public virtual ICollection<FoodRate> FoodRates { get; set; }
         [InverseProperty(nameof(Order.User))]
         public virtual ICollection<Order> Orders { get; set; }
-
         public String GenerateHash(String Input)
         {
             byte[] bytes = System.Text.Encoding.UTF8.GetBytes(Input);
