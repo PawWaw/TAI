@@ -25,7 +25,7 @@ namespace Backend.Controllers
         public async Task<ActionResult<IEnumerable<Dish>>> GetFoods()
         {
             List<Dish> dish_list = new List<Dish>();
-            IEnumerable<Food> list_food = await _context.Foods.Include(f=>f.FoodIngredients).ToListAsync();
+            IEnumerable<Food> list_food = await _context.Foods.Include(f=>f.FoodIngredients).Where(f=>(bool)f.IsActive == true).ToListAsync();
             foreach(Food food in list_food)
             {
                 Dish temp = new Dish();
@@ -49,7 +49,7 @@ namespace Backend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Dish>> GetFood(long id)
         {
-            var food = await _context.Foods.Include(f => f.FoodIngredients).SingleOrDefaultAsync(f => f.Id == id);
+            var food = await _context.Foods.Include(f => f.FoodIngredients).Where(f => (bool)f.IsActive == true).SingleOrDefaultAsync(f => f.Id == id);
 
             if (food == null)
             {
@@ -111,6 +111,7 @@ namespace Backend.Controllers
             Food food = new Food();
             food.inject_data(dish);
             Ingredient temp_ingredient;
+            food.IsActive = true;
             _context.Foods.Add(food);
             await _context.SaveChangesAsync();
             foreach (string ingredient in dish.ingredients)
@@ -186,8 +187,7 @@ namespace Backend.Controllers
             {
                 return NotFound();
             }
-
-            _context.Foods.Remove(food);
+            food.IsActive = false;
             await _context.SaveChangesAsync();
 
             return food;
