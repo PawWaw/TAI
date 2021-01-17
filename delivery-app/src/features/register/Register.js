@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Button from "../../app/common/Button";
 import { Form, IconInput } from "../../app/common/Form";
 import styled from "styled-components";
+import { useSetRecoilState } from "recoil";
+import { registerSelector } from "../../app/recoil/UserState";
 
 const Header = styled.h1`
   font-size: 1.3em;
@@ -19,6 +21,8 @@ const Register = () => {
   const [city, setCity] = useState("");
   const [address, setAddress] = useState("");
 
+  const register = useSetRecoilState(registerSelector)
+
   const handleRegister = () => {
     const values = {
       username,
@@ -29,7 +33,7 @@ const Register = () => {
       city,
       address,
     };
-    console.log(values);
+    register(values)
   };
 
   return (

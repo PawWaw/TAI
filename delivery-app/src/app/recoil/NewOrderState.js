@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import { atom, selector } from "recoil";
 import OrderPopup from "../../features/order/OrderPopup";
 import { infoState } from "./DashboardState";
@@ -38,6 +39,8 @@ export const findOrderSelector = selector({
 export const acceptOrderSelector = selector({
   key: "acceptOrderSelector",
   set: async ({set, get}) => {
+    try {
+
     const info = get(infoState)
 
     const objIndex = info.findIndex(obj => obj.name === 'Current orders');
@@ -55,6 +58,9 @@ export const acceptOrderSelector = selector({
       opened: false,
       body: null
     })
+  } catch(error) {
+    toast.error("Error with accepting order.")
+  }
   }
 })
 
@@ -62,10 +68,14 @@ export const acceptOrderSelector = selector({
 export const declineOrderSelector = selector({
   key: "declineOrderSelector",
   set: async ({set}) => {
+    try  {
     set(modalState, {
       opened: false,
       body: null
     })
     set(newOrderState, null)
+    } catch(error) {
+
+    }
   }
 })

@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import { atom, selector } from "recoil";
 import { history } from "../..";
 
@@ -20,7 +21,9 @@ export const selectOrderSelector = selector({
         client: "ul. Sezamkowa 10/7 Katowice",
       });
 
-    } catch (error) {}
+    } catch (error) {
+
+    }
   },
 });
 
@@ -32,7 +35,7 @@ export const delieveredOrderSelector = selector({
       history.push("/dashboard")
 
     } catch(error) {
-
+      toast.error("Problem with delievering order.");
     }
   }
 })

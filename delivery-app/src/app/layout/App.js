@@ -8,6 +8,8 @@ import Navbar from "../../features/nav/Navbar";
 import OrderDetails from "../../features/order/OrderDetails";
 import OrderList from "../../features/order/OrderList";
 import Settings from "../../features/settings/Settings";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const MainContainer = styled.div`
   position: relative;
@@ -41,6 +43,7 @@ const App = () => {
   return (
     <>
       <Modal />
+      <ToastContainer/>
       <MainContainer>
         <AppContainer>
           <Route exact path="/" component={HomeLogin} />
