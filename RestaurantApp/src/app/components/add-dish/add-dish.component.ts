@@ -75,7 +75,7 @@ export class AddDishComponent implements OnInit {
     console.log(this.dish);
     this.dishService.postDish(this.dish).subscribe(
       data=>{
-        this.router.navigate(['']);
+        this.router.navigate(['/dish']);
       },
       error=>{
       }

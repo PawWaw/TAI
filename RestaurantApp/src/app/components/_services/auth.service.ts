@@ -17,9 +17,10 @@ export class AuthService {
     })
   };
 
-  authenticate(value: string){
+  authenticate(value: string, username: string){
     return this.http.post(this.baseurl,value, {responseType: 'text'}).pipe(map(token => {
       localStorage.setItem('auth_token', token);
+      localStorage.setItem('username', username);
       return token;
   }), catchError(this.errorHandler));
   }

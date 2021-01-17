@@ -37,7 +37,7 @@ export class SigninComponent implements OnInit {
 
     this.formGroup.patchValue({username: this.username.value.toString().toLowerCase()});
 
-    this.authService.authenticate(this.formGroup.value).subscribe(
+    this.authService.authenticate(this.formGroup.value, this.formGroup.get('username').value).subscribe(
       data=>{
         this.router.navigate(['/history']);
         this.dataSharingService.isLogged.next(true);

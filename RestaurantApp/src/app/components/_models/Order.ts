@@ -5,6 +5,7 @@ export class Order {
     orderStationId: number;
     delivererId: number;
     userId: number;
+    username?: string;
     status: string;
     startTime: string;
     endTime: string;

@@ -22,7 +22,7 @@
         <mat-form-field class="register-full-width" *ngIf="!isDelivered">
           <mat-label>Choose deliverer</mat-label>
           <mat-select (selectionChange)="selectedValue($event)">
-            <mat-option *ngFor="let deliverer of deliverers | async" [value]="deliverer.lastName">
+            <mat-option *ngFor="let deliverer of deliverers | async" [value]="deliverer.id">
               {{deliverer.firstName}} {{deliverer.lastName}}
             </mat-option>
           </mat-select>

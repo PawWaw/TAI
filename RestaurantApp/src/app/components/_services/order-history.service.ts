@@ -21,7 +21,7 @@ export class OrderHistoryService {
   });
 
   public getOrders(): Observable<Order[]> {
-    return this.http.get<Order[]>(this.orderUrl + "/isCurrent?current=false", {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
+    return this.http.get<Order[]>(this.orderUrl + "/" + localStorage.getItem('username') + "/isCurrent?current=false", {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
   }
 
   public getSingleOrder(code: string): Observable<Order> {

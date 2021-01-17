@@ -72,7 +72,7 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   modifyItem() {
-    this.order.deliverer = this.selectedData;
+    this.order.delivererId = Number(this.selectedData);
     this.orderService.modifyOrder(this.order).subscribe(
       data=>{
         this.router.navigate(['']);
