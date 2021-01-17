@@ -171,7 +171,12 @@ namespace Backend.Controllers
             {
                 return NotFound();
             }
-            order.DelivererId = response.DelivererId;
+            order.Status = response.Status;
+            if (response.DelivererId != null)
+            {
+                order.DelivererId = response.DelivererId;
+            }
+            
             await _context.SaveChangesAsync();
 
             return order;
