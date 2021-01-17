@@ -3,6 +3,8 @@ import { Location } from '@angular/common';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Dish } from '../_models/Dish';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { DishService } from '../_services/dish.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-dish',
@@ -12,7 +14,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class AddDishComponent implements OnInit {
 
   formGroup: FormGroup;
-  dish: Dish;
+  dish: Dish = new Dish;
   ingredients: String[] = [];
   value = 'Clear me';
 
@@ -20,6 +22,8 @@ export class AddDishComponent implements OnInit {
     private _location: Location,
     private _snackBar: MatSnackBar,
     private formBuilder: FormBuilder,
+    private dishService: DishService,
+    private router: Router
     ) { }
 
   ngOnInit() {
@@ -43,6 +47,7 @@ export class AddDishComponent implements OnInit {
   }
 
   addIngredient(ingredient: String) {
+    console.log(this.ingredients);''
     if (this.formGroup.get('ingredient').value != "") {
       this.ingredients.push(this.formGroup.get('ingredient').value);
       this.formGroup.get('ingredient').setValue("");
@@ -55,7 +60,7 @@ export class AddDishComponent implements OnInit {
   }
 
   deleteIngredient(ingredient: String) {
-    delete this.ingredients[this.ingredients.findIndex(x => x==ingredient)];
+    delete this.ingredients[this.ingredients.findIndex(x => x == ingredient)];
     this.ingredients = this.ingredients.filter(value => Object.keys(value).length !== 0);
   }
 
@@ -66,6 +71,14 @@ export class AddDishComponent implements OnInit {
   addItem() {
     this.dish.name = this.formGroup.get('name').value;
     this.dish.ingredients = this.ingredients;
+    this.dish.price = this.formGroup.get('price').value;
     console.log(this.dish);
+    this.dishService.postDish(this.dish).subscribe(
+      data=>{
+        this.router.navigate(['']);
+      },
+      error=>{
+      }
+    );
   }
 }

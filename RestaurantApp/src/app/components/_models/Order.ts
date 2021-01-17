@@ -1,3 +1,5 @@
+import { OrderStation } from "./OrderStation";
+
 export class Order {
     id: number;
     orderStationId: number;
@@ -6,6 +8,6 @@ export class Order {
     status: string;
     startTime: string;
     endTime: string;
-    deliverer: string;
-    orderStation: string;
+    deliverer?: string;
+    orderStation: OrderStation;
 }

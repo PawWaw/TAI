@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../_services/auth.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from "@angular/router";
+import { first } from 'rxjs/internal/operators/first';
+import { DataSharingService } from '../_services/data-sharing.service';
 
 @Component({
   selector: 'app-signin',
@@ -16,6 +18,7 @@ export class SigninComponent implements OnInit {
 
     constructor(private formBuilder: FormBuilder,
                 private authService: AuthService,
+                private dataSharingService: DataSharingService,
                 private router: Router) {
   }
 
@@ -37,6 +40,7 @@ export class SigninComponent implements OnInit {
     this.authService.authenticate(this.formGroup.value).subscribe(
       data=>{
         this.router.navigate(['/history']);
+        this.dataSharingService.isLogged.next(true);
       },
       error=>{
         this.error=true;

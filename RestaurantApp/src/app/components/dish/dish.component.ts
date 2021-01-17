@@ -23,12 +23,12 @@ export class DishComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    // if (localStorage.getItem('current_user') == null) { // TODO: odkomentować po podpięciu backendu
-    //   this.router.navigate(['/signin']);
-    //   this._snackBar.open("Sign in to do this operation!", "Close", {
-    //   duration: 2000,
-    // });
-    // }
+    if (localStorage.getItem('auth_token') == null) { 
+      this.router.navigate(['/signin']);
+      this._snackBar.open("Sign in to do this operation!", "Close", {
+      duration: 2000,
+    });
+    }
     this.dataSource = this.dishService.getDishes();
   }
 

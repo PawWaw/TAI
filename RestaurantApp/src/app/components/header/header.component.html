@@ -14,11 +14,10 @@
     <button mat-button routerLink="/signup" class="signup">
         Sign Up
     </button>
-    <button mat-button routerLink="/signin" class="rightHeader">
+    <button mat-button routerLink="/signin" *ngIf="!isLogged" class="rightHeader">
         Sign In
     </button>
-    
-    <!-- <mat-form-field class="login-form">
-        <input matInput placeholder="Search">
-    </mat-form-field> -->
+    <button mat-button routerLink="" *ngIf="isLogged" class="rightHeader" (click)="logout()">
+        Log Out
+    </button>
 </div>

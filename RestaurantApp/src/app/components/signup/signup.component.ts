@@ -53,7 +53,9 @@ export class SignupComponent implements OnInit {
       password: ['', [Validators.required, Validators.minLength(this.minPwLength)]],
       password2: ['', [Validators.required]],
       firstName: '',
-      lastName: ''
+      lastName: '',
+      city: '',
+      address: ''
     }, {validator: passwordMatchValidator});
   }
 
@@ -72,6 +74,14 @@ export class SignupComponent implements OnInit {
   get password2() {
     return this.formGroup.get('password2');
   }
+  
+  get city() {
+    return this.formGroup.get('city');
+  }
+
+  get address() {
+    return this.formGroup.get('address');
+  }
 
   onPasswordInput() {
     if (this.formGroup.hasError('passwordMismatch'))
@@ -81,22 +91,22 @@ export class SignupComponent implements OnInit {
   }
 
   onSubmit() {
-    // if (this.formGroup.invalid) {
-    //   return;
-    // }
-    // this.loading = true;
+    if (this.formGroup.invalid) {
+      return;
+    }
+    this.loading = true;
 
-    // this.formGroup.patchValue({username: this.username.value.toString().toLowerCase()});
+    this.formGroup.patchValue({username: this.username.value.toString().toLowerCase()});
 
-    // this.userService.postUser(this.formGroup.value).pipe(first()).subscribe(
-    //   data => {
-    //     this.router.navigate(['/signin']);
-    //   },
-    //   error => {
-    //     this.loading = false;
-    //     this.errorText = "Username and/or email are already taken!"
-    //   }
-    // )
+    this.userService.postUser(this.formGroup.value).pipe(first()).subscribe(
+      data => {
+        this.router.navigate(['/signin']);
+      },
+      error => {
+        this.loading = false;
+        this.errorText = "Username and/or email are already taken!"
+      }
+    )
   }
 
   matcher = new MyErrorStateMatcher();

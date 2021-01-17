@@ -5,4 +5,6 @@ export class Dish {
     name: string;
     price: number;
     ingredients: String[];
+    foodOrders: String[];
+    foodRates: String[];
 }

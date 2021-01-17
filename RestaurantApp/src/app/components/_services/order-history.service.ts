@@ -1,49 +1,16 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { throwError } from 'rxjs';
+import { Observable } from 'rxjs/internal/Observable';
+import { catchError, retry } from 'rxjs/operators';
 import { Order } from '../_models/Order';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrderHistoryService {
-
-  Orders: Order[] = [
-    {
-      id: 1,
-      orderStationId: 1,
-      delivererId: 2,
-      userId: 3,
-      status: "delivered",
-      startTime: "00:00:01",
-      endTime: "01:02:03",
-      deliverer: "Dzidosław Żuberek",
-      orderStation: "Katowice"
-    },
-    {
-      id: 2,
-      orderStationId: 1,
-      delivererId: 2,
-      userId: 4,
-      status: "delivered",
-      startTime: "03:24:01",
-      endTime: "11:42:03",
-      deliverer: "Dzidosław Żuberek",
-      orderStation: "Katowice"
-    },
-    {
-      id: 3,
-      orderStationId: 2,
-      delivererId: 3,
-      userId: 3,
-      status: "delivered",
-      startTime: "16:50:00",
-      endTime: "18:12:00",
-      deliverer: "Andrzej Andrzejewski",
-      orderStation: "Sosnowiec"
-    }
-  ]
   
-  orderUrl = 'http://localhost:8080/orderHistory';
+  orderUrl = 'https://localhost:44308/api/orders';
   temp: any;
 
   constructor(private http: HttpClient) { 
@@ -53,15 +20,24 @@ export class OrderHistoryService {
     'Content-Type': 'application/json'
   });
 
-  public getOrders(): Order[] {
-    // public getOrders(): Observable<Order[]> {
-      //return this.http.get<Order[]>(this.orderUrl, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
-      return this.Orders;
+  public getOrders(): Observable<Order[]> {
+    return this.http.get<Order[]>(this.orderUrl + "/isCurrent?current=false", {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
+  }
+
+  public getSingleOrder(code: string): Observable<Order> {
+    return this.http.get<Order>(this.orderUrl + "/" + code, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
+  }
+
+  errorHandler(error: HttpErrorResponse) {
+    let errorMessage = '';
+    if (error.error instanceof ErrorEvent) {
+      // Get client-side error
+      errorMessage = error.error.message;
+    } else {
+      // Get server-side error
+      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
     }
-  
-    public getSingleOrder(id: number): Order {
-    // public getSingleOrder(code: string): Observable<Order> {
-      //return this.http.get<Order>(this.orderUrl + "/" + code, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
-      return this.Orders.find(x => x.id == id);
-    }
+    console.log(errorMessage);
+    return throwError(errorMessage);
+  }
 }

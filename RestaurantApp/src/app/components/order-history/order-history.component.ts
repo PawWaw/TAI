@@ -11,7 +11,6 @@ import { OrderHistoryService } from '../_services/order-history.service';
   styleUrls: ['./order-history.component.css']
 })
 export class OrderHistoryComponent implements OnInit {
-
   
   orders: Order[];
   data: any;
@@ -27,12 +26,12 @@ export class OrderHistoryComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    // if (localStorage.getItem('current_user') == null) { // TODO: odkomentować po podpięciu backendu
-    //   this.router.navigate(['/signin']);
-    //   this._snackBar.open("Sign in to do this operation!", "Close", {
-    //   duration: 2000,
-    // });
-    // }
+    if (localStorage.getItem('auth_token') == null) { 
+      this.router.navigate(['/signin']);
+      this._snackBar.open("Sign in to do this operation!", "Close", {
+      duration: 2000,
+    });
+    }
     this.dataSource = this.orderHistoryService.getOrders();
   }
 }

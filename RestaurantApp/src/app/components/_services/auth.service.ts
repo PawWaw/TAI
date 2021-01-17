@@ -9,7 +9,7 @@ import {throwError} from "rxjs";
   providedIn: 'root'
 })
 export class AuthService {
-  baseurl = 'http://localhost:8080/users/auth'; // TODO: jaka ścieżka do autha z serwera?
+  baseurl = 'https://localhost:44308/api/users/auth'; 
   constructor(private http: HttpClient) { }
   httpOptions = {
     headers: new HttpHeaders({
@@ -18,7 +18,10 @@ export class AuthService {
   };
 
   authenticate(value: string){
-    return this.http.post<any>(this.baseurl,value, {observe: 'response'}).pipe(map((data: HttpResponse<any>)=>this.saveSession(data)),catchError(this.errorHandler));
+    return this.http.post(this.baseurl,value, {responseType: 'text'}).pipe(map(token => {
+      localStorage.setItem('auth_token', token);
+      return token;
+  }), catchError(this.errorHandler));
   }
 
   saveSession(data: HttpResponse<any>){

@@ -12,18 +12,18 @@
           <mat-hint>ID</mat-hint>
         </mat-form-field>
         <mat-form-field class="register-full-width">
-          <input name="orderStation" matInput [(ngModel)]="this.order.orderStation" readonly>
+          <input name="orderStation" matInput [(ngModel)]="this.order.orderStation.address" readonly>
           <mat-hint>Order station</mat-hint>
         </mat-form-field>
         <mat-form-field class="register-full-width" *ngIf="isDelivered">
-          <input name="deliverer" matInput [(ngModel)]="this.order.deliverer" readonly>
+          <input name="deliverer" matInput [(ngModel)]="this.order.deliverer.lastName" readonly>
           <mat-hint>Deliverer</mat-hint>
         </mat-form-field>
         <mat-form-field class="register-full-width" *ngIf="!isDelivered">
           <mat-label>Choose deliverer</mat-label>
           <mat-select (selectionChange)="selectedValue($event)">
-            <mat-option *ngFor="let deliverer of deliverers" [value]="deliverer">
-              {{deliverer}}
+            <mat-option *ngFor="let deliverer of deliverers | async" [value]="deliverer.lastName">
+              {{deliverer.firstName}} {{deliverer.lastName}}
             </mat-option>
           </mat-select>
         </mat-form-field>

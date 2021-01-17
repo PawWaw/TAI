@@ -8,29 +8,8 @@ import { Dish } from '../_models/Dish';
   providedIn: 'root'
 })
 export class DishService {
-  Dishes: Dish[] = [
-    {
-      id: 1,
-      name: 'Spaghetti',
-      price: 16.99,
-      ingredients: [
-          'Makaron pszenny', 'Sos pomidorowy', 'Mięso mielone']
-    },
-    {
-      id: 2,
-      name: 'Omlet',
-      price: 12.99,
-      ingredients: ['Ziemniaki','Jajko']
-    },
-    {
-      id: 3,
-      name: 'Coca-Cola 0.5l',
-      price: 3.99,
-      ingredients: []
-    }
-  ]
 
-  dishUrl = 'http://localhost:8080/dish';
+  dishUrl = 'https://localhost:44308/api/foods';
   temp: any;
 
   constructor(private http: HttpClient) { 
@@ -40,25 +19,24 @@ export class DishService {
     'Content-Type': 'application/json'
   });
 
-  public getDishes(): Dish[] {
-  // public getDishes(): Observable<Dish[]> {
-  //   return this.http.get<Dish[]>(this.dishUrl, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
-    return this.Dishes;
+  public getDishes(): Observable<Dish[]> {
+    return this.http.get<Dish[]>(this.dishUrl, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
   }
 
-  public getSingleDish(id: number): Dish {
-  // public getSingleDish(name: string): Observable<Dish> {
-  //   return this.http.get<Dish>(this.dishUrl + "/" + id, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
-    return this.Dishes.find(x => x.id == id);
+  public getSingleDish(id: number): Observable<Dish> {
+    return this.http.get<Dish>(this.dishUrl + "/" + id, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
   }
 
   public postDish(dish: Dish) {
-    //this.http.post<Dish>(this.dishUrl, dish, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
-    this.Dishes.push(dish);
+    return this.http.post<Dish>(this.dishUrl, dish, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
   }
 
   public modifyDish(dish: Dish) {
-    this.http.patch(this.dishUrl + "/" + dish.id, dish, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
+    return this.http.patch(this.dishUrl + "/" + dish.id, dish, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
+  }
+
+  public deleteDish(id: number) {
+    return this.http.delete(this.dishUrl + "/" + id, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
   }
 
   errorHandler(error: HttpErrorResponse) {

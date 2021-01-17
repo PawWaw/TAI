@@ -32,6 +32,7 @@ import { DishDetailsComponent } from './components/dish-details/dish-details.com
 import { MatIconModule } from '@angular/material';
 import { DishModifyComponent } from './components/dish-modify/dish-modify.component';
 import { AddDishComponent } from './components/add-dish/add-dish.component';
+import { DataSharingService } from './components/_services/data-sharing.service';
 
 @NgModule({
   declarations: [
@@ -71,7 +72,9 @@ import { AddDishComponent } from './components/add-dish/add-dish.component';
     MatProgressSpinnerModule,
     OAuthModule.forRoot()
   ],
-  providers: [],
+  providers: [
+    DataSharingService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

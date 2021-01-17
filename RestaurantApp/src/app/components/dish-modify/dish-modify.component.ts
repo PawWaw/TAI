@@ -4,6 +4,8 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { Dish } from '../_models/Dish';
 import { Ingredient } from '../_models/Ingredient';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { DishService } from '../_services/dish.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dish-modify',
@@ -22,6 +24,8 @@ export class DishModifyComponent implements OnInit {
     private _location: Location,
     private _snackBar: MatSnackBar,
     private formBuilder: FormBuilder,
+    private dishService: DishService,
+    private router: Router
     ) { }
 
   ngOnInit() {
@@ -50,7 +54,6 @@ export class DishModifyComponent implements OnInit {
   deleteIngredient(ingredient: String) {
     delete this.ingredients[this.ingredients.findIndex(x => x == ingredient)];
     this.ingredients = this.ingredients.filter(value => Object.keys(value).length !== 0);
-    console.log(this.ingredients);
   }
 
   backClicked() {
@@ -75,8 +78,26 @@ export class DishModifyComponent implements OnInit {
 
   modifyItem() {
     this.modifiedDish.id = this.dish.id;
+    this.modifiedDish.price = this.dish.price;
     this.modifiedDish.name = this.formGroup.get('name').value;
     this.modifiedDish.ingredients = this.ingredients;
     console.log(this.modifiedDish);
+    this.dishService.modifyDish(this.modifiedDish).subscribe(
+      data=>{
+        this.router.navigate(['/dish']);
+      },
+      error=>{
+      }
+    );
+  }
+
+  deleteItem() {
+    this.dishService.deleteDish(this.dish.id).subscribe(
+      data=>{
+        this.router.navigate(['/dish']);
+      },
+      error=>{
+      }
+    );
   }
 }

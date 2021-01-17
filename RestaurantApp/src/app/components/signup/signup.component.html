@@ -24,6 +24,14 @@
           <input matInput placeholder="Last name" formControlName="lastName">
         </mat-form-field>
         <mat-form-field class="register-full-width">
+          <input matInput type="city" placeholder="City" formControlName="city">
+          <mat-error *ngIf="city.hasError('required')">City is <strong>required</strong></mat-error>
+        </mat-form-field>
+        <mat-form-field class="register-full-width">
+          <input matInput type="address" placeholder="Address" formControlName="address">
+          <mat-error *ngIf="address.hasError('required')">Address is <strong>required</strong></mat-error>
+        </mat-form-field>
+        <mat-form-field class="register-full-width">
           <input matInput type="password" placeholder="Password*" formControlName="password" (input)="onPasswordInput()">
           <mat-error *ngIf="password.hasError('required')">Password is <strong>required</strong></mat-error>
           <mat-error *ngIf="password.hasError('minlength')">Password must have at least {{minPwLength}} characters</mat-error>

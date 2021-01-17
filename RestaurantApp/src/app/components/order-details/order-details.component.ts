@@ -5,6 +5,8 @@ import { Order } from '../_models/Order';
 import { Router } from '@angular/router';
 import { OrderService } from '../_services/order.service';
 import { MatSelectChange } from '@angular/material';
+import { Deliverer } from '../_models/Deliverer';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-details',
@@ -16,7 +18,7 @@ export class OrderDetailsComponent implements OnInit {
   formGroup: FormGroup;
   order: Order;
   isDelivered: boolean;
-  deliverers: String[];
+  deliverers: Observable<Deliverer[]>;
   selectedData: string
 
   constructor(
@@ -29,7 +31,8 @@ export class OrderDetailsComponent implements OnInit {
   ngOnInit() {
     this.deliverers = this.orderService.getDeliverers();
     this.order = JSON.parse(localStorage.getItem('row'));
-    if (this.order.deliverer == "") {
+    console.log(this.deliverers);
+    if (this.order.deliverer == null) {
       this.isDelivered = false;
     } else {
       this.isDelivered = true;
@@ -70,8 +73,13 @@ export class OrderDetailsComponent implements OnInit {
 
   modifyItem() {
     this.order.deliverer = this.selectedData;
-    console.log(this.order);
-    this.orderService.modifyOrder(this.order);
+    this.orderService.modifyOrder(this.order).subscribe(
+      data=>{
+        this.router.navigate(['']);
+      },
+      error=>{
+      }
+    );
   }
 
   selectedValue(event: MatSelectChange) {
