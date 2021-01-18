@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Backend.Model;
 using Backend.RestModel;
 using Backend.Helpers;
-using Microsoft.AspNetCore.JsonPatch;
 
 namespace Backend.Controllers
 {
