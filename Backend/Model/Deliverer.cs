@@ -29,6 +29,10 @@ namespace Backend.Model
             this.password = user.Value;
             this.Username = user.Username;
         }
+        public void InsertHashedPassword(string password)
+        {
+            this.password = password;
+        }
         [Key]
         public long Id { get; set; }
         [Column("cityId")]

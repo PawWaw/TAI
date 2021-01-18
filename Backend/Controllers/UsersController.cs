@@ -85,9 +85,9 @@ namespace Backend.Controllers
         {
             var userId = (long)HttpContext.Items["UserId"];
             var authUser = await _context.Users.FirstAsync(u=>u.Id == userId);
-            if(authUser.Password == passwordPut.OldPassword.Value)
+            if (authUser.Password == passwordPut.OldPassword.Value)
             {
-                authUser.Password = passwordPut.NewPassword.Value;
+                authUser.InsertHashedPassword(passwordPut.NewPassword.Value);
             }
             _context.Entry(authUser).State = EntityState.Modified;
 
