@@ -31,8 +31,10 @@ namespace Backend.Controllers
             {
                 ClientRate = deliverer.DelivererRates.Average(d => d.Value),
                 TotalDelivery = deliverer.Orders.Count,
-                CurrentOrders = deliverer.Orders.Where(o => o.Status != "ENDED").Count(),
-                MaxDailyOrders = deliverer.Orders.GroupBy(o => o.EndTime.Date.ToString("d")).Count()
+                CurrentOrders = deliverer.Orders.Where(o => o.Status.TrimEnd() != "ENDED").Count(),
+                MaxDailyOrders = deliverer.Orders.Where(o => o.Status.TrimEnd() == "ENDED")
+                                    .GroupBy(o => o.EndTime.Date.ToString("d"))
+                                    .Max(gr => gr.Count())
             };
             return Ok(statistics);
         }
