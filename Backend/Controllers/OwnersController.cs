@@ -73,10 +73,10 @@ namespace Backend.Controllers
             }
             return Ok();
         }
-        // PUT: api/Owners/password
+        // PUT: api/Owners/user/password
         // Update password
         [Authorize]
-        [HttpPut("password")]
+        [HttpPut("user/password")]
         public async Task<IActionResult> PutPassword(WsPasswordPut passwordPut)
         {
             var userId = (long)HttpContext.Items["UserId"];
@@ -109,8 +109,13 @@ namespace Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> PostOwner([Bind("address,username,password,email,firstName,lastName,city")] WsUser user)
         {
-            Owner dbOwner = new Owner();
-            dbOwner.FillProperties(user);
+            Owner newOwner = new Owner();
+            newOwner.FillProperties(user);
+            var dbOwner = _context.Owners.FirstOrDefaultAsync(o => o.Username == newOwner.Username);
+            if(dbOwner!=null)
+            {
+                return StatusCode(409);
+            }
             if (user.City != null && user.City.Length > 0)
             {
                 City temp = _context.Cities.Where(c => c.Name == user.City).SingleOrDefault();
@@ -122,10 +127,10 @@ namespace Backend.Controllers
                     };
                     _context.Cities.Add(temp);
                 }
-                dbOwner.CityId = temp.Id;
-                dbOwner.City = temp;
+                newOwner.CityId = temp.Id;
+                newOwner.City = temp;
             }
-            _context.Owners.Add(dbOwner);
+            _context.Owners.Add(newOwner);
             await _context.SaveChangesAsync();
 
             return Ok();

@@ -113,9 +113,14 @@ namespace Backend.Controllers
         [HttpPost("user/register")]
         public async Task<IActionResult> PostUser([Bind("address,username,password,email,firstName,lastName,city")] WsUser user)
         {
-            User dbUser = new User();
-            dbUser.FillProperties(user);
-            if(user.City !=null && user.City.Length > 0)
+            User newUser = new User();
+            newUser.FillProperties(user);
+            var dbUser = _context.Deliverers.FirstOrDefaultAsync(o => o.Username == newUser.Username);
+            if (dbUser != null)
+            {
+                return StatusCode(409);
+            }
+            if (user.City !=null && user.City.Length > 0)
             {
                 City temp = _context.Cities.Where(c => c.Name == user.City).SingleOrDefault();
                 if(temp == null)
@@ -126,10 +131,10 @@ namespace Backend.Controllers
                     };
                     _context.Cities.Add(temp);
                 }
-                dbUser.CityId = temp.Id;
-                dbUser.City = temp;
+                newUser.CityId = temp.Id;
+                newUser.City = temp;
             }
-            _context.Users.Add(dbUser);
+            _context.Users.Add(newUser);
             await _context.SaveChangesAsync();
 
             return Ok();

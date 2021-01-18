@@ -128,8 +128,13 @@ namespace Backend.Controllers
         [HttpPost("user/register")]
         public async Task<IActionResult> PostDeliverer([Bind("address,username,password,email,firstName,lastName,city")] WsUser user)
         {
-            Deliverer dbDeliverer = new Deliverer();
-            dbDeliverer.FillProperties(user);
+            Deliverer newDeliverer = new Deliverer();
+            newDeliverer.FillProperties(user);
+            var dbDeliverer = _context.Deliverers.FirstOrDefaultAsync(o => o.Username == newDeliverer.Username);
+            if (dbDeliverer != null)
+            {
+                return StatusCode(409);
+            }
             if (user.City != null && user.City.Length > 0)
             {
                 City temp = _context.Cities.Where(c => c.Name == user.City).SingleOrDefault();
@@ -141,10 +146,10 @@ namespace Backend.Controllers
                     };
                     _context.Cities.Add(temp);
                 }
-                dbDeliverer.CityId = temp.Id;
-                dbDeliverer.City = temp;
+                newDeliverer.CityId = temp.Id;
+                newDeliverer.City = temp;
             }
-            _context.Deliverers.Add(dbDeliverer);
+            _context.Deliverers.Add(newDeliverer);
             await _context.SaveChangesAsync();
 
             return Ok();
