@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using Backend.RestModel;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 #nullable disable
 
@@ -26,7 +27,7 @@ namespace Backend.Model
             this.Email = user.Email;
             this.FirstName = user.FirstName;
             this.LastName = user.LastName;
-            this.password = user.Password;
+            this.password = user.Value;
             this.Username = user.Username;
         }
         [Key]
@@ -42,6 +43,7 @@ namespace Backend.Model
         [StringLength(50)]
         public string Username { get; set; }
         [Required]
+        [JsonIgnore]
         [Column("password")]
         public string Password { get { return password; } set { password = GenerateHash(value); } }
         [Required]

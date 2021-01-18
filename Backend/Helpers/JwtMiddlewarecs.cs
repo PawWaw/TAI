@@ -50,9 +50,8 @@ namespace Backend.Helpers
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
                 var userId = long.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
-                var user = dbContext.Users.Include(u=>u.City).FirstOrDefault(u=> u.Id == userId);
                 // attach user to context on successful jwt validation
-                context.Items["User"] = user;
+                context.Items["UserId"] = userId;
             }
             catch
             {

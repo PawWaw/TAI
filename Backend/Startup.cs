@@ -60,7 +60,7 @@ namespace Backend
 
             }
             app.UseHttpsRedirection();
-
+            
             app.UseRouting();
 
             app.UseCors(MyAllowSpecificOrigins);

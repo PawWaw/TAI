@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Backend.Model;
 using Backend.RestModel;
 using Backend.Helpers;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace Backend.Controllers
 {
@@ -20,19 +21,21 @@ namespace Backend.Controllers
         }
 
         // GET: api/Users
-        [HttpGet]
         [Authorize]
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
         }
 
-        // GET: api/Users/5
+        // GET: api/Users/user
+        // Information about current logged in user
         [Authorize]
         [HttpGet("user")]
-        public ActionResult<User> GetUser()
+        public async Task<ActionResult<LoginResponse>> GetUserAsync()
         {
-            var user = (User)HttpContext.Items["User"];
+            var userId = (long)HttpContext.Items["UserId"];
+            var user = await _context.Users.Include(u => u.City).FirstAsync(u => u.Id == userId);
             LoginResponse loginResponse = new LoginResponse
             {
                 Token = JwtService.GenerateJwtToken(user.Id),
@@ -44,22 +47,18 @@ namespace Backend.Controllers
                 LastName = user.LastName
             };
             return Ok(loginResponse);
-            //return Ok();
         }
 
-        // PUT: api/Users/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        // PUT: api/Users/user
+        // Update user
         [Authorize]
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(long id, User user)
+        [HttpPut("user")]
+        public async Task<IActionResult> PutUser(WsPutUser wsUser)
         {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(user).State = EntityState.Modified;
+            var userId = (long)HttpContext.Items["UserId"];
+            var authUser = await _context.Users.Include(u => u.City).FirstAsync(u => u.Id == userId);
+            wsUser.FIllPutUser(authUser);
+            _context.Entry(authUser).State = EntityState.Modified;
 
             try
             {
@@ -67,7 +66,7 @@ namespace Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserExists(id))
+                if (!UserExists(authUser.Id))
                 {
                     return NotFound();
                 }
@@ -76,14 +75,43 @@ namespace Backend.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
+            return Ok();
         }
+        // PUT: api/Users/password
+        // Update password
+        [Authorize]
+        [HttpPut("password")]
+        public async Task<IActionResult> PutPassword(WsPasswordPut passwordPut)
+        {
+            var userId = (long)HttpContext.Items["UserId"];
+            var authUser = await _context.Users.FirstAsync(u=>u.Id == userId);
+            if(authUser.Password == passwordPut.OldPassword.Value)
+            {
+                authUser.Password = passwordPut.NewPassword.Value;
+            }
+            _context.Entry(authUser).State = EntityState.Modified;
 
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(authUser.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return Ok();
+        }
         // POST: api/Users
         // Register
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser([Bind("address,username,password,email,firstName,lastName,city")] WsUser user)
+        public async Task<IActionResult> PostUser([Bind("address,username,password,email,firstName,lastName,city")] WsUser user)
         {
             User dbUser = new User();
             dbUser.FillProperties(user);
@@ -104,19 +132,18 @@ namespace Backend.Controllers
             _context.Users.Add(dbUser);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = dbUser.Id }, user);
-            //return Ok();
+            return Ok();
         }
 
         // POST: api/Users/auth
         // Authorization
         [HttpPost("auth")]
-        public async Task<ActionResult<User>> Login(LoginRequest user)
+        public async Task<ActionResult<LoginResponse>> Login(LoginRequest user)
         {
             if(ModelState.IsValid)
             {
                 var findUser = await _context.Users.Include(u=>u.City)
-                    .FirstOrDefaultAsync(m => m.Username == user.Username && m.Password == user.Password);
+                    .FirstOrDefaultAsync(m => m.Username == user.Username && m.Password == user.Value);
                 if (findUser != null)
                 {
                     LoginResponse loginResponse = new LoginResponse
@@ -156,5 +183,6 @@ namespace Backend.Controllers
         {
             return _context.Users.Any(e => e.Id == id);
         }
+       
     }
 }

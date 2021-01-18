@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace Backend.RestModel
     {
         private string password;
         [Required]
-        public string Password { get {return password; } set {password = GenerateHash(value); } }
+        public string Value { get {return password; } set {password = GenerateHash(value); } }
         public String GenerateHash(String Input)
         {
             byte[] bytes = System.Text.Encoding.UTF8.GetBytes(Input);
