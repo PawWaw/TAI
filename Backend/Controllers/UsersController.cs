@@ -108,9 +108,9 @@ namespace Backend.Controllers
             }
             return Ok();
         }
-        // POST: api/Users
+        // POST: api/Users/user/register
         // Register
-        [HttpPost]
+        [HttpPost("user/register")]
         public async Task<IActionResult> PostUser([Bind("address,username,password,email,firstName,lastName,city")] WsUser user)
         {
             User dbUser = new User();
@@ -137,7 +137,7 @@ namespace Backend.Controllers
 
         // POST: api/Users/auth
         // Authorization
-        [HttpPost("auth")]
+        [HttpPost("login")]
         public async Task<ActionResult<LoginResponse>> Login(LoginRequest user)
         {
             if(ModelState.IsValid)

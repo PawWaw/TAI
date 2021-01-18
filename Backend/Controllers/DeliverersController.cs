@@ -92,10 +92,10 @@ namespace Backend.Controllers
             }
             return Ok();
         }
-        // PUT: api/Deliverers/password
+        // PUT: api/Deliverers/user/password
         // Update password
         [Authorize]
-        [HttpPut("password")]
+        [HttpPut("user/password")]
         public async Task<IActionResult> PutPassword(WsPasswordPut passwordPut)
         {
             var userId = (long)HttpContext.Items["UserId"];
@@ -123,13 +123,13 @@ namespace Backend.Controllers
             }
             return Ok();
         }
-        // POST: api/Deliverers
+        // POST: api/Deliverers/user/register
         // Register
-        [HttpPost]
+        [HttpPost("user/register")]
         public async Task<IActionResult> PostDeliverer([Bind("address,username,password,email,firstName,lastName,city")] WsUser user)
         {
-            Deliverer dbOwner = new Deliverer();
-            dbOwner.FillProperties(user);
+            Deliverer dbDeliverer = new Deliverer();
+            dbDeliverer.FillProperties(user);
             if (user.City != null && user.City.Length > 0)
             {
                 City temp = _context.Cities.Where(c => c.Name == user.City).SingleOrDefault();
@@ -141,10 +141,10 @@ namespace Backend.Controllers
                     };
                     _context.Cities.Add(temp);
                 }
-                dbOwner.CityId = temp.Id;
-                dbOwner.City = temp;
+                dbDeliverer.CityId = temp.Id;
+                dbDeliverer.City = temp;
             }
-            _context.Deliverers.Add(dbOwner);
+            _context.Deliverers.Add(dbDeliverer);
             await _context.SaveChangesAsync();
 
             return Ok();
@@ -152,7 +152,7 @@ namespace Backend.Controllers
 
         // POST: api/Deliverers/auth
         // Authorization
-        [HttpPost("auth")]
+        [HttpPost("user/login")]
         public async Task<ActionResult<LoginResponse>> Login(LoginRequest user)
         {
             if (ModelState.IsValid)
