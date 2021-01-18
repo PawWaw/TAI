@@ -26,7 +26,7 @@ namespace Backend.Controllers
         {
             List<Dish> dish_list = new List<Dish>();
             User user = await _context.Users.Where(f => f.Username == username).FirstOrDefaultAsync();
-            List<long> foodIds = await _context.FoodUsers.Where(f => f.IdUser == user.Id).Select(a => a.IdFood).ToListAsync();
+            List<long> foodIds = await _context.Foods.Where(f => f.IdRestaurant == user.Id).Select(a => a.Id).ToListAsync();
 
             IEnumerable<Food> list_food = await _context.Foods.Include(f=>f.FoodIngredients).Where(f=>(bool)f.IsActive == true).ToListAsync();
             foreach(Food food in list_food)
@@ -57,7 +57,7 @@ namespace Backend.Controllers
         {
             var food = await _context.Foods.Include(f => f.FoodIngredients).Where(f => (bool)f.IsActive == true).SingleOrDefaultAsync(f => f.Id == id);
             User user = await _context.Users.Where(f => f.Username == username).FirstOrDefaultAsync();
-            List<long> foodIds = await _context.FoodUsers.Where(f => f.IdUser == user.Id).Select(a => a.IdFood).ToListAsync();
+            List<long> foodIds = await _context.Foods.Where(f => f.IdRestaurant == user.Id).Select(a => a.Id).ToListAsync();
 
             if (food == null)
             {
@@ -124,14 +124,9 @@ namespace Backend.Controllers
             food.inject_data(dish);
             Ingredient temp_ingredient;
             food.IsActive = true;
-            _context.Foods.Add(food);
-            await _context.SaveChangesAsync();
-
             User user = await _context.Users.Where(f => f.Username == username).FirstOrDefaultAsync();
-            FoodUser foodUser = new FoodUser();
-            foodUser.IdFood = food.Id;
-            foodUser.IdUser = user.Id;
-            _context.FoodUsers.Add(foodUser);
+            food.IdRestaurant = user.Id;
+            _context.Foods.Add(food);
             await _context.SaveChangesAsync();
 
             foreach (string ingredient in dish.ingredients)

@@ -1,11 +1,10 @@
 ﻿using System;
-using Backend.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
-namespace Backend
+namespace Backend.Model
 {
     public partial class DragorantContext : DbContext
     {
@@ -25,7 +24,6 @@ namespace Backend
         public virtual DbSet<FoodIngredient> FoodIngredients { get; set; }
         public virtual DbSet<FoodOrder> FoodOrders { get; set; }
         public virtual DbSet<FoodRate> FoodRates { get; set; }
-        public virtual DbSet<FoodUser> FoodUsers { get; set; }
         public virtual DbSet<Ingredient> Ingredients { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<OrderStation> OrderStations { get; set; }
@@ -38,7 +36,7 @@ namespace Backend
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=DESKTOP-IJ6PTEF;Database=Dragorant;Trusted_Connection=True;MultipleActiveResultSets=true");
+                optionsBuilder.UseSqlServer("Server=DESKTOP-IJ6PTEF;Database=Dragorant;Trusted_Connection=True;");
             }
         }
 
@@ -130,6 +128,8 @@ namespace Backend
             {
                 entity.ToTable("Food");
 
+                entity.Property(e => e.IdRestaurant).HasColumnName("idRestaurant");
+
                 entity.Property(e => e.IsActive).HasColumnName("isActive");
 
                 entity.Property(e => e.Name)
@@ -139,6 +139,12 @@ namespace Backend
                     .IsFixedLength(true);
 
                 entity.Property(e => e.Price).HasColumnName("price");
+
+                entity.HasOne(d => d.IdRestaurantNavigation)
+                    .WithMany(p => p.Foods)
+                    .HasForeignKey(d => d.IdRestaurant)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Food_Restaurant");
             });
 
             modelBuilder.Entity<FoodIngredient>(entity =>
@@ -208,23 +214,6 @@ namespace Backend
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_FoodRate_User");
-            });
-
-            modelBuilder.Entity<FoodUser>(entity =>
-            {
-                entity.ToTable("FoodUser");
-
-                entity.HasOne(d => d.IdFoodNavigation)
-                    .WithMany(p => p.FoodUsers)
-                    .HasForeignKey(d => d.IdFood)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_FoodUser_Food");
-
-                entity.HasOne(d => d.IdUserNavigation)
-                    .WithMany(p => p.FoodUsers)
-                    .HasForeignKey(d => d.IdUser)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_FoodUser_User");
             });
 
             modelBuilder.Entity<Ingredient>(entity =>

@@ -43,6 +43,10 @@ namespace Backend.Model
 
         [Column("isActive")]
         public bool? IsActive { get; set; }
+        [Column("idRestaurant")]
+        public long IdRestaurant { get; set; }
+
+        public virtual Restaurant IdRestaurantNavigation { get; set; }
 
         [InverseProperty(nameof(FoodIngredient.Food))]
         public virtual ICollection<FoodIngredient> FoodIngredients { get; set; }
@@ -50,7 +54,5 @@ namespace Backend.Model
         public virtual ICollection<FoodOrder> FoodOrders { get; set; }
         [InverseProperty(nameof(FoodRate.Food))]
         public virtual ICollection<FoodRate> FoodRates { get; set; }
-
-        public virtual ICollection<FoodUser> FoodUsers { get; set; }
     }
 }

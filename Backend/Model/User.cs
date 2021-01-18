@@ -65,7 +65,6 @@ namespace Backend.Model
         [InverseProperty(nameof(Order.User))]
         public virtual ICollection<Order> Orders { get; set; }
 
-        public virtual ICollection<FoodUser> FoodUsers { get; set; }
 
         public String GenerateHash(String Input)
         {

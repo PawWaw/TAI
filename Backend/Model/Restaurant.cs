@@ -13,6 +13,7 @@ namespace Backend.Model
     {
         public Restaurant()
         {
+            Foods = new HashSet<Food>();
             OrderStations = new HashSet<OrderStation>();
         }
 
@@ -31,5 +32,6 @@ namespace Backend.Model
         public virtual Owner Owner { get; set; }
         [InverseProperty(nameof(OrderStation.Resteurant))]
         public virtual ICollection<OrderStation> OrderStations { get; set; }
+        public virtual ICollection<Food> Foods { get; set; }
     }
 }
