@@ -107,6 +107,19 @@ namespace Backend.Controllers
             return order;
         }
 
+        [HttpGet("isCurrent")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrders([FromQuery] bool current)
+        {
+            if (current)
+            {
+                return await _context.Orders.Where(e => e.Status != "ENDED").Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).ToListAsync();
+            }
+            else
+            {
+                return await _context.Orders.Where(e => e.Status == "ENDED").Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).ToListAsync();
+            }
+        }
+
         [HttpGet("{username}/isCurrent")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders([FromQuery] bool current, string username)
         {
