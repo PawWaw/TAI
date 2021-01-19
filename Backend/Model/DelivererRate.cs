@@ -25,5 +25,8 @@ namespace Backend.Model
         [ForeignKey(nameof(DelivererId))]
         [InverseProperty("DelivererRates")]
         public virtual Deliverer Deliverer { get; set; }
+        [ForeignKey(nameof(UserId))]
+        [InverseProperty("DelivererRates")]
+        public virtual User User { get; set; }
     }
 }

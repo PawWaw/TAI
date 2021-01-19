@@ -9,6 +9,12 @@ using Backend.Model;
 
 namespace Backend.Controllers
 {
+    public class BaseDelivererRate
+    {
+        public long id { get; set; }
+        public int rate { get; set; }
+    }
+
     [Route("api/[controller]")]
     [ApiController]
     public class DelivererRatesController : ControllerBase
@@ -76,9 +82,14 @@ namespace Backend.Controllers
         // POST: api/DelivererRates
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<DelivererRate>> PostDelivererRate(DelivererRate delivererRate)
+        [HttpPost("RateDeliverer")]
+        public async Task<ActionResult<DelivererRate>> PostDelivererRate(BaseDelivererRate baseDelivererRate)
         {
+            DelivererRate delivererRate = new DelivererRate();
+            delivererRate.Date = DateTime.Now;
+            delivererRate.DelivererId = baseDelivererRate.id;
+            delivererRate.Value = baseDelivererRate.rate;
+            delivererRate.UserId = 1;//////////////////////////////////////////////////////                      TUTAJ BARTEK ID Z TOKENA
             _context.DelivererRates.Add(delivererRate);
             await _context.SaveChangesAsync();
 

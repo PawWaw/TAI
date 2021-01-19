@@ -17,6 +17,7 @@ namespace Backend.Model
         private string password;
         public User()
         {
+            DelivererRates = new HashSet<DelivererRate>();
             FoodRates = new HashSet<FoodRate>();
             Orders = new HashSet<Order>();
         }
@@ -64,7 +65,8 @@ namespace Backend.Model
         public virtual ICollection<FoodRate> FoodRates { get; set; }
         [InverseProperty(nameof(Order.User))]
         public virtual ICollection<Order> Orders { get; set; }
-
+        [InverseProperty(nameof(DelivererRate.User))]
+        public virtual ICollection<DelivererRate> DelivererRates { get; set; }
 
         public String GenerateHash(String Input)
         {

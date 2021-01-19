@@ -122,6 +122,12 @@ namespace Backend.Model
                     .HasForeignKey(d => d.DelivererId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_DelivererRate_Deliverer");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.DelivererRates)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_DelivererRate_User");
             });
 
             modelBuilder.Entity<Food>(entity =>

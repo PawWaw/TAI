@@ -9,6 +9,12 @@ using Backend.Model;
 
 namespace Backend.Controllers
 {
+    public class BodyFoodRates
+    {
+        public long id { get; set; }
+        public long rate { get; set; }
+    }
+
     [Route("api/[controller]")]
     [ApiController]
     public class FoodRatesController : ControllerBase
@@ -76,9 +82,14 @@ namespace Backend.Controllers
         // POST: api/FoodRates
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<FoodRate>> PostFoodRate(FoodRate foodRate)
+        [HttpPost("RateFood")]
+        public async Task<ActionResult<FoodRate>> PostFoodRate(BodyFoodRates bodyFoodRate)
         {
+            FoodRate foodRate = new FoodRate();
+            foodRate.Date = DateTime.Now;
+            foodRate.FoodId = bodyFoodRate.id;
+            foodRate.Value = bodyFoodRate.rate;
+            foodRate.UserId = 1; ////////////////////////////////////////////////////////////////////////////////////        TUTAJ TOKEN BARTEK
             _context.FoodRates.Add(foodRate);
             await _context.SaveChangesAsync();
 
