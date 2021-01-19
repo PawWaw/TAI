@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using Backend.RestModel;
-using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 #nullable disable
 
@@ -21,14 +21,18 @@ namespace Backend.Model
             FoodRates = new HashSet<FoodRate>();
             Orders = new HashSet<Order>();
         }
-        public void fillProperties(WsUser user)
+        public void FillProperties(WsUser user)
         {
             this.Address = user.Address;
             this.Email = user.Email;
             this.FirstName = user.FirstName;
             this.LastName = user.LastName;
-            this.Password = user.Password;
+            this.password = user.Value;
             this.Username = user.Username;
+        }
+        public void InsertHashedPassword(string password)
+        {
+            this.password = password;
         }
         [Key]
         public long Id { get; set; }
@@ -43,6 +47,7 @@ namespace Backend.Model
         [StringLength(50)]
         public string Username { get; set; }
         [Required]
+        [JsonIgnore]
         [Column("password")]
         public string Password { get { return password; } set { password = GenerateHash(value); } }
         [Required]

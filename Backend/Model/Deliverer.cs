@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
+using System.Text;
+using Backend.RestModel;
 
 #nullable disable
 
@@ -11,12 +12,26 @@ namespace Backend.Model
     [Table("Deliverer")]
     public partial class Deliverer
     {
+        private string password;
+
         public Deliverer()
         {
             DelivererRates = new HashSet<DelivererRate>();
             Orders = new HashSet<Order>();
         }
-
+        public void FillProperties(WsUser user)
+        {
+            this.Address = user.Address;
+            this.Email = user.Email;
+            this.FirstName = user.FirstName;
+            this.LastName = user.LastName;
+            this.password = user.Value;
+            this.Username = user.Username;
+        }
+        public void InsertHashedPassword(string password)
+        {
+            this.password = password;
+        }
         [Key]
         public long Id { get; set; }
         [Column("cityId")]
@@ -31,7 +46,7 @@ namespace Backend.Model
         public string Username { get; set; }
         [Required]
         [Column("password")]
-        public string Password { get; set; }
+        public string Password { get { return password; } set { password = GenerateHash(value); } }
         [Required]
         [Column("email")]
         [StringLength(50)]
@@ -54,5 +69,24 @@ namespace Backend.Model
         public virtual ICollection<DelivererRate> DelivererRates { get; set; }
         [InverseProperty(nameof(Order.Deliverer))]
         public virtual ICollection<Order> Orders { get; set; }
+        public String GenerateHash(String Input)
+        {
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(Input);
+            System.Security.Cryptography.SHA256Managed hashString = new System.Security.Cryptography.SHA256Managed();
+            byte[] hash = hashString.ComputeHash(bytes);
+
+            return ByteArrayToHexString(hash);
+        }
+        private String ByteArrayToHexString(byte[] bytes)
+        {
+            StringBuilder hex = new StringBuilder(bytes.Length * 2);
+
+            foreach (byte b in bytes)
+            {
+                hex.AppendFormat("{0:x2}", b);
+            }
+
+            return hex.ToString();
+        }
     }
 }

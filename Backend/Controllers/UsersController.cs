@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Model;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Backend.RestModel;
-using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-using Microsoft.IdentityModel.Tokens;
+using Backend.Helpers;
 
 namespace Backend.Controllers
 {
@@ -27,38 +20,46 @@ namespace Backend.Controllers
         }
 
         // GET: api/Users
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
         }
 
-        // GET: api/Users/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(long id)
+        // GET: api/Users/user
+        // Information about current logged in user
+        [Authorize]
+        [HttpGet("user")]
+        public async Task<ActionResult<LoginResponse>> GetUserAsync()
         {
-            var user = await _context.Users.FindAsync(id);
+            var userId = (long)HttpContext.Items["userId"];
 
-            if (user == null)
+            var user = await _context.Users.Include(u => u.City).FirstAsync(u => u.Id == userId);
+            LoginResponse loginResponse = new LoginResponse
             {
-                return NotFound();
-            }
-
-            return user;
+                Token = JwtService.GenerateUserJwtToken(user),
+                Username = user.Username,
+                Address = user.Address,
+                City = user.City.Name,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName
+            };
+            return Ok(loginResponse);
         }
 
-        // PUT: api/Users/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(long id, User user)
+        // PUT: api/Users/user
+        // Update user
+        [Authorize]
+        [HttpPut("user")]
+        public async Task<IActionResult> PutUser(WsPutUser wsUser)
         {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
+            var userId = (long)HttpContext.Items["userId"];
 
-            _context.Entry(user).State = EntityState.Modified;
+            var authUser = await _context.Users.Include(u => u.City).FirstAsync(u => u.Id == userId);
+            wsUser.FIllPutUser(authUser);
+            _context.Entry(authUser).State = EntityState.Modified;
 
             try
             {
@@ -66,7 +67,7 @@ namespace Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserExists(id))
+                if (!UserExists(authUser.Id))
                 {
                     return NotFound();
                 }
@@ -75,49 +76,94 @@ namespace Backend.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
+            return Ok();
         }
-
-        // POST: api/Users
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<User>> PostUser([Bind("address,username,password,email,firstName,lastName,city")] WsUser user)
+        // PUT: api/Users/password
+        // Update password
+        [Authorize]
+        [HttpPut("password")]
+        public async Task<IActionResult> PutPassword(WsPutPassword passwordPut)
         {
-            User dbUser = new User();
-            dbUser.fillProperties(user);
-            if(user.City !=null && user.City.Length > 0)
+            var userId = (long)HttpContext.Items["userId"];
+
+            var authUser = await _context.Users.FirstAsync(u=>u.Id == userId);
+            if (authUser.Password == passwordPut.OldPassword.Value)
+            {
+                authUser.InsertHashedPassword(passwordPut.NewPassword.Value);
+            }
+            _context.Entry(authUser).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(authUser.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return Ok();
+        }
+        // POST: api/Users/user/register
+        // Register
+        [HttpPost("user/register")]
+        public async Task<IActionResult> PostUser([Bind("address,username,password,email,firstName,lastName,city")] WsUser user)
+        {
+            User newUser = new User();
+            newUser.FillProperties(user);
+            var dbUser = await _context.Deliverers.FirstOrDefaultAsync(o => o.Username == newUser.Username);
+            if (dbUser != null)
+            {
+                return StatusCode(409);
+            }
+            if (user.City !=null && user.City.Length > 0)
             {
                 City temp = _context.Cities.Where(c => c.Name == user.City).SingleOrDefault();
                 if(temp == null)
                 {
-                    temp = new City();
-                    temp.Name = user.City;
+                    temp = new City
+                    {
+                        Name = user.City
+                    };
                     _context.Cities.Add(temp);
                 }
-                dbUser.CityId = temp.Id;
-                dbUser.City = temp;
+                newUser.CityId = temp.Id;
+                newUser.City = temp;
             }
-            _context.Users.Add(dbUser);
+            _context.Users.Add(newUser);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = dbUser.Id }, user);
+            return StatusCode(201);
         }
 
         // POST: api/Users/auth
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost("auth")]
-        public async Task<ActionResult<User>> Login(LoginRequest user)
+        // Authorization
+        [HttpPost("login")]
+        public async Task<ActionResult<LoginResponse>> Login(LoginRequest user)
         {
             if(ModelState.IsValid)
             {
-                var findUser = await _context.Users
-                    .FirstOrDefaultAsync(m => m.Username == user.Username && m.Password == user.Password);
+                var findUser = await _context.Users.Include(u=>u.City)
+                    .FirstOrDefaultAsync(m => m.Username == user.Username && m.Password == user.Value);
                 if (findUser != null)
                 {
-                    return Ok(GenerateJwtToken((int)findUser.Id));
+                    LoginResponse loginResponse = new LoginResponse
+                    {
+                        Token = JwtService.GenerateUserJwtToken(findUser),
+                        Username = findUser.Username,
+                        Address = findUser.Address,
+                        City = findUser.City.Name,
+                        Email = findUser.Email,
+                        FirstName = findUser.FirstName,
+                        LastName = findUser.LastName
+                    };
+                    return Ok(loginResponse);
                 }
             }
             return StatusCode(401); 
@@ -125,6 +171,7 @@ namespace Backend.Controllers
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<ActionResult<User>> DeleteUser(long id)
         {
             var user = await _context.Users.FindAsync(id);
@@ -143,18 +190,6 @@ namespace Backend.Controllers
         {
             return _context.Users.Any(e => e.Id == id);
         }
-        public string GenerateJwtToken(int accountId)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("[SECRET USED TO SIGN AND VERIFY JWT TOKENS, IT CAN BE ANY STRING]");
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[] { new Claim("id", accountId.ToString()) }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
+       
     }
 }

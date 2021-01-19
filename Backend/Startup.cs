@@ -5,10 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Backend.Model;
 using Microsoft.EntityFrameworkCore;
-using System;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using Backend.Helpers;
 
 namespace Backend
 {
@@ -34,33 +31,15 @@ namespace Backend
                   .AllowAnyHeader()
                   .AllowCredentials());
             });
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = Configuration["Jwt:Issuer"],
-                    ValidAudience = Configuration["Jwt:Issuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
-                };
-            });
-            // If we'd like to add custom authorization handlers
-            //
-            //services.AddAuthorization(options =>
-            //{
-            //    options.AddPolicy("OfficeNumberUnder200", policy => policy.Requirements.Add(new MaximumOfficeNumberRequirement(200)));
-            //});
-            //services.AddSingleton<IAuthorizationHandler, MaximumOfficeNumberAuthorizationHandler>();
             services.AddControllersWithViews()
             .AddNewtonsoftJson(options =>
-            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-);
+
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
 
             services.AddControllers();
+            // configure strongly typed settings object
+            services.Configure<AppSettings>(Configuration.GetSection("Jwt"));
             services.AddDistributedMemoryCache();
             services.AddDbContext<DragorantContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
@@ -76,13 +55,11 @@ namespace Backend
 
             }
             app.UseHttpsRedirection();
+            
 
-            app.UseRouting();
             app.UseAuthentication();
             app.UseCors("CorsPolicy");
-            app.UseAuthorization();
-
-
+            app.UseMiddleware<JwtMiddleware>();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

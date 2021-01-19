@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Model;
+using Backend.RestModel;
+using Backend.Helpers;
 
 namespace Backend.Controllers
 {
@@ -18,39 +19,43 @@ namespace Backend.Controllers
             _context = context;
         }
 
-        // GET: api/Owners
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Owner>>> GetOwners()
+        // GET: api/Owners/user
+        // Information about current logged in user
+        [Authorize]
+        [HttpGet("user")]
+        public ActionResult<LoginResponse> GetOwner()
         {
-            return await _context.Owners.ToListAsync();
-        }
+            var ownerId = (long)HttpContext.Items["ownerId"];
 
-        // GET: api/Owners/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Owner>> GetOwner(long id)
-        {
-            var owner = await _context.Owners.FindAsync(id);
-
-            if (owner == null)
+            var user = _context.Owners.Include(o => o.City).FirstOrDefault(o => o.Id == ownerId);
+            if(user == null)
             {
                 return NotFound();
             }
-
-            return owner;
+            LoginResponse loginResponse = new LoginResponse
+            {
+                Token = JwtService.GenerateOwnerJwtToken(user),
+                Username = user.Username,
+                Address = user.Address,
+                City = user.City.Name,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName
+            };
+            return Ok(loginResponse);
         }
 
-        // PUT: api/Owners/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutOwner(long id, Owner owner)
+        // PUT: api/Owners/user
+        // Update user
+        [Authorize]
+        [HttpPut("user")]
+        public async Task<IActionResult> PutOwner(WsPutUser wsUser)
         {
-            if (id != owner.Id)
-            {
-                return BadRequest();
-            }
+            var ownerId = (long)HttpContext.Items["ownerId"];
 
-            _context.Entry(owner).State = EntityState.Modified;
+            var authUser = await _context.Owners.Include(o => o.City).FirstAsync(o => o.Id == ownerId);
+            wsUser.FIllPutUser(authUser);
+            _context.Entry(authUser).State = EntityState.Modified;
 
             try
             {
@@ -58,7 +63,7 @@ namespace Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!OwnerExists(id))
+                if (!OwnerExists(authUser.Id))
                 {
                     return NotFound();
                 }
@@ -67,23 +72,101 @@ namespace Backend.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
+            return Ok();
         }
-
-        // POST: api/Owners
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<Owner>> PostOwner(Owner owner)
+        // PUT: api/Owners/user/password
+        // Update password
+        [Authorize]
+        [HttpPut("user/password")]
+        public async Task<IActionResult> PutPassword(WsPutPassword passwordPut)
         {
-            _context.Owners.Add(owner);
+            var ownerId = (long)HttpContext.Items["ownerId"];
+
+            var authUser = await _context.Owners.FirstAsync(o => o.Id == ownerId);
+            if (authUser.Password == passwordPut.OldPassword.Value)
+            {
+                authUser.InsertHashedPassword(passwordPut.NewPassword.Value);
+            }
+            _context.Entry(authUser).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!OwnerExists(authUser.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return Ok();
+        }
+        // POST: api/Owners
+        // Register
+        [HttpPost]
+        public async Task<IActionResult> PostOwner([Bind("address,username,password,email,firstName,lastName,city")] WsUser user)
+        {
+            Owner newOwner = new Owner();
+            newOwner.FillProperties(user);
+            var dbOwner = await _context.Owners.FirstOrDefaultAsync(o => o.Username == newOwner.Username);
+            if(dbOwner!=null)
+            {
+                return StatusCode(409);
+            }
+            if (user.City != null && user.City.Length > 0)
+            {
+                City temp = _context.Cities.Where(c => c.Name == user.City).SingleOrDefault();
+                if (temp == null)
+                {
+                    temp = new City
+                    {
+                        Name = user.City
+                    };
+                    _context.Cities.Add(temp);
+                }
+                newOwner.CityId = temp.Id;
+                newOwner.City = temp;
+            }
+            _context.Owners.Add(newOwner);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetOwner", new { id = owner.Id }, owner);
+            return StatusCode(201);
+        }
+
+        // POST: api/Owners/auth
+        // Authorization
+        [HttpPost("auth")]
+        public async Task<ActionResult<LoginResponse>> Login(LoginRequest user)
+        {
+            if (ModelState.IsValid)
+            {
+                var findUser = await _context.Owners.Include(u => u.City)
+                    .FirstOrDefaultAsync(m => m.Username == user.Username && m.Password == user.Value);
+                if (findUser != null)
+                {
+                    LoginResponse loginResponse = new LoginResponse
+                    {
+                        Token = JwtService.GenerateOwnerJwtToken(findUser),
+                        Username = findUser.Username,
+                        Address = findUser.Address,
+                        City = findUser.City.Name,
+                        Email = findUser.Email,
+                        FirstName = findUser.FirstName,
+                        LastName = findUser.LastName
+                    };
+                    return Ok(loginResponse);
+                }
+            }
+            return StatusCode(401);
         }
 
         // DELETE: api/Owners/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult<Owner>> DeleteOwner(long id)
         {

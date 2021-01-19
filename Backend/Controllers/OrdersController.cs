@@ -203,6 +203,7 @@ namespace Backend.Controllers
 
         }
 
+        //delete from query and get first with not Ended
         [HttpGet("find")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrdersToRealise([FromQuery] double latitude, [FromQuery] double longitude)
         {

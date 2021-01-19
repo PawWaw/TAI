@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Model;
+using Backend.RestModel;
+using Backend.Helpers;
 
 namespace Backend.Controllers
 {
@@ -20,39 +20,105 @@ namespace Backend.Controllers
             _context = context;
         }
 
-        // GET: api/Deliverers
-        [HttpGet("{username}")]
-        public async Task<ActionResult<IEnumerable<Deliverer>>> GetDeliverers()
+
+        // GET: /api/Deliverers/statistics
+        [Authorize]
+        [HttpGet("statistics")]
+        public ActionResult<WsStatistics> GetStatistics()
         {
-            return await _context.Deliverers.ToListAsync();
+
+            var delivererId = (long)HttpContext.Items["delivererId"];
+
+            var deliverer = _context.Deliverers.Include(d=>d.DelivererRates).Include(d=>d.Orders).FirstOrDefault(o => o.Id == delivererId);
+            WsStatistics statistics = new WsStatistics
+            {
+                ClientRate = deliverer.DelivererRates.Average(d => d.Value),
+                TotalDelivery = deliverer.Orders.Count,
+                CurrentOrders = deliverer.Orders.Where(o => o.Status.TrimEnd() != "ENDED").Count(),
+                MaxDailyOrders = deliverer.Orders.Where(o => o.Status.TrimEnd() == "ENDED")
+                                    .GroupBy(o => o.EndTime.Date.ToString("d"))
+                                    .Max(gr => gr.Count())
+            };
+            return Ok(statistics);
         }
 
-        // GET: api/Deliverers/5
-        [HttpGet("{username}/{id}")]
-        public async Task<ActionResult<Deliverer>> GetDeliverer(long id)
-        {
-            var deliverer = await _context.Deliverers.FindAsync(id);
 
-            if (deliverer == null)
+        // GET: api/Deliverers/user
+        // Information about current logged in user
+        [Authorize]
+        [HttpGet("user")]
+        public ActionResult<LoginResponse> GetDeliverer()
+        {
+
+            var delivererId = (long)HttpContext.Items["delivererId"];
+
+
+            var user = _context.Deliverers.Include(d => d.City).FirstOrDefault(d => d.Id == delivererId);
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return deliverer;
+            LoginResponse loginResponse = new LoginResponse
+            {
+                Token = JwtService.GenerateDelivererJwtToken(user),
+                Username = user.Username,
+                Address = user.Address,
+                City = user.City.Name,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName
+            };
+            return Ok(loginResponse);
         }
 
-        // PUT: api/Deliverers/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutDeliverer(long id, Deliverer deliverer)
-        {
-            if (id != deliverer.Id)
-            {
-                return BadRequest();
-            }
 
-            _context.Entry(deliverer).State = EntityState.Modified;
+        // PUT: api/Deliverers/user
+        // Update user
+        [Authorize]
+        [HttpPut("user")]
+        public async Task<IActionResult> PutDeliverer(WsPutUser wsUser)
+        {
+
+            var delivererId = (long)HttpContext.Items["delivererId"];
+
+            var authUser = await _context.Deliverers.Include(d => d.City).FirstAsync(d => d.Id == delivererId);
+            wsUser.FIllPutUser(authUser);
+            _context.Entry(authUser).State = EntityState.Modified;
+
+            try
+            {
+
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!DelivererExists(authUser.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return Ok();
+        }
+        // PUT: api/Deliverers/user/password
+        // Update password
+        [Authorize]
+        [HttpPut("user/password")]
+        public async Task<IActionResult> PutPassword(WsPutPassword passwordPut)
+        {
+            var delivererId = (long)HttpContext.Items["delivererId"];
+
+
+            var authUser = await _context.Deliverers.FirstAsync(d => d.Id == delivererId);
+            if (authUser.Password == passwordPut.OldPassword.Value)
+            {
+                authUser.InsertHashedPassword(passwordPut.NewPassword.Value);
+            }
+            _context.Entry(authUser).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +126,8 @@ namespace Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!DelivererExists(id))
+
+                if (!DelivererExists(authUser.Id))
                 {
                     return NotFound();
                 }
@@ -70,19 +137,68 @@ namespace Backend.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok();
         }
 
-        // POST: api/Deliverers
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<Deliverer>> PostDeliverer(Deliverer deliverer)
+        // POST: api/Deliverers/user/register
+        // Register
+        [HttpPost("user/register")]
+        public async Task<IActionResult> PostDeliverer([Bind("address,username,password,email,firstName,lastName,city")] WsUser user)
         {
-            _context.Deliverers.Add(deliverer);
+
+            Deliverer newDeliverer = new Deliverer();
+            newDeliverer.FillProperties(user);
+            var dbDeliverer = await _context.Deliverers.FirstOrDefaultAsync(o => o.Username == newDeliverer.Username);
+            if (dbDeliverer != null)
+            {
+                return StatusCode(409);
+            }
+            if (user.City != null && user.City.Length > 0)
+            {
+                City temp = _context.Cities.Where(c => c.Name == user.City).SingleOrDefault();
+                if (temp == null)
+                {
+                    temp = new City
+                    {
+                        Name = user.City
+                    };
+                    _context.Cities.Add(temp);
+                }
+                newDeliverer.CityId = temp.Id;
+                newDeliverer.City = temp;
+            }
+            _context.Deliverers.Add(newDeliverer);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetDeliverer", new { id = deliverer.Id }, deliverer);
+
+            return StatusCode(201);
+        }
+
+        // POST: api/Deliverers/auth
+        // Authorization
+        [HttpPost("user/login")]
+        public async Task<ActionResult<LoginResponse>> Login(LoginRequest user)
+        {
+            if (ModelState.IsValid)
+            {
+                var findUser = await _context.Deliverers.Include(u => u.City)
+                    .FirstOrDefaultAsync(m => m.Username == user.Username && m.Password == user.Value);
+                if (findUser != null)
+                {
+                    LoginResponse loginResponse = new LoginResponse
+                    {
+                        Token = JwtService.GenerateDelivererJwtToken(findUser),
+                        Username = findUser.Username,
+                        Address = findUser.Address,
+                        City = findUser.City.Name,
+                        Email = findUser.Email,
+                        FirstName = findUser.FirstName,
+                        LastName = findUser.LastName
+                    };
+                    return Ok(loginResponse);
+                }
+            }
+            return StatusCode(401);
         }
 
         // DELETE: api/Deliverers/5
