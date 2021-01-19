@@ -30,7 +30,7 @@ namespace Backend.Model
         public string Status { get; set; }
         public DateTime StartTime { get; set; }
         [Column("endTime")]
-        public DateTime EndTime { get; set; }
+        public DateTime? EndTime { get; set; }
 
         [ForeignKey(nameof(DelivererId))]
         [InverseProperty("Orders")]

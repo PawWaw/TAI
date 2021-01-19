@@ -9,6 +9,17 @@ using Backend.Model;
 
 namespace Backend.Controllers
 {
+    public class AverageRateFood
+    {
+        public Food food { get; set; }
+        public double averageRate { get; set; }
+    }
+    public class BodyOrderStation
+    {
+        public OrderStation orderStation {get;set;}
+        public List<AverageRateFood> foods { get; set; }
+    }
+
     [Route("api/[controller]")]
     [ApiController]
     public class OrderStationsController : ControllerBase
@@ -24,7 +35,76 @@ namespace Backend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderStation>>> GetOrderStations()
         {
-            return await _context.OrderStations.ToListAsync();
+            return await _context.OrderStations.Include(e=>e.Resteurant).ToListAsync();
+        }
+
+        [HttpGet("DishesFromOrderStations")]
+        public async Task<ActionResult<IEnumerable<BodyOrderStation>>> GetDishOrderStations()
+        {
+            IEnumerable<OrderStation> orderStations = await _context.OrderStations.Include(e => e.Resteurant).Include(e =>e.Resteurant.Foods).ToListAsync();
+            List<BodyOrderStation> bodyOrderStations = new List<BodyOrderStation>();
+            foreach(OrderStation orderStation in orderStations)
+            {
+                BodyOrderStation temp = new BodyOrderStation();
+                temp.foods = new List<AverageRateFood>();
+                temp.orderStation = orderStation;
+                foreach(Food food in orderStation.Resteurant.Foods)
+                {
+                    AverageRateFood tempFood = new AverageRateFood();
+                    tempFood.food = await _context.Foods.Include(e => e.FoodRates).Include(e => e.FoodIngredients).FirstOrDefaultAsync(e => e.Id == food.Id);
+                    List<FoodIngredient> tempIngredient = new List<FoodIngredient>();
+                    foreach (FoodIngredient foodIngredient in tempFood.food.FoodIngredients)
+                    {
+                         FoodIngredient ingredient = await _context.FoodIngredients.Include(e => e.Ingredient).SingleOrDefaultAsync(e => e.Id == foodIngredient.Id);
+                         tempIngredient.Add(ingredient);
+                    }
+                    tempFood.food.FoodIngredients = tempIngredient;
+                    double i = 0;
+                    double sum = 0;
+                    foreach(FoodRate tempRate in tempFood.food.FoodRates)
+                    {
+                        i++;
+                        sum += tempRate.Value;
+                    }
+                    tempFood.averageRate = sum / i;
+                    temp.foods.Add(tempFood);
+                }
+                temp.orderStation.Resteurant.Foods = null;
+                bodyOrderStations.Add(temp);
+            }
+            return bodyOrderStations;
+        }
+
+        [HttpGet("DishesFromOrderStations/{id}")]
+        public async Task<ActionResult<BodyOrderStation>> GetDishOrderStations([FromQuery]long OrderStationId)
+        {
+            OrderStation orderStation = await _context.OrderStations.Include(e => e.Resteurant).Include(e => e.Resteurant.Foods).FirstOrDefaultAsync(e => e.Id == OrderStationId);
+            BodyOrderStation bodyOrderStations = new BodyOrderStation();
+            bodyOrderStations.foods = new List<AverageRateFood>();
+            bodyOrderStations.orderStation = orderStation;
+            foreach (Food food in orderStation.Resteurant.Foods)
+            {
+                AverageRateFood tempFood = new AverageRateFood();
+                tempFood.food = await _context.Foods.Include(e => e.FoodRates).Include(e => e.FoodIngredients).FirstOrDefaultAsync(e => e.Id == food.Id);
+                List<FoodIngredient> tempIngredient = new List<FoodIngredient>();
+                foreach (FoodIngredient foodIngredient in tempFood.food.FoodIngredients)
+                {
+                    FoodIngredient ingredient = await _context.FoodIngredients.Include(e => e.Ingredient).SingleOrDefaultAsync(e => e.Id == foodIngredient.Id);
+                    tempIngredient.Add(ingredient);
+                }
+                tempFood.food.FoodIngredients = tempIngredient;
+                double i = 0;
+                double sum = 0;
+                foreach (FoodRate tempRate in tempFood.food.FoodRates)
+                {
+                    i++;
+                    sum += tempRate.Value;
+                }
+                tempFood.averageRate = sum / i;
+                bodyOrderStations.foods.Add(tempFood);
+            }
+            bodyOrderStations.orderStation.Resteurant.Foods = null;
+            return bodyOrderStations;
         }
 
         // GET: api/OrderStations/5

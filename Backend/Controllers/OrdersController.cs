@@ -9,6 +9,29 @@ using Backend.Model;
 
 namespace Backend.Controllers
 {
+    public class BodyUserOrder
+    {
+        public Order order { get; set; }
+        public OrderStation orderStation { get; set; }
+        public List<Food> food { get; set; }
+    }
+
+    public class UserOrder
+    {
+        public List<DishOrder> dishes { get; set; }
+    }
+
+    public class DishOrder
+    {
+        public List<FoodOrdered> foods { get; set; }
+        public long orderStationId { get; set; }
+    }
+
+    public class FoodOrdered
+    {
+        public long dishId { get; set; }
+        public int count { get; set; }
+    }
 
     [Route("api/[controller]")]
     [ApiController]
@@ -82,13 +105,31 @@ namespace Backend.Controllers
         // POST: api/Orders
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<Order>> PostOrder(Order order)
+        [HttpPost("SubmitOrder")]
+        public async Task<ActionResult<Order>> PostOrder(UserOrder userOrder)
         {
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
+            long id = 1; /////////////////////////////////////////////////////// DODAJ TOKENA TUTAJ BARTEK
+            foreach (DishOrder tempDishOrder in userOrder.dishes)
+            {
+                Order order = new Order();
+                order.DelivererId = null;
+                order.EndTime = null;
+                order.StartTime = DateTime.Now;
+                order.Status = "STARTED";
+                order.OrderStationId = tempDishOrder.orderStationId;
+                order.UserId = id;
+                _context.Orders.Add(order);
+                await _context.SaveChangesAsync();
+                foreach (FoodOrdered tempFoodOrdered in tempDishOrder.foods)
+                {
+                    FoodOrder tempFoodOrder = new FoodOrder();
+                    tempFoodOrder.FoodId = tempFoodOrdered.dishId;
+                    tempFoodOrder.OrderId = order.Id;
+                }
+                await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetOrder", new { id = order.Id }, order);
+            }
+            return StatusCode(201);
         }
 
         // DELETE: api/Orders/5
@@ -119,6 +160,31 @@ namespace Backend.Controllers
                 return await _context.Orders.Where(e => e.Status == "ENDED").Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).ToListAsync();
             }
         }
+
+        [HttpGet("UserOrders")]
+        public async Task<ActionResult<IEnumerable<BodyUserOrder>>> GetUserOrders()
+        {
+            /////////////////////////////////////token zamiast id
+            long id = 1;
+            IEnumerable<Order> orders = await _context.Orders.Where(e => e.UserId == id).Where(e => e.Status == "ENDED" || e.Status == "REALIZE").Include(e => e.OrderStation).Include(e => e.FoodOrders).Include(e => e.OrderStation.Resteurant).ToListAsync();
+            List<BodyUserOrder> bodyUserOrder = new List<BodyUserOrder>();
+            
+            foreach(Order tempOrder in orders)
+            {
+                BodyUserOrder tempBody = new BodyUserOrder();
+                tempBody.food = new List<Food>();
+                tempBody.order = tempOrder;
+                foreach(FoodOrder foodOrder in tempOrder.FoodOrders)
+                {
+                    FoodOrder tempFoodOrder = await _context.FoodOrders.Include(e => e.Food).FirstOrDefaultAsync(e => e.Id == tempOrder.Id);
+                    tempBody.food.Add(tempFoodOrder.Food);
+                }
+                tempBody.orderStation = tempOrder.OrderStation;
+                tempBody.orderStation.Resteurant.Foods = null;
+                bodyUserOrder.Add(tempBody);
+            }
+            return bodyUserOrder;
+    }
 
         [HttpGet("{username}/isCurrent")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders([FromQuery] bool current, string username)
