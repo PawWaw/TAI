@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text;
+using Backend.RestModel;
 using Microsoft.EntityFrameworkCore;
 
 #nullable disable
@@ -11,11 +13,18 @@ namespace Backend.Model
     [Table("OrderStation")]
     public partial class OrderStation
     {
+        private string password;
+
         public OrderStation()
         {
             Orders = new HashSet<Order>();
         }
-
+        public void FillProperties(WsStation user)
+        {
+            this.Address = user.Address;
+            this.password = user.Value;
+            this.Username = user.Username;
+        }
         [Key]
         public long Id { get; set; }
         [Column("resteurantId")]
@@ -32,7 +41,7 @@ namespace Backend.Model
         public string Username { get; set; }
         [Required]
         [Column("password")]
-        public string Password { get; set; }
+        public string Password { get { return password; } set { password = GenerateHash(value); } }
 
         [ForeignKey(nameof(CityId))]
         [InverseProperty("OrderStations")]
@@ -42,5 +51,29 @@ namespace Backend.Model
         public virtual Restaurant Resteurant { get; set; }
         [InverseProperty(nameof(Order.OrderStation))]
         public virtual ICollection<Order> Orders { get; set; }
+
+        internal void InsertHashedPassword(string password)
+        {
+            this.password = password;
+        }
+        public String GenerateHash(String Input)
+        {
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(Input);
+            System.Security.Cryptography.SHA256Managed hashString = new System.Security.Cryptography.SHA256Managed();
+            byte[] hash = hashString.ComputeHash(bytes);
+
+            return ByteArrayToHexString(hash);
+        }
+        private String ByteArrayToHexString(byte[] bytes)
+        {
+            StringBuilder hex = new StringBuilder(bytes.Length * 2);
+
+            foreach (byte b in bytes)
+            {
+                hex.AppendFormat("{0:x2}", b);
+            }
+
+            return hex.ToString();
+        }
     }
 }

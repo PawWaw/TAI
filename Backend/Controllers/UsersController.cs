@@ -33,11 +33,12 @@ namespace Backend.Controllers
         [HttpGet("user")]
         public async Task<ActionResult<LoginResponse>> GetUserAsync()
         {
-            var userId = (long)HttpContext.Items["UserId"];
+            var userId = (long)HttpContext.Items["userId"];
+
             var user = await _context.Users.Include(u => u.City).FirstAsync(u => u.Id == userId);
             LoginResponse loginResponse = new LoginResponse
             {
-                Token = JwtService.GenerateJwtToken(user.Id),
+                Token = JwtService.GenerateUserJwtToken(user),
                 Username = user.Username,
                 Address = user.Address,
                 City = user.City.Name,
@@ -54,7 +55,8 @@ namespace Backend.Controllers
         [HttpPut("user")]
         public async Task<IActionResult> PutUser(WsPutUser wsUser)
         {
-            var userId = (long)HttpContext.Items["UserId"];
+            var userId = (long)HttpContext.Items["userId"];
+
             var authUser = await _context.Users.Include(u => u.City).FirstAsync(u => u.Id == userId);
             wsUser.FIllPutUser(authUser);
             _context.Entry(authUser).State = EntityState.Modified;
@@ -80,9 +82,10 @@ namespace Backend.Controllers
         // Update password
         [Authorize]
         [HttpPut("password")]
-        public async Task<IActionResult> PutPassword(WsPasswordPut passwordPut)
+        public async Task<IActionResult> PutPassword(WsPutPassword passwordPut)
         {
-            var userId = (long)HttpContext.Items["UserId"];
+            var userId = (long)HttpContext.Items["userId"];
+
             var authUser = await _context.Users.FirstAsync(u=>u.Id == userId);
             if (authUser.Password == passwordPut.OldPassword.Value)
             {
@@ -152,7 +155,7 @@ namespace Backend.Controllers
                 {
                     LoginResponse loginResponse = new LoginResponse
                     {
-                        Token = JwtService.GenerateJwtToken(findUser.Id),
+                        Token = JwtService.GenerateUserJwtToken(findUser),
                         Username = findUser.Username,
                         Address = findUser.Address,
                         City = findUser.City.Name,

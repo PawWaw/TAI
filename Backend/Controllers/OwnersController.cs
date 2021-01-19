@@ -25,15 +25,16 @@ namespace Backend.Controllers
         [HttpGet("user")]
         public ActionResult<LoginResponse> GetOwner()
         {
-            var userId = (long)HttpContext.Items["UserId"];
-            var user = _context.Owners.Include(o => o.City).FirstOrDefault(o => o.Id == userId);
+            var ownerId = (long)HttpContext.Items["ownerId"];
+
+            var user = _context.Owners.Include(o => o.City).FirstOrDefault(o => o.Id == ownerId);
             if(user == null)
             {
                 return NotFound();
             }
             LoginResponse loginResponse = new LoginResponse
             {
-                Token = JwtService.GenerateJwtToken(user.Id),
+                Token = JwtService.GenerateOwnerJwtToken(user),
                 Username = user.Username,
                 Address = user.Address,
                 City = user.City.Name,
@@ -50,8 +51,9 @@ namespace Backend.Controllers
         [HttpPut("user")]
         public async Task<IActionResult> PutOwner(WsPutUser wsUser)
         {
-            var userId = (long)HttpContext.Items["UserId"];
-            var authUser = await _context.Owners.Include(o => o.City).FirstAsync(o => o.Id == userId);
+            var ownerId = (long)HttpContext.Items["ownerId"];
+
+            var authUser = await _context.Owners.Include(o => o.City).FirstAsync(o => o.Id == ownerId);
             wsUser.FIllPutUser(authUser);
             _context.Entry(authUser).State = EntityState.Modified;
 
@@ -76,10 +78,11 @@ namespace Backend.Controllers
         // Update password
         [Authorize]
         [HttpPut("user/password")]
-        public async Task<IActionResult> PutPassword(WsPasswordPut passwordPut)
+        public async Task<IActionResult> PutPassword(WsPutPassword passwordPut)
         {
-            var userId = (long)HttpContext.Items["UserId"];
-            var authUser = await _context.Owners.FirstAsync(o => o.Id == userId);
+            var ownerId = (long)HttpContext.Items["ownerId"];
+
+            var authUser = await _context.Owners.FirstAsync(o => o.Id == ownerId);
             if (authUser.Password == passwordPut.OldPassword.Value)
             {
                 authUser.InsertHashedPassword(passwordPut.NewPassword.Value);
@@ -148,7 +151,7 @@ namespace Backend.Controllers
                 {
                     LoginResponse loginResponse = new LoginResponse
                     {
-                        Token = JwtService.GenerateJwtToken(findUser.Id),
+                        Token = JwtService.GenerateOwnerJwtToken(findUser),
                         Username = findUser.Username,
                         Address = findUser.Address,
                         City = findUser.City.Name,

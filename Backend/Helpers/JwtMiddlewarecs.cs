@@ -21,17 +21,19 @@ namespace Backend.Helpers
             _appSettings = appSettings.Value;
         }
 
-        public async Task Invoke(HttpContext context, DragorantContext dbContext)
+        public async Task Invoke(HttpContext context)
         {
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
             if (token != null)
-                AttachUserToContext(context, dbContext, token);
+            {
+                AttachToContext(context, token);
+            }
 
             await _next(context);
         }
 
-        private void AttachUserToContext(HttpContext context, DragorantContext dbContext, string token)
+        private void AttachToContext(HttpContext context, string token)
         {
             try
             {
@@ -46,16 +48,31 @@ namespace Backend.Helpers
                     // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
                     ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
-
                 var jwtToken = (JwtSecurityToken)validatedToken;
-                var userId = long.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
-                // attach user to context on successful jwt validation
-                context.Items["UserId"] = userId;
+                if (jwtToken.Claims.FirstOrDefault(x => x.Type == "userId") != null)
+                {
+                    var userId = long.Parse(jwtToken.Claims.First(x => x.Type == "userId").Value);
+                    context.Items["userId"] = userId;
+                }
+                else if (jwtToken.Claims.FirstOrDefault(x => x.Type == "delivererId") != null)
+                {
+                    var delivererId = long.Parse(jwtToken.Claims.First(x => x.Type == "delivererId").Value);
+                    context.Items["delivererId"] = delivererId;
+                }
+                else if (jwtToken.Claims.FirstOrDefault(x => x.Type == "stationId") != null)
+                {
+                    var stationId = long.Parse(jwtToken.Claims.First(x => x.Type == "stationId").Value);
+                    context.Items["stationId"] = stationId;
+                }
+                else if (jwtToken.Claims.FirstOrDefault(x => x.Type == "ownerId") != null)
+                {
+                    var ownerId = long.Parse(jwtToken.Claims.First(x => x.Type == "ownerId").Value);
+                    context.Items["ownerId"] = ownerId;
+                }
             }
             catch
             {
-                // do nothing if jwt validation fails
-                // user is not attached to context so request won't have access to secure routes
+
             }
         }
     }

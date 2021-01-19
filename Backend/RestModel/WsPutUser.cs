@@ -102,5 +102,20 @@ namespace Backend.RestModel
                 user.City.Name = City;
             }
         }
+        public void FIllPutUser(OrderStation user)
+        {
+            if (Address != "" && Address != null)
+            {
+                user.Address = Address;
+            }
+            if (Username != "" && Username != null)
+            {
+                user.Username = Username;
+            }
+            if (City != "" && City != null)
+            {
+                user.City.Name = City;
+            }
+        }
     }
 }

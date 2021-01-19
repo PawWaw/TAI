@@ -25,7 +25,8 @@ namespace Backend.Controllers
         [HttpGet("statistics")]
         public ActionResult<WsStatistics> GetStatistics()
         {
-            var delivererId = (long)HttpContext.Items["UserId"];
+            var delivererId = (long)HttpContext.Items["delivererId"];
+
             var deliverer = _context.Deliverers.Include(d=>d.DelivererRates).Include(d=>d.Orders).FirstOrDefault(o => o.Id == delivererId);
             WsStatistics statistics = new WsStatistics
             {
@@ -45,15 +46,16 @@ namespace Backend.Controllers
         [HttpGet("user")]
         public ActionResult<LoginResponse> GetDeliverer()
         {
-            var userId = (long)HttpContext.Items["UserId"];
-            var user = _context.Deliverers.Include(d => d.City).FirstOrDefault(d => d.Id == userId);
+            var delivererId = (long)HttpContext.Items["delivererId"];
+
+            var user = _context.Deliverers.Include(d => d.City).FirstOrDefault(d => d.Id == delivererId);
             if (user == null)
             {
                 return NotFound();
             }
             LoginResponse loginResponse = new LoginResponse
             {
-                Token = JwtService.GenerateJwtToken(user.Id),
+                Token = JwtService.GenerateDelivererJwtToken(user),
                 Username = user.Username,
                 Address = user.Address,
                 City = user.City.Name,
@@ -70,8 +72,9 @@ namespace Backend.Controllers
         [HttpPut("user")]
         public async Task<IActionResult> PutDeliverer(WsPutUser wsUser)
         {
-            var userId = (long)HttpContext.Items["UserId"];
-            var authUser = await _context.Deliverers.Include(d => d.City).FirstAsync(d => d.Id == userId);
+            var delivererId = (long)HttpContext.Items["delivererId"];
+
+            var authUser = await _context.Deliverers.Include(d => d.City).FirstAsync(d => d.Id == delivererId);
             wsUser.FIllPutUser(authUser);
             _context.Entry(authUser).State = EntityState.Modified;
 
@@ -96,10 +99,11 @@ namespace Backend.Controllers
         // Update password
         [Authorize]
         [HttpPut("user/password")]
-        public async Task<IActionResult> PutPassword(WsPasswordPut passwordPut)
+        public async Task<IActionResult> PutPassword(WsPutPassword passwordPut)
         {
-            var userId = (long)HttpContext.Items["UserId"];
-            var authUser = await _context.Deliverers.FirstAsync(d => d.Id == userId);
+            var delivererId = (long)HttpContext.Items["delivererId"];
+
+            var authUser = await _context.Deliverers.FirstAsync(d => d.Id == delivererId);
             if (authUser.Password == passwordPut.OldPassword.Value)
             {
                 authUser.InsertHashedPassword(passwordPut.NewPassword.Value);
@@ -168,7 +172,7 @@ namespace Backend.Controllers
                 {
                     LoginResponse loginResponse = new LoginResponse
                     {
-                        Token = JwtService.GenerateJwtToken(findUser.Id),
+                        Token = JwtService.GenerateDelivererJwtToken(findUser),
                         Username = findUser.Username,
                         Address = findUser.Address,
                         City = findUser.City.Name,

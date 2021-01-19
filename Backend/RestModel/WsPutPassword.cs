@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Backend.RestModel
 {
-    public class WsPasswordPut
+    public class WsPutPassword
     {
         [JsonProperty(PropertyName = "oldPassword")]
         public WsPassword OldPassword { get; set; }
