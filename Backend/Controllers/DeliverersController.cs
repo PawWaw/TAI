@@ -134,7 +134,7 @@ namespace Backend.Controllers
         {
             Deliverer newDeliverer = new Deliverer();
             newDeliverer.FillProperties(user);
-            var dbDeliverer = _context.Deliverers.FirstOrDefaultAsync(o => o.Username == newDeliverer.Username);
+            var dbDeliverer = await _context.Deliverers.FirstOrDefaultAsync(o => o.Username == newDeliverer.Username);
             if (dbDeliverer != null)
             {
                 return StatusCode(409);

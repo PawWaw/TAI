@@ -122,7 +122,7 @@ namespace Backend.Controllers
         {
             OrderStation newStation = new OrderStation();
             newStation.FillProperties(user);
-            var dbStation = _context.OrderStations.FirstOrDefaultAsync(o => o.Username == newStation.Username);
+            var dbStation = await _context.OrderStations.FirstOrDefaultAsync(o => o.Username == newStation.Username);
             if (dbStation != null)
             {
                 return StatusCode(409);

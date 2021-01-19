@@ -113,7 +113,7 @@ namespace Backend.Controllers
         {
             Owner newOwner = new Owner();
             newOwner.FillProperties(user);
-            var dbOwner = _context.Owners.FirstOrDefaultAsync(o => o.Username == newOwner.Username);
+            var dbOwner = await _context.Owners.FirstOrDefaultAsync(o => o.Username == newOwner.Username);
             if(dbOwner!=null)
             {
                 return StatusCode(409);

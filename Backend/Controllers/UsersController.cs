@@ -117,7 +117,7 @@ namespace Backend.Controllers
         {
             User newUser = new User();
             newUser.FillProperties(user);
-            var dbUser = _context.Deliverers.FirstOrDefaultAsync(o => o.Username == newUser.Username);
+            var dbUser = await _context.Deliverers.FirstOrDefaultAsync(o => o.Username == newUser.Username);
             if (dbUser != null)
             {
                 return StatusCode(409);
