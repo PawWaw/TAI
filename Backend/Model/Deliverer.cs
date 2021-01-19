@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using Backend.RestModel;
-using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
