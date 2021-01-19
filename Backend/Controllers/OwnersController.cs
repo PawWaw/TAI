@@ -135,7 +135,7 @@ namespace Backend.Controllers
             _context.Owners.Add(newOwner);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return StatusCode(201);
         }
 
         // POST: api/Owners/auth

@@ -142,7 +142,7 @@ namespace Backend.Controllers
             _context.OrderStations.Add(newStation);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return StatusCode(201);
         }
 
         // POST: api/OrderStations/auth

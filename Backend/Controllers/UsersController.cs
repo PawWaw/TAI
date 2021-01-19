@@ -139,7 +139,7 @@ namespace Backend.Controllers
             _context.Users.Add(newUser);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return StatusCode(201);
         }
 
         // POST: api/Users/auth

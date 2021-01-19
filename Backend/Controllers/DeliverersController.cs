@@ -156,7 +156,7 @@ namespace Backend.Controllers
             _context.Deliverers.Add(newDeliverer);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return StatusCode(201);
         }
 
         // POST: api/Deliverers/auth
