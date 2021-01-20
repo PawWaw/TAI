@@ -13,10 +13,6 @@ namespace Backend.Model
     [Table("Owner")]
     public partial class Owner
     {
-        public Owner()
-        {
-            Restaurants = new HashSet<Restaurant>();
-        }
         public void FillProperties(WsUser user)
         {
             this.Address = user.Address;
@@ -64,8 +60,8 @@ namespace Backend.Model
         [ForeignKey(nameof(CityId))]
         [InverseProperty("Owners")]
         public virtual City City { get; set; }
-        [InverseProperty(nameof(Restaurant.Owner))]
-        public virtual ICollection<Restaurant> Restaurants { get; set; }
+        [InverseProperty(nameof(Model.Restaurant.Owner))]
+        public virtual Restaurant Restaurant { get; set; }
         public String GenerateHash(String Input)
         {
             byte[] bytes = System.Text.Encoding.UTF8.GetBytes(Input);

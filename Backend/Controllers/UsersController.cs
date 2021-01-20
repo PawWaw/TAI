@@ -31,12 +31,12 @@ namespace Backend.Controllers
         // Information about current logged in user
         [Authorize]
         [HttpGet("user")]
-        public async Task<ActionResult<LoginResponse>> GetUserAsync_User()
+        public async Task<ActionResult<WsLoginResponse>> GetUserAsync_User()
         {
             var userId = (long)HttpContext.Items["userId"];
 
             var user = await _context.Users.Include(u => u.City).FirstAsync(u => u.Id == userId);
-            LoginResponse loginResponse = new LoginResponse
+            WsLoginResponse loginResponse = new WsLoginResponse
             {
                 Token = JwtService.GenerateUserJwtToken(user),
                 Username = user.Username,
@@ -87,10 +87,11 @@ namespace Backend.Controllers
             var userId = (long)HttpContext.Items["userId"];
 
             var authUser = await _context.Users.FirstAsync(u=>u.Id == userId);
-            if (authUser.Password == passwordPut.OldPassword.Value)
+            if (authUser.Password != passwordPut.OldPassword.Value)
             {
-                authUser.InsertHashedPassword(passwordPut.NewPassword.Value);
+                return ValidationProblem();
             }
+            authUser.InsertHashedPassword(passwordPut.NewPassword.Value);
             _context.Entry(authUser).State = EntityState.Modified;
 
             try
@@ -145,7 +146,7 @@ namespace Backend.Controllers
         // POST: api/Users/auth
         // Authorization
         [HttpPost("login")]
-        public async Task<ActionResult<LoginResponse>> Login(LoginRequest user)
+        public async Task<ActionResult<WsLoginResponse>> Login(LoginRequest user)
         {
             if(ModelState.IsValid)
             {
@@ -153,7 +154,7 @@ namespace Backend.Controllers
                     .FirstOrDefaultAsync(m => m.Username == user.Username && m.Password == user.Value);
                 if (findUser != null)
                 {
-                    LoginResponse loginResponse = new LoginResponse
+                    WsLoginResponse loginResponse = new WsLoginResponse
                     {
                         Token = JwtService.GenerateUserJwtToken(findUser),
                         Username = findUser.Username,

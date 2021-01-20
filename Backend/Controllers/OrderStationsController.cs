@@ -70,14 +70,14 @@ namespace Backend.Controllers
         [HttpGet("DishesFromOrderStations")]
         public async Task<ActionResult<IEnumerable<BodyOrderStation>>> GetDishOrderStations_User()
         {
-            IEnumerable<OrderStation> orderStations = await _context.OrderStations.Include(e => e.Resteurant).Include(e =>e.Resteurant.Foods).ToListAsync();
+            IEnumerable<OrderStation> orderStations = await _context.OrderStations.Include(e => e.Restaurant).Include(e =>e.Restaurant.Foods).ToListAsync();
             List<BodyOrderStation> bodyOrderStations = new List<BodyOrderStation>();
             foreach(OrderStation orderStation in orderStations)
             {
                 BodyOrderStation temp = new BodyOrderStation();
                 temp.foods = new List<AverageRateFood>();
                 temp.orderStation = orderStation;
-                foreach(Food food in orderStation.Resteurant.Foods)
+                foreach(Food food in orderStation.Restaurant.Foods)
                 {
                     AverageRateFood tempFood = new AverageRateFood();
                     tempFood.food = await _context.Foods.Include(e => e.FoodRates).Include(e => e.FoodIngredients).FirstOrDefaultAsync(e => e.Id == food.Id);
@@ -98,7 +98,7 @@ namespace Backend.Controllers
                     tempFood.averageRate = sum / i;
                     temp.foods.Add(tempFood);
                 }
-                temp.orderStation.Resteurant.Foods = null;
+                temp.orderStation.Restaurant.Foods = null;
                 bodyOrderStations.Add(temp);
             }
             return bodyOrderStations;
@@ -108,11 +108,11 @@ namespace Backend.Controllers
         [HttpGet("DishesFromOrderStations/{id}")]
         public async Task<ActionResult<BodyOrderStation>> GetDishOrderStations_User([FromQuery]long OrderStationId)
         {
-            OrderStation orderStation = await _context.OrderStations.Include(e => e.Resteurant).Include(e => e.Resteurant.Foods).FirstOrDefaultAsync(e => e.Id == OrderStationId);
+            OrderStation orderStation = await _context.OrderStations.Include(e => e.Restaurant).Include(e => e.Restaurant.Foods).FirstOrDefaultAsync(e => e.Id == OrderStationId);
             BodyOrderStation bodyOrderStations = new BodyOrderStation();
             bodyOrderStations.foods = new List<AverageRateFood>();
             bodyOrderStations.orderStation = orderStation;
-            foreach (Food food in orderStation.Resteurant.Foods)
+            foreach (Food food in orderStation.Restaurant.Foods)
             {
                 AverageRateFood tempFood = new AverageRateFood();
                 tempFood.food = await _context.Foods.Include(e => e.FoodRates).Include(e => e.FoodIngredients).FirstOrDefaultAsync(e => e.Id == food.Id);
@@ -133,7 +133,7 @@ namespace Backend.Controllers
                 tempFood.averageRate = sum / i;
                 bodyOrderStations.foods.Add(tempFood);
             }
-            bodyOrderStations.orderStation.Resteurant.Foods = null;
+            bodyOrderStations.orderStation.Restaurant.Foods = null;
             return bodyOrderStations;
         }
 
@@ -188,10 +188,11 @@ namespace Backend.Controllers
                 return StatusCode(409);
             }
             var authUser = await _context.OrderStations.FirstAsync(o => o.Id == stationId);
-            if (authUser.Password == passwordPut.OldPassword.Value)
+            if (authUser.Password != passwordPut.OldPassword.Value)
             {
-                authUser.InsertHashedPassword(passwordPut.NewPassword.Value);
+                return ValidationProblem();
             }
+            authUser.InsertHashedPassword(passwordPut.NewPassword.Value);
             _context.Entry(authUser).State = EntityState.Modified;
 
 
@@ -216,10 +217,11 @@ namespace Backend.Controllers
         }
         // POST: api/OrderStations
         // Register
+        // In Owner Registration orderStation is registered
         [HttpPost]
         public async Task<IActionResult> PostOrderStation([Bind("address,username,password, city")] WsStation user)
         {
-
+            return NotFound();
             OrderStation newStation = new OrderStation();
             newStation.FillProperties(user);
             var dbStation = await _context.OrderStations.FirstOrDefaultAsync(o => o.Username == newStation.Username);

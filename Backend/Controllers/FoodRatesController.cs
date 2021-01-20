@@ -84,14 +84,17 @@ namespace Backend.Controllers
         // POST: api/FoodRates
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [Authorize]
         [HttpPost("RateFood")]
         public async Task<ActionResult<FoodRate>> PostFoodRate_User(BodyFoodRates bodyFoodRate)
         {
-            FoodRate foodRate = new FoodRate();
-            foodRate.Date = DateTime.Now;
-            foodRate.FoodId = bodyFoodRate.id;
-            foodRate.Value = bodyFoodRate.rate;
-            foodRate.UserId = 1; ////////////////////////////////////////////////////////////////////////////////////        TUTAJ TOKEN BARTEK
+            FoodRate foodRate = new FoodRate
+            {
+                Date = DateTime.Now,
+                FoodId = bodyFoodRate.id,
+                Value = bodyFoodRate.rate,
+                UserId = (long)HttpContext.Items["userId"]
+            };
             _context.FoodRates.Add(foodRate);
             await _context.SaveChangesAsync();
 

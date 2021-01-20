@@ -2,7 +2,7 @@
 
 namespace Backend.RestModel
 {
-    public class LoginResponse
+    public class WsLoginResponse
     {
         private string adress;
         private string username;

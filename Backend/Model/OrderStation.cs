@@ -28,7 +28,7 @@ namespace Backend.Model
         [Key]
         public long Id { get; set; }
         [Column("resteurantId")]
-        public long ResteurantId { get; set; }
+        public long RestaurantId { get; set; }
         [Column("cityId")]
         public long CityId { get; set; }
         [Required]
@@ -46,9 +46,10 @@ namespace Backend.Model
         [ForeignKey(nameof(CityId))]
         [InverseProperty("OrderStations")]
         public virtual City City { get; set; }
-        [ForeignKey(nameof(ResteurantId))]
-        [InverseProperty(nameof(Restaurant.OrderStations))]
-        public virtual Restaurant Resteurant { get; set; }
+        [Column("OrderStations")]
+        [ForeignKey(nameof(RestaurantId))]
+        [InverseProperty(nameof(Model.Restaurant.OrderStation))]
+        public virtual Restaurant Restaurant { get; set; }
         [InverseProperty(nameof(Order.OrderStation))]
         public virtual ICollection<Order> Orders { get; set; }
 

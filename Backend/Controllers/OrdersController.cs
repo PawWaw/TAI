@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Model;
 using Backend.Helpers;
+using Backend.RestModel;
 
 namespace Backend.Controllers
 {
@@ -48,7 +49,7 @@ namespace Backend.Controllers
         {
             _context = context;
         }
-//Do Autoryzacji
+
         // GET: api/Orders
         [Authorize]
         [HttpGet("all")]
@@ -56,11 +57,11 @@ namespace Backend.Controllers
         {
             return await _context.Orders.ToListAsync();
         }
-//Do Autoryzacji
+
         // GET: api/Orders/5 
         [Authorize]
         [HttpGet("{id}")]
-        public async Task<ActionResult<Order>> GetOrder_OwnerStationDeliverer(long id)
+        public async Task<ActionResult<Order>> GetOrder_OwnerDeliverer(long id)
         {
             var order = await _context.Orders.Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).SingleOrDefaultAsync(e => e.Id == id); ;
 
@@ -142,7 +143,6 @@ namespace Backend.Controllers
             }
             return StatusCode(201);
         }
-        //Do Autoryzacji
         // DELETE: api/Orders/5
         [Authorize]
         [HttpDelete("{id}")]
@@ -184,7 +184,7 @@ namespace Backend.Controllers
         public async Task<ActionResult<IEnumerable<BodyUserOrder>>> GetUserOrders_User()
         {
             long id = (long)HttpContext.Items["userId"];
-            IEnumerable<Order> orders = await _context.Orders.Where(e => e.UserId == id).Where(e => e.Status == "ENDED" || e.Status == "REALIZE").Include(e => e.OrderStation).Include(e => e.FoodOrders).Include(e => e.OrderStation.Resteurant).ToListAsync();
+            IEnumerable<Order> orders = await _context.Orders.Where(e => e.UserId == id).Where(e => e.Status == "ENDED" || e.Status == "REALIZE").Include(e => e.OrderStation).Include(e => e.FoodOrders).Include(e => e.OrderStation.Restaurant).ToListAsync();
             List<BodyUserOrder> bodyUserOrder = new List<BodyUserOrder>();
             
             foreach(Order tempOrder in orders)
@@ -198,80 +198,79 @@ namespace Backend.Controllers
                     tempBody.food.Add(tempFoodOrder.Food);
                 }
                 tempBody.orderStation = tempOrder.OrderStation;
-                tempBody.orderStation.Resteurant.Foods = null;
+                tempBody.orderStation.Restaurant.Foods = null;
                 bodyUserOrder.Add(tempBody);
             }
             return bodyUserOrder;
         }
-//Konflikt Paweł W.
-/* Ordersy dla restauracji
- * Tokenem autoryzacja
- * */
+
         [Authorize]
         [HttpGet("/isActive")]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders_OwnerStation([FromQuery] bool current)
+        public ActionResult<IEnumerable<Order>> GetOrders_Owner([FromQuery] bool current)
         {
             long id = 0L;
             List<Order> orders = null;
-            if(HttpContext.Items["ownerId"]!=null)
+            if (HttpContext.Items["ownerId"] != null)
             {
                 id = (long)HttpContext.Items["ownerId"];
                 var owner = _context.Owners.FirstOrDefault(o => o.Id == id);
-                if(owner == null)
+                if (owner == null)
                 {
                     return NotFound();
                 }
-                if(current)
+                if (current)
                 {
-                    orders = await _context.Orders.Where(o => o.Id == id && o.Status != "ENDED").Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).ToListAsync();
+                    orders = owner.Restaurant.OrderStation.Orders.Where(s => s.Status != "ENDED").ToList();
                 }
                 else
                 {
-                    orders = await _context.Orders.Where(o => o.Id == id && o.Status == "ENDED")
-                        .Include(e => e.OrderStation).Include(e => e.Deliverer)
-                        .Include(e => e.User).Include(e => e.User.City).ToListAsync();
+                    orders = owner.Restaurant.OrderStation.Orders.Where(s => s.Status == "ENDED").ToList();
                 }
             }
-            else if(HttpContext.Items["stationId"] != null)
+            else if (HttpContext.Items["stationId"] != null)
             {
                 id = (long)HttpContext.Items["stationId"];
-//TO:DO
                 var station = _context.OrderStations
-                    .Include(s=>s.Orders).FirstOrDefault(s => s.Id == id);
-                if(station == null)
+                    .Include(s => s.Orders).FirstOrDefault(s => s.Id == id);
+                if (station == null)
                 {
                     return NotFound();
                 }
-                if(current)
+                if (current)
                 {
                     orders = station.Orders.Where(s => s.Status != "ENDED").ToList();
+                }
+                else
+                {
+                    orders = station.Orders.Where(s => s.Status == "ENDED").ToList();
                 }
             }
             else
             {
                 return Unauthorized();
             }
-            List<long> orderIds = await _context.Orders.Where(f => f.UserId == id).Select(a => a.Id).ToListAsync();
-
-            if (current)
-            {
-                return await _context.Orders.Where(e => e.Status != "ENDED").Where(f => orderIds.Contains(f.Id)).Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).ToListAsync();
-            }
-            else
-            {
-                return await _context.Orders.Where(e => e.Status == "ENDED").Where(f => orderIds.Contains(f.Id)).Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).ToListAsync();
-            }
+            return Ok(orders);
 
         }
 
-        //delete from query and get first with not Ended
         [Authorize]
         [HttpGet("find")]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrderToRealise_Deliverer()
+        public async Task<ActionResult<WsOrderResponse_Deliverer>> GetOrderToRealise_Deliverer()
         {
-            //do dokonczenia
-                return await _context.Orders.Where(e => e.Status == "STARTED").ToListAsync();
-
+            var order = await _context.Orders.Include(o => o.OrderStation.City)
+                                            .Include(o => o.User.City).Where(e => e.Status == "STARTED")
+                                            .OrderBy(e => e.StartTime.Date.ToString("d")).FirstOrDefaultAsync();
+            if(order == null)
+            {
+                return NotFound();
+            }
+            WsOrderResponse_Deliverer response = new WsOrderResponse_Deliverer();
+            response.Id = order.Id;
+            response.ClientAddress.Address = order.User.Address;
+            response.ClientAddress.City = order.User.City.Name;
+            response.RestaurantAddress.Address = order.OrderStation.Address;
+            response.RestaurantAddress.City = order.OrderStation.City.Name;
+            return Ok(response);
         }
 
         [Authorize]

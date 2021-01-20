@@ -26,7 +26,7 @@ namespace Backend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Restaurant>>> GetRestaurants()
         {
-            return await _context.Restaurants.Include(e => e.OrderStations).Include(e => e.Owner).Include(e => e.Owner.Restaurants).Include(e => e.Owner.City).ToListAsync();
+            return await _context.Restaurants.Include(e => e.OrderStation).Include(e => e.Owner).Include(e => e.Owner.Restaurant).Include(e => e.Owner.City).ToListAsync();
         }
 
         // GET: api/Restaurants/5

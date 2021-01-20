@@ -23,16 +23,16 @@ namespace Backend.Controllers
         // Information about current logged in user
         [Authorize]
         [HttpGet("user")]
-        public ActionResult<LoginResponse> GetOwner()
+        public ActionResult<WsOwnerLoginResponse> GetOwner_Owner()
         {
             var ownerId = (long)HttpContext.Items["ownerId"];
 
-            var user = _context.Owners.Include(o => o.City).FirstOrDefault(o => o.Id == ownerId);
+            var user = _context.Owners.Include(o => o.City).Include(o=>o.Restaurant).FirstOrDefault(o => o.Id == ownerId);
             if(user == null)
             {
                 return NotFound();
             }
-            LoginResponse loginResponse = new LoginResponse
+            WsOwnerLoginResponse loginResponse = new WsOwnerLoginResponse
             {
                 Token = JwtService.GenerateOwnerJwtToken(user),
                 Username = user.Username,
@@ -40,7 +40,8 @@ namespace Backend.Controllers
                 City = user.City.Name,
                 Email = user.Email,
                 FirstName = user.FirstName,
-                LastName = user.LastName
+                LastName = user.LastName,
+                RestaurantName = user.Restaurant.Name
             };
             return Ok(loginResponse);
         }
@@ -49,14 +50,15 @@ namespace Backend.Controllers
         // Update user
         [Authorize]
         [HttpPut("user")]
-        public async Task<IActionResult> PutOwner(WsPutUser wsUser)
+        public async Task<IActionResult> PutOwner_Owner(WsPutUser wsUser)
         {
             var ownerId = (long)HttpContext.Items["ownerId"];
 
-            var authUser = await _context.Owners.Include(o => o.City).FirstAsync(o => o.Id == ownerId);
+            var authUser = await _context.Owners.Include(o => o.City).Include(o=>o.Restaurant.OrderStation.City).FirstAsync(o => o.Id == ownerId);
             wsUser.FIllPutUser(authUser);
-            _context.Entry(authUser).State = EntityState.Modified;
 
+            _context.Entry(authUser).State = EntityState.Modified;
+            _context.Entry(authUser.Restaurant.OrderStation).State = EntityState.Modified;
             try
             {
                 await _context.SaveChangesAsync();
@@ -78,17 +80,19 @@ namespace Backend.Controllers
         // Update password
         [Authorize]
         [HttpPut("user/password")]
-        public async Task<IActionResult> PutPassword(WsPutPassword passwordPut)
+        public async Task<IActionResult> PutPassword_Owner(WsPutPassword passwordPut)
         {
             var ownerId = (long)HttpContext.Items["ownerId"];
 
-            var authUser = await _context.Owners.FirstAsync(o => o.Id == ownerId);
-            if (authUser.Password == passwordPut.OldPassword.Value)
+            var authUser = await _context.Owners.Include(o=>o.Restaurant.OrderStation).FirstAsync(o => o.Id == ownerId);
+            if (authUser.Password != passwordPut.OldPassword.Value)
             {
-                authUser.InsertHashedPassword(passwordPut.NewPassword.Value);
+                return ValidationProblem();
             }
+            authUser.InsertHashedPassword(passwordPut.NewPassword.Value);
+            authUser.Restaurant.OrderStation.InsertHashedPassword(passwordPut.NewPassword.Value);
             _context.Entry(authUser).State = EntityState.Modified;
-
+            _context.Entry(authUser.Restaurant.OrderStation).State = EntityState.Modified;
             try
             {
                 await _context.SaveChangesAsync();
@@ -109,15 +113,24 @@ namespace Backend.Controllers
         // POST: api/Owners/user/register
         // Register
         [HttpPost("user/register")]
-        public async Task<IActionResult> PostOwner([Bind("address,username,password,email,firstName,lastName,city")] WsUser user)
+        public async Task<IActionResult> PostOwner([Bind("address,username,password,email,firstName,lastName,city")] WsOwnerStation user)
         {
-            Owner newOwner = new Owner();
-            newOwner.FillProperties(user);
-            var dbOwner = await _context.Owners.FirstOrDefaultAsync(o => o.Username == newOwner.Username);
+            var dbOwner = await _context.Owners.FirstOrDefaultAsync(o => o.Username == user.Username);
             if(dbOwner!=null)
             {
                 return StatusCode(409);
             }
+
+            Owner newOwner = new Owner();
+            Restaurant newRestaurant = new Restaurant();
+            OrderStation newOrderStation = new OrderStation();
+            newOwner.FillProperties(user);
+            newRestaurant.Name = user.RestaurantName;
+            newOrderStation.FillProperties(user);
+            newRestaurant.Owner = newOwner;
+            newRestaurant.OwnerId = newOwner.Id;
+            newRestaurant.OrderStation = newOrderStation;
+
             if (user.City != null && user.City.Length > 0)
             {
                 City temp = _context.Cities.Where(c => c.Name == user.City).SingleOrDefault();
@@ -131,8 +144,12 @@ namespace Backend.Controllers
                 }
                 newOwner.CityId = temp.Id;
                 newOwner.City = temp;
+                newOrderStation.City = temp;
+                newOrderStation.CityId = temp.Id;
             }
             _context.Owners.Add(newOwner);
+            _context.OrderStations.Add(newOrderStation);
+            _context.Restaurants.Add(newRestaurant);
             await _context.SaveChangesAsync();
 
             return StatusCode(201);
@@ -141,15 +158,15 @@ namespace Backend.Controllers
         // POST: api/Owners/auth
         // Authorization
         [HttpPost("auth")]
-        public async Task<ActionResult<LoginResponse>> Login(LoginRequest user)
+        public async Task<ActionResult<WsLoginResponse>> Login(LoginRequest user)
         {
             if (ModelState.IsValid)
             {
-                var findUser = await _context.Owners.Include(u => u.City)
+                var findUser = await _context.Owners.Include(u => u.City).Include(u=>u.Restaurant)
                     .FirstOrDefaultAsync(m => m.Username == user.Username && m.Password == user.Value);
                 if (findUser != null)
                 {
-                    LoginResponse loginResponse = new LoginResponse
+                    WsOwnerLoginResponse loginResponse = new WsOwnerLoginResponse
                     {
                         Token = JwtService.GenerateOwnerJwtToken(findUser),
                         Username = findUser.Username,
@@ -157,7 +174,8 @@ namespace Backend.Controllers
                         City = findUser.City.Name,
                         Email = findUser.Email,
                         FirstName = findUser.FirstName,
-                        LastName = findUser.LastName
+                        LastName = findUser.LastName,
+                        RestaurantName = findUser.Restaurant.Name
                     };
                     return Ok(loginResponse);
                 }

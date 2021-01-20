@@ -286,7 +286,7 @@ namespace Backend.Model
                     .IsUnicode(false)
                     .HasColumnName("password");
 
-                entity.Property(e => e.ResteurantId).HasColumnName("resteurantId");
+                entity.Property(e => e.RestaurantId).HasColumnName("resteurantId");
 
                 entity.Property(e => e.Username)
                     .IsRequired()
@@ -300,11 +300,9 @@ namespace Backend.Model
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_OrderStation_City");
 
-                entity.HasOne(d => d.Resteurant)
-                    .WithMany(p => p.OrderStations)
-                    .HasForeignKey(d => d.ResteurantId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_OrderStation_Restaurant");
+                entity.HasOne(d => d.Restaurant)
+                    .WithOne(p => p.OrderStation)
+                    .HasForeignKey<OrderStation>(p=>p.RestaurantId);
             });
 
             modelBuilder.Entity<Owner>(entity =>
@@ -370,8 +368,8 @@ namespace Backend.Model
                 entity.Property(e => e.OwnerId).HasColumnName("ownerId");
 
                 entity.HasOne(d => d.Owner)
-                    .WithMany(p => p.Restaurants)
-                    .HasForeignKey(d => d.OwnerId)
+                    .WithOne(p => p.Restaurant)
+                    .HasForeignKey<Restaurant>(d => d.OwnerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Restaurant_Owner");
             });

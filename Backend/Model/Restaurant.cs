@@ -14,7 +14,7 @@ namespace Backend.Model
         public Restaurant()
         {
             Foods = new HashSet<Food>();
-            OrderStations = new HashSet<OrderStation>();
+            OrderStation = new OrderStation();
         }
 
         [Key]
@@ -28,10 +28,10 @@ namespace Backend.Model
         public string Name { get; set; }
 
         [ForeignKey(nameof(OwnerId))]
-        [InverseProperty("Restaurants")]
+        [InverseProperty("Restaurant")]
         public virtual Owner Owner { get; set; }
-        [InverseProperty(nameof(OrderStation.Resteurant))]
-        public virtual ICollection<OrderStation> OrderStations { get; set; }
+        [InverseProperty(nameof(Model.OrderStation.Restaurant))]
+        public virtual OrderStation OrderStation { get; set; }
         public virtual ICollection<Food> Foods { get; set; }
     }
 }

@@ -24,7 +24,7 @@ namespace Backend.Controllers
         // GET: api/Deliverers
         [Authorize]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Deliverer>>> GetDeliverers_OwnerStation()
+        public async Task<ActionResult<IEnumerable<Deliverer>>> GetDeliverers_Owner()
         {
             return await _context.Deliverers.ToListAsync();
         }
@@ -54,7 +54,7 @@ namespace Backend.Controllers
         // Information about current logged in user
         [Authorize]
         [HttpGet("user")]
-        public ActionResult<LoginResponse> GetDeliverer_Deliverer()
+        public ActionResult<WsLoginResponse> GetDeliverer_Deliverer()
         {
             var delivererId = (long)HttpContext.Items["delivererId"];
 
@@ -64,7 +64,7 @@ namespace Backend.Controllers
                 return NotFound();
             }
 
-            LoginResponse loginResponse = new LoginResponse
+            WsLoginResponse loginResponse = new WsLoginResponse
             {
                 Token = JwtService.GenerateDelivererJwtToken(user),
                 Username = user.Username,
@@ -117,10 +117,11 @@ namespace Backend.Controllers
             var delivererId = (long)HttpContext.Items["delivererId"];
 
             var authUser = await _context.Deliverers.FirstAsync(d => d.Id == delivererId);
-            if (authUser.Password == passwordPut.OldPassword.Value)
+            if (authUser.Password != passwordPut.OldPassword.Value)
             {
-                authUser.InsertHashedPassword(passwordPut.NewPassword.Value);
+                return ValidationProblem();
             }
+            authUser.InsertHashedPassword(passwordPut.NewPassword.Value);
             _context.Entry(authUser).State = EntityState.Modified;
 
             try
@@ -178,7 +179,7 @@ namespace Backend.Controllers
         // POST: api/Deliverers/auth
         // Authorization
         [HttpPost("user/login")]
-        public async Task<ActionResult<LoginResponse>> Login(LoginRequest user)
+        public async Task<ActionResult<WsLoginResponse>> Login(LoginRequest user)
         {
             if (ModelState.IsValid)
             {
@@ -186,7 +187,7 @@ namespace Backend.Controllers
                     .FirstOrDefaultAsync(m => m.Username == user.Username && m.Password == user.Value);
                 if (findUser != null)
                 {
-                    LoginResponse loginResponse = new LoginResponse
+                    WsLoginResponse loginResponse = new WsLoginResponse
                     {
                         Token = JwtService.GenerateDelivererJwtToken(findUser),
                         Username = findUser.Username,

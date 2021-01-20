@@ -96,6 +96,7 @@ namespace Backend.RestModel
             if (City != "" && City != null)
             {
                 user.City.Name = City;
+                user.Restaurant.OrderStation.City.Name = City;
             }
         }
         public void FIllPutUser(OrderStation user)
