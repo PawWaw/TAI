@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Model;
+using Backend.Helpers;
 
 namespace Backend.Controllers
 {
@@ -17,6 +18,7 @@ namespace Backend.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class FoodRatesController : ControllerBase
     {
         private readonly DragorantContext _context;
@@ -83,7 +85,7 @@ namespace Backend.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost("RateFood")]
-        public async Task<ActionResult<FoodRate>> PostFoodRate(BodyFoodRates bodyFoodRate)
+        public async Task<ActionResult<FoodRate>> PostFoodRate_User(BodyFoodRates bodyFoodRate)
         {
             FoodRate foodRate = new FoodRate();
             foodRate.Date = DateTime.Now;

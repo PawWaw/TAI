@@ -6,11 +6,13 @@ using Microsoft.EntityFrameworkCore;
 using Backend.Model;
 using Backend.Helpers;
 using Backend.RestModel;
+using System.Collections.Generic;
 
 namespace Backend.Controllers
 {
     public class AverageRateFood
     {
+
         public Food food { get; set; }
         public double averageRate { get; set; }
     }
@@ -31,6 +33,12 @@ namespace Backend.Controllers
             _context = context;
         }
 
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<OrderStation>>> GetOrderStations_User()
+        {
+            return await _context.OrderStations.ToListAsync();
+        }
 
         // GET: api/OrderStations/user
         // Information about a current logged in user
@@ -58,8 +66,9 @@ namespace Backend.Controllers
             return Ok(loginResponse);
         }
 
+        [Authorize]
         [HttpGet("DishesFromOrderStations")]
-        public async Task<ActionResult<IEnumerable<BodyOrderStation>>> GetDishOrderStations()
+        public async Task<ActionResult<IEnumerable<BodyOrderStation>>> GetDishOrderStations_User()
         {
             IEnumerable<OrderStation> orderStations = await _context.OrderStations.Include(e => e.Resteurant).Include(e =>e.Resteurant.Foods).ToListAsync();
             List<BodyOrderStation> bodyOrderStations = new List<BodyOrderStation>();
@@ -95,8 +104,9 @@ namespace Backend.Controllers
             return bodyOrderStations;
         }
 
+        [Authorize]
         [HttpGet("DishesFromOrderStations/{id}")]
-        public async Task<ActionResult<BodyOrderStation>> GetDishOrderStations([FromQuery]long OrderStationId)
+        public async Task<ActionResult<BodyOrderStation>> GetDishOrderStations_User([FromQuery]long OrderStationId)
         {
             OrderStation orderStation = await _context.OrderStations.Include(e => e.Resteurant).Include(e => e.Resteurant.Foods).FirstOrDefaultAsync(e => e.Id == OrderStationId);
             BodyOrderStation bodyOrderStations = new BodyOrderStation();
@@ -131,7 +141,7 @@ namespace Backend.Controllers
         // Update Station
         [Authorize]
         [HttpPut("user")]
-        public async Task<IActionResult> PutOrderStation(WsPutUser wsUser))
+        public async Task<IActionResult> PutOrderStation(WsPutUser wsUser)
         {
 
             var stationId = GetStationIdFromContext();
@@ -207,7 +217,6 @@ namespace Backend.Controllers
         // POST: api/OrderStations
         // Register
         [HttpPost]
-
         public async Task<IActionResult> PostOrderStation([Bind("address,username,password, city")] WsStation user)
         {
 
@@ -264,6 +273,7 @@ namespace Backend.Controllers
         }
 
         // DELETE: api/OrderStations/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult<OrderStation>> DeleteOrderStation(long id)
         {

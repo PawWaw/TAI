@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Model;
+using Backend.Helpers;
 
 namespace Backend.Controllers
 {
@@ -27,6 +28,7 @@ namespace Backend.Controllers
         }
 
         // GET: api/DelivererRates
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DelivererRate>>> GetDelivererRates()
         {
@@ -34,6 +36,7 @@ namespace Backend.Controllers
         }
 
         // GET: api/DelivererRates/5
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<DelivererRate>> GetDelivererRate(long id)
         {
@@ -50,6 +53,7 @@ namespace Backend.Controllers
         // PUT: api/DelivererRates/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutDelivererRate(long id, DelivererRate delivererRate)
         {
@@ -82,14 +86,15 @@ namespace Backend.Controllers
         // POST: api/DelivererRates
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [Authorize]
         [HttpPost("RateDeliverer")]
-        public async Task<ActionResult<DelivererRate>> PostDelivererRate(BaseDelivererRate baseDelivererRate)
+        public async Task<ActionResult<DelivererRate>> PostRate_User(BaseDelivererRate baseDelivererRate)
         {
             DelivererRate delivererRate = new DelivererRate();
             delivererRate.Date = DateTime.Now;
             delivererRate.DelivererId = baseDelivererRate.id;
             delivererRate.Value = baseDelivererRate.rate;
-            delivererRate.UserId = 1;//////////////////////////////////////////////////////                      TUTAJ BARTEK ID Z TOKENA
+            delivererRate.UserId = (long)HttpContext.Items["userId"];
             _context.DelivererRates.Add(delivererRate);
             await _context.SaveChangesAsync();
 
@@ -97,6 +102,7 @@ namespace Backend.Controllers
         }
 
         // DELETE: api/DelivererRates/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult<DelivererRate>> DeleteDelivererRate(long id)
         {

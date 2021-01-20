@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Model;
+using Backend.Helpers;
 
 namespace Backend.Controllers
 {
@@ -48,17 +48,19 @@ namespace Backend.Controllers
         {
             _context = context;
         }
-
+//Do Autoryzacji
         // GET: api/Orders
+        [Authorize]
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
             return await _context.Orders.ToListAsync();
         }
-
+//Do Autoryzacji
         // GET: api/Orders/5 
+        [Authorize]
         [HttpGet("{id}")]
-        public async Task<ActionResult<Order>> GetOrder(long id)
+        public async Task<ActionResult<Order>> GetOrder_OwnerStationDeliverer(long id)
         {
             var order = await _context.Orders.Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).SingleOrDefaultAsync(e => e.Id == id); ;
 
@@ -67,13 +69,14 @@ namespace Backend.Controllers
                 return NotFound();
             }
 
-            return order;
+            return Ok(order);
         }
 
         // PUT: api/Orders/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutOrder(long id, Order order)
         {
             if (id != order.Id)
@@ -106,9 +109,10 @@ namespace Backend.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost("SubmitOrder")]
-        public async Task<ActionResult<Order>> PostOrder(UserOrder userOrder)
+        [Authorize]
+        public async Task<ActionResult<Order>> PostOrder_User(UserOrder userOrder)
         {
-            long id = 1; /////////////////////////////////////////////////////// DODAJ TOKENA TUTAJ BARTEK
+            long id = (long)HttpContext.Items["userId"];
             foreach (DishOrder tempDishOrder in userOrder.dishes)
             {
                 Order order = new Order();
@@ -122,17 +126,25 @@ namespace Backend.Controllers
                 await _context.SaveChangesAsync();
                 foreach (FoodOrdered tempFoodOrdered in tempDishOrder.foods)
                 {
-                    FoodOrder tempFoodOrder = new FoodOrder();
-                    tempFoodOrder.FoodId = tempFoodOrdered.dishId;
-                    tempFoodOrder.OrderId = order.Id;
+                    List<FoodOrder> tempList = new List<FoodOrder>();
+                    for (int i = 0; i < tempFoodOrdered.count; ++i)
+                    {
+                        FoodOrder tempFoodOrder = new FoodOrder();//Do przetestowania
+                        tempFoodOrder.FoodId = tempFoodOrdered.dishId;
+                        tempFoodOrder.OrderId = order.Id;
+                        tempList.Add(tempFoodOrder);
+                        _context.FoodOrders.Add(tempFoodOrder);
+                    }
+                    await _context.SaveChangesAsync();
                 }
                 await _context.SaveChangesAsync();
 
             }
             return StatusCode(201);
         }
-
+        //Do Autoryzacji
         // DELETE: api/Orders/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult<Order>> DeleteOrder(long id)
         {
@@ -148,24 +160,30 @@ namespace Backend.Controllers
             return order;
         }
 
+        [Authorize]
         [HttpGet("isCurrent")]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders([FromQuery] bool current)
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrders_Deliverer([FromQuery] bool current)
         {
+            long id = (long)HttpContext.Items["delivererId"];
             if (current)
             {
-                return await _context.Orders.Where(e => e.Status != "ENDED").Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).ToListAsync();
+                return await _context.Orders.Where(e => e.Status != "ENDED" && e.DelivererId == id)
+                    .Include(e => e.OrderStation).Include(e => e.Deliverer)
+                    .Include(e => e.User).Include(e => e.User.City).ToListAsync();
             }
             else
             {
-                return await _context.Orders.Where(e => e.Status == "ENDED").Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).ToListAsync();
+                return await _context.Orders.Where(e => e.Status == "ENDED" && e.DelivererId == id)
+                    .Include(e => e.OrderStation).Include(e => e.Deliverer)
+                    .Include(e => e.User).Include(e => e.User.City).ToListAsync();
             }
         }
 
+        [Authorize]
         [HttpGet("UserOrders")]
-        public async Task<ActionResult<IEnumerable<BodyUserOrder>>> GetUserOrders()
+        public async Task<ActionResult<IEnumerable<BodyUserOrder>>> GetUserOrders_User()
         {
-            /////////////////////////////////////token zamiast id
-            long id = 1;
+            long id = (long)HttpContext.Items["userId"];
             IEnumerable<Order> orders = await _context.Orders.Where(e => e.UserId == id).Where(e => e.Status == "ENDED" || e.Status == "REALIZE").Include(e => e.OrderStation).Include(e => e.FoodOrders).Include(e => e.OrderStation.Resteurant).ToListAsync();
             List<BodyUserOrder> bodyUserOrder = new List<BodyUserOrder>();
             
@@ -184,13 +202,56 @@ namespace Backend.Controllers
                 bodyUserOrder.Add(tempBody);
             }
             return bodyUserOrder;
-    }
-
-        [HttpGet("{username}/isCurrent")]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders([FromQuery] bool current, string username)
+        }
+//Konflikt Paweł W.
+/* Ordersy dla restauracji
+ * Tokenem autoryzacja
+ * */
+        [Authorize]
+        [HttpGet("/isActive")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrders_OwnerStation([FromQuery] bool current)
         {
-            User user = await _context.Users.Where(f => f.Username == username).FirstOrDefaultAsync();
-            List<long> orderIds = await _context.Orders.Where(f => f.UserId == user.Id).Select(a => a.Id).ToListAsync();
+            long id = 0L;
+            List<Order> orders = null;
+            if(HttpContext.Items["ownerId"]!=null)
+            {
+                id = (long)HttpContext.Items["ownerId"];
+                var owner = _context.Owners.FirstOrDefault(o => o.Id == id);
+                if(owner == null)
+                {
+                    return NotFound();
+                }
+                if(current)
+                {
+                    orders = await _context.Orders.Where(o => o.Id == id && o.Status != "ENDED").Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).ToListAsync();
+                }
+                else
+                {
+                    orders = await _context.Orders.Where(o => o.Id == id && o.Status == "ENDED")
+                        .Include(e => e.OrderStation).Include(e => e.Deliverer)
+                        .Include(e => e.User).Include(e => e.User.City).ToListAsync();
+                }
+            }
+            else if(HttpContext.Items["stationId"] != null)
+            {
+                id = (long)HttpContext.Items["stationId"];
+//TO:DO
+                var station = _context.OrderStations
+                    .Include(s=>s.Orders).FirstOrDefault(s => s.Id == id);
+                if(station == null)
+                {
+                    return NotFound();
+                }
+                if(current)
+                {
+                    orders = station.Orders.Where(s => s.Status != "ENDED").ToList();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+            List<long> orderIds = await _context.Orders.Where(f => f.UserId == id).Select(a => a.Id).ToListAsync();
 
             if (current)
             {
@@ -204,31 +265,34 @@ namespace Backend.Controllers
         }
 
         //delete from query and get first with not Ended
+        [Authorize]
         [HttpGet("find")]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrdersToRealise([FromQuery] double latitude, [FromQuery] double longitude)
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrderToRealise_Deliverer()
         {
             //do dokonczenia
-                return await _context.Orders.Where(e => e.Status != "ENDED").ToListAsync();
+                return await _context.Orders.Where(e => e.Status == "STARTED").ToListAsync();
 
         }
 
+        [Authorize]
         [HttpPost("take")]
-        public async Task<ActionResult<Order>> RealizeOrder(Data data)
+        public async Task<ActionResult<Order>> RealizeOrder_Deliverer(Data data)
         {
             var order = await _context.Orders.FindAsync(data.id);
             if (order == null)
             {
                 return NotFound();
             }
-
+            order.DelivererId = (long)HttpContext.Items["delivererId"];
             order.Status = "REALIZE";
             await _context.SaveChangesAsync();
 
             return order;
         }
 
+        [Authorize]
         [HttpPost("delivered")]
-        public async Task<ActionResult<Order>> DeliverOrder(Data data)
+        public async Task<ActionResult<Order>> DeliverOrder_Deliverer(Data data)
         {
             var order = await _context.Orders.FindAsync(data.id);
             if (order == null)
@@ -237,14 +301,15 @@ namespace Backend.Controllers
             }
 
             order.Status = "ENDED";
-            order.EndTime = DateTime.Now; //mozliwe ze trzeba bedzie w bazie zmienic wartosc na datetime2 jesli nie ma teraz
+            order.EndTime = DateTime.Now;
             await _context.SaveChangesAsync();
 
             return order;
         }
 
+        [Authorize]
         [HttpPatch("{id}")]
-        public async Task<ActionResult<Order>> PatchOrderDelivery(Order response)
+        public async Task<ActionResult<Order>> PatchOrderDeliveryOwnerStation(Order response)
         {
             var order = await _context.Orders.FindAsync(response.Id);
             if (order == null)
@@ -262,19 +327,6 @@ namespace Backend.Controllers
             return order;
         }
 
-        //[HttpPatch("{id}")]
-        //public async Task<ActionResult<Order>> PatchOrder(long id)
-        //{
-        //    var order = await _context.Orders.FindAsync(id);
-        //    if (order == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    _context.Orders.Remove(order);
-        //    await _context.SaveChangesAsync();
-
-        //    return order;
-        //}
         private bool OrderExists(long id)
         {
             return _context.Orders.Any(e => e.Id == id);

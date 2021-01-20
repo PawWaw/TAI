@@ -31,7 +31,7 @@ namespace Backend.Controllers
         // Information about current logged in user
         [Authorize]
         [HttpGet("user")]
-        public async Task<ActionResult<LoginResponse>> GetUserAsync()
+        public async Task<ActionResult<LoginResponse>> GetUserAsync_User()
         {
             var userId = (long)HttpContext.Items["userId"];
 
@@ -53,7 +53,7 @@ namespace Backend.Controllers
         // Update user
         [Authorize]
         [HttpPut("user")]
-        public async Task<IActionResult> PutUser(WsPutUser wsUser)
+        public async Task<IActionResult> PutUser_User(WsPutUser wsUser)
         {
             var userId = (long)HttpContext.Items["userId"];
 

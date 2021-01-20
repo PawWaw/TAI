@@ -12,33 +12,38 @@ namespace Backend.Helpers
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var id = 0L;
-            var controller = context.ActionDescriptor.RouteValues["action"];
-            if (controller.Contains("User"))
+            string action = "";
+            var actionSplit = context.ActionDescriptor.RouteValues["action"].Split("_");
+            if(actionSplit.Length==2)
             {
-                if (context.HttpContext.Items["userId"] != null)
+                action = actionSplit[1];
+                if (action.Contains("User"))
                 {
-                    id = (long)context.HttpContext.Items["userId"];
+                    if (context.HttpContext.Items["userId"] != null)
+                    {
+                        id = (long)context.HttpContext.Items["userId"];
+                    }
                 }
-            }
-            else if (controller.Contains("Order") || controller.Contains("Station") || controller.Contains("OrderStation"))
-            {
-                if (context.HttpContext.Items["stationId"] != null)
+                else if (action.Contains("Order") || action.Contains("Station") || action.Contains("OrderStation"))
                 {
-                    id = (long)context.HttpContext.Items["stationId"];
+                    if (context.HttpContext.Items["stationId"] != null)
+                    {
+                        id = (long)context.HttpContext.Items["stationId"];
+                    }
                 }
-            }
-            else if (controller.Contains("Deliver"))
-            {
-                if (context.HttpContext.Items["delivererId"] != null)
+                else if (action.Contains("Deliverer"))
                 {
-                    id = (long)context.HttpContext.Items["delivererId"];
+                    if (context.HttpContext.Items["delivererId"] != null)
+                    {
+                        id = (long)context.HttpContext.Items["delivererId"];
+                    }
                 }
-            }
-            else if (controller.Contains("Owner"))
-            {
-                if (context.HttpContext.Items["ownerId"] != null)
+                else if (action.Contains("Owner"))
                 {
-                    id = (long)context.HttpContext.Items["ownerId"];
+                    if (context.HttpContext.Items["ownerId"] != null)
+                    {
+                        id = (long)context.HttpContext.Items["ownerId"];
+                    }
                 }
             }
             if (id <= 0)

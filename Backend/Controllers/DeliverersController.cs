@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Backend.Model;
 using Backend.RestModel;
 using Backend.Helpers;
+using System.Collections.Generic;
 
 namespace Backend.Controllers
 {
@@ -20,13 +21,19 @@ namespace Backend.Controllers
             _context = context;
         }
 
+        // GET: api/Deliverers
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Deliverer>>> GetDeliverers_OwnerStation()
+        {
+            return await _context.Deliverers.ToListAsync();
+        }
 
         // GET: /api/Deliverers/statistics
         [Authorize]
         [HttpGet("statistics")]
-        public ActionResult<WsStatistics> GetStatistics()
+        public ActionResult<WsStatistics> GetStatistics_Deliverer()
         {
-
             var delivererId = (long)HttpContext.Items["delivererId"];
 
             var deliverer = _context.Deliverers.Include(d=>d.DelivererRates).Include(d=>d.Orders).FirstOrDefault(o => o.Id == delivererId);
@@ -36,10 +43,10 @@ namespace Backend.Controllers
                 TotalDelivery = deliverer.Orders.Count,
                 CurrentOrders = deliverer.Orders.Where(o => o.Status.TrimEnd() != "ENDED").Count(),
                 MaxDailyOrders = deliverer.Orders.Where(o => o.Status.TrimEnd() == "ENDED")
-                                    .GroupBy(o => o.EndTime.Date.ToString("d"))
+                                    .GroupBy(o => o.EndTime.Value.Date.ToString("d"))
                                     .Max(gr => gr.Count())
             };
-            return Ok(statistics);
+            return Ok(statistics); 
         }
 
 
@@ -47,11 +54,9 @@ namespace Backend.Controllers
         // Information about current logged in user
         [Authorize]
         [HttpGet("user")]
-        public ActionResult<LoginResponse> GetDeliverer()
+        public ActionResult<LoginResponse> GetDeliverer_Deliverer()
         {
-
             var delivererId = (long)HttpContext.Items["delivererId"];
-
 
             var user = _context.Deliverers.Include(d => d.City).FirstOrDefault(d => d.Id == delivererId);
             if (user == null)
@@ -77,9 +82,8 @@ namespace Backend.Controllers
         // Update user
         [Authorize]
         [HttpPut("user")]
-        public async Task<IActionResult> PutDeliverer(WsPutUser wsUser)
+        public async Task<IActionResult> PutDeliverer_Deliverer(WsPutUser wsUser)
         {
-
             var delivererId = (long)HttpContext.Items["delivererId"];
 
             var authUser = await _context.Deliverers.Include(d => d.City).FirstAsync(d => d.Id == delivererId);
@@ -108,10 +112,9 @@ namespace Backend.Controllers
         // Update password
         [Authorize]
         [HttpPut("user/password")]
-        public async Task<IActionResult> PutPassword(WsPutPassword passwordPut)
+        public async Task<IActionResult> PutPassword_Deliverer(WsPutPassword passwordPut)
         {
             var delivererId = (long)HttpContext.Items["delivererId"];
-
 
             var authUser = await _context.Deliverers.FirstAsync(d => d.Id == delivererId);
             if (authUser.Password == passwordPut.OldPassword.Value)
@@ -145,7 +148,6 @@ namespace Backend.Controllers
         [HttpPost("user/register")]
         public async Task<IActionResult> PostDeliverer([Bind("address,username,password,email,firstName,lastName,city")] WsUser user)
         {
-
             Deliverer newDeliverer = new Deliverer();
             newDeliverer.FillProperties(user);
             var dbDeliverer = await _context.Deliverers.FirstOrDefaultAsync(o => o.Username == newDeliverer.Username);
@@ -169,7 +171,6 @@ namespace Backend.Controllers
             }
             _context.Deliverers.Add(newDeliverer);
             await _context.SaveChangesAsync();
-
 
             return StatusCode(201);
         }
@@ -203,6 +204,7 @@ namespace Backend.Controllers
 
         // DELETE: api/Deliverers/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<ActionResult<Deliverer>> DeleteDeliverer(long id)
         {
             var deliverer = await _context.Deliverers.FindAsync(id);

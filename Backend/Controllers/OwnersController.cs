@@ -106,9 +106,9 @@ namespace Backend.Controllers
             }
             return Ok();
         }
-        // POST: api/Owners
+        // POST: api/Owners/user/register
         // Register
-        [HttpPost]
+        [HttpPost("user/register")]
         public async Task<IActionResult> PostOwner([Bind("address,username,password,email,firstName,lastName,city")] WsUser user)
         {
             Owner newOwner = new Owner();

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Model;
+using Backend.Helpers;
 
 namespace Backend.Controllers
 {
@@ -21,6 +22,7 @@ namespace Backend.Controllers
         }
 
         // GET: api/FoodIngredients
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<FoodIngredient>>> GetFoodIngredients()
         {
@@ -28,6 +30,7 @@ namespace Backend.Controllers
         }
 
         // GET: api/FoodIngredients/5
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<FoodIngredient>> GetFoodIngredient(long id)
         {
@@ -45,6 +48,7 @@ namespace Backend.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutFoodIngredient(long id, FoodIngredient foodIngredient)
         {
             if (id != foodIngredient.Id)

@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Model;
+using Backend.Helpers;
 
 namespace Backend.Controllers
 {
@@ -19,10 +18,11 @@ namespace Backend.Controllers
         {
             _context = context;
         }
-
+//Zmiana na Owner -> do przeredagowania połączenia
         // GET: api/Foods
+        [Authorize]
         [HttpGet("{username}")]
-        public async Task<ActionResult<IEnumerable<Dish>>> GetFoods(string username)
+        public async Task<ActionResult<IEnumerable<Dish>>> GetFoods_OwnerStation(string username)
         {
             List<Dish> dish_list = new List<Dish>();
             User user = await _context.Users.Where(f => f.Username == username).FirstOrDefaultAsync();
@@ -52,8 +52,9 @@ namespace Backend.Controllers
         }
 
         // GET: api/Foods/5
+        [Authorize]
         [HttpGet("{username}/{id}")]
-        public async Task<ActionResult<Dish>> GetFood(long id, string username)
+        public async Task<ActionResult<Dish>> GetFood_OwnerStation(long id, string username)
         {
             var food = await _context.Foods.Include(f => f.FoodIngredients).Where(f => (bool)f.IsActive == true).SingleOrDefaultAsync(f => f.Id == id);
             User user = await _context.Users.Where(f => f.Username == username).FirstOrDefaultAsync();
@@ -85,6 +86,7 @@ namespace Backend.Controllers
         // PUT: api/Foods/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutFood(long id, Food food)
         {
@@ -117,8 +119,9 @@ namespace Backend.Controllers
         // POST: api/Foods
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [Authorize]
         [HttpPost("{username}")]
-        public async Task<ActionResult<Food>> PostFood(Dish dish, string username)
+        public async Task<ActionResult<Food>> PostFood_OwnerStation(Dish dish, string username)
         {
             Food food = new Food();
             food.inject_data(dish);
@@ -149,8 +152,9 @@ namespace Backend.Controllers
             return StatusCode(200);
         }
 
+        [Authorize]
         [HttpPatch("{id}")]
-        public async Task<ActionResult<Food>> PatchFood(long id, Dish dish)
+        public async Task<ActionResult<Food>> PatchFood_OwnerStation(long id, Dish dish)
         {
             List<Ingredient> ingredient_list = new List<Ingredient>();
             var food = await _context.Foods.Include(x => x.FoodIngredients).FirstOrDefaultAsync(x => x.Id == id);
@@ -194,9 +198,10 @@ namespace Backend.Controllers
             return food;
         }
 
-            // DELETE: api/Foods/5
-            [HttpDelete("{id}")]
-        public async Task<ActionResult<Food>> DeleteFood(long id)
+        // DELETE: api/Foods/5
+        [Authorize]
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Food>> DeleteFood_OwnerStation(long id)
         {
             var food = await _context.Foods.FindAsync(id);
             if (food == null)

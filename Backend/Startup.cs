@@ -11,7 +11,6 @@ namespace Backend
 {
     public class Startup
     {
-        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -55,8 +54,8 @@ namespace Backend
 
             }
             app.UseHttpsRedirection();
-            
 
+            app.UseRouting();
             app.UseAuthentication();
             app.UseCors("CorsPolicy");
             app.UseMiddleware<JwtMiddleware>();
