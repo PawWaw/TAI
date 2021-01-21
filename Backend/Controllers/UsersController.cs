@@ -157,12 +157,12 @@ namespace Backend.Controllers
                     WsLoginResponse loginResponse = new WsLoginResponse
                     {
                         Token = JwtService.GenerateUserJwtToken(findUser),
-                        Username = findUser.Username.Trim(),
-                        Address = findUser.Address.Trim(),
+                        Username = findUser.Username,
+                        Address = findUser.Address,
                         City = findUser.City.Name,
-                        Email = findUser.Email.Trim(),
-                        FirstName = findUser.FirstName.Trim(),
-                        LastName = findUser.LastName.Trim()
+                        Email = findUser.Email,
+                        FirstName = findUser.FirstName,
+                        LastName = findUser.LastName
                     };
                     return Ok(loginResponse);
                 }
