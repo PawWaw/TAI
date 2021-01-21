@@ -39,12 +39,12 @@ namespace Backend.Controllers
             WsLoginResponse loginResponse = new WsLoginResponse
             {
                 Token = JwtService.GenerateUserJwtToken(user),
-                Username = user.Username,
-                Address = user.Address,
+                Username = user.Username.Trim(),
+                Address = user.Address.Trim(),
                 City = user.City.Name,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName
+                Email = user.Email.Trim(),
+                FirstName = user.FirstName.Trim(),
+                LastName = user.LastName.Trim()
             };
             return Ok(loginResponse);
         }
@@ -157,12 +157,12 @@ namespace Backend.Controllers
                     WsLoginResponse loginResponse = new WsLoginResponse
                     {
                         Token = JwtService.GenerateUserJwtToken(findUser),
-                        Username = findUser.Username,
-                        Address = findUser.Address,
+                        Username = findUser.Username.Trim(),
+                        Address = findUser.Address.Trim(),
                         City = findUser.City.Name,
-                        Email = findUser.Email,
-                        FirstName = findUser.FirstName,
-                        LastName = findUser.LastName
+                        Email = findUser.Email.Trim(),
+                        FirstName = findUser.FirstName.Trim(),
+                        LastName = findUser.LastName.Trim()
                     };
                     return Ok(loginResponse);
                 }
