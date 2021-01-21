@@ -204,10 +204,12 @@ namespace Backend.Controllers
             
             foreach(Order tempOrder in orders)
             {
-                BodyUserOrder tempBody = new BodyUserOrder();
-                tempBody.food = new List<Food>();
-                tempBody.order = tempOrder;
-                foreach(FoodOrder foodOrder in tempOrder.FoodOrders)
+                BodyUserOrder tempBody = new BodyUserOrder
+                {
+                    food = new List<Food>(),
+                    order = tempOrder
+                };
+                foreach (FoodOrder foodOrder in tempOrder.FoodOrders)
                 {
                     FoodOrder tempFoodOrder = await _context.FoodOrders.Include(e => e.Food).FirstOrDefaultAsync(e => e.Id == tempOrder.Id);
                     tempBody.food.Add(tempFoodOrder.Food);
@@ -220,15 +222,15 @@ namespace Backend.Controllers
         }
 
         [Authorize]
-        [HttpGet("/isActive")]
-        public ActionResult<IEnumerable<Order>> GetOrders_Owner([FromQuery] bool current)
+        [HttpGet("isActive")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrders_Owner([FromQuery] bool current)
         {
             long id = 0L;
             List<Order> orders = null;
             if (HttpContext.Items["ownerId"] != null)
             {
                 id = (long)HttpContext.Items["ownerId"];
-                var owner = _context.Owners.FirstOrDefault(o => o.Id == id);
+                var owner = _context.Owners.Include(o=>o.Restaurant.OrderStation.Orders).FirstOrDefault(o => o.Id == id);
                 if (owner == null)
                 {
                     return NotFound();
@@ -236,10 +238,18 @@ namespace Backend.Controllers
                 if (current)
                 {
                     orders = owner.Restaurant.OrderStation.Orders.Where(s => s.Status != "ENDED").ToList();
+                    foreach(Order order in orders)
+                    {
+                        Deliverer deliverer = await _context.Deliverers.FirstOrDefaultAsync(d => d.Id == order.DelivererId);
+                    }
                 }
                 else
                 {
                     orders = owner.Restaurant.OrderStation.Orders.Where(s => s.Status == "ENDED").ToList();
+                    foreach (Order order in orders)
+                    {
+                        Deliverer deliverer = await _context.Deliverers.FirstOrDefaultAsync(d => d.Id == order.DelivererId);
+                    }
                 }
             }
             else if (HttpContext.Items["stationId"] != null)
@@ -254,10 +264,18 @@ namespace Backend.Controllers
                 if (current)
                 {
                     orders = station.Orders.Where(s => s.Status != "ENDED").ToList();
+                    foreach (Order order in orders)
+                    {
+                        Deliverer deliverer = await _context.Deliverers.FirstOrDefaultAsync(d => d.Id == order.DelivererId);
+                    }
                 }
                 else
                 {
                     orders = station.Orders.Where(s => s.Status == "ENDED").ToList();
+                    foreach (Order order in orders)
+                    {
+                        Deliverer deliverer = await _context.Deliverers.FirstOrDefaultAsync(d => d.Id == order.DelivererId);
+                    }
                 }
             }
             else
@@ -329,7 +347,7 @@ namespace Backend.Controllers
 
         [Authorize]
         [HttpPatch("{id}")]
-        public async Task<ActionResult<Order>> PatchOrderDeliveryOwnerStation(Order response)
+        public async Task<ActionResult<Order>> PatchOrderDelivery_OwnerStation(Order response)
         {
             var order = await _context.Orders.FindAsync(response.Id);
             if (order == null)

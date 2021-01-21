@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Backend.Model;
 using Microsoft.EntityFrameworkCore;
 using Backend.Helpers;
+using System.Text;
 
 namespace Backend
 {
@@ -21,6 +22,7 @@ namespace Backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            JwtService.Key = Encoding.ASCII.GetBytes(Configuration["Jwt:Key"]);
             services.AddCors(options =>
             {
                 options.AddPolicy(
