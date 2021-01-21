@@ -1,0 +1,55 @@
+<h2 mat-dialog-title>User data</h2>
+<mat-card>
+  <form [formGroup]="userDataForm"
+        novalidate
+        (ngSubmit)="updateUser()">
+    <mat-dialog-content>
+      <mat-form-field appearance="legacy" class="spacer">
+        <input type="text"
+               matInput
+               readonly
+               placeholder="Username"
+               formControlName="username">
+      </mat-form-field>
+      <mat-form-field appearance="legacy" class="spacer">
+        <input type="text"
+               matInput
+               placeholder="FirstName"
+               formControlName="firstName">
+      </mat-form-field>
+      <mat-form-field appearance="legacy" class="spacer">
+        <input type="text"
+               matInput
+               placeholder="LastName"
+               formControlName="lastName">
+      </mat-form-field>
+      <mat-form-field appearance="legacy" class="spacer">
+        <input type="text"
+               matInput
+               placeholder="Email"
+               formControlName="email">
+      </mat-form-field>
+      <mat-form-field appearance="legacy" class="spacer">
+        <input type="text"
+               matInput
+               placeholder="City"
+               formControlName="city">
+      </mat-form-field>
+      <mat-form-field appearance="legacy" class="spacer">
+        <input type="text"
+               matInput
+               placeholder="Address"
+               formControlName="address">
+      </mat-form-field>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+      <button mat-button
+              mat-dialog-close>Cancel</button>
+      <button mat-button
+              [mat-dialog-close]="true"
+              cdkFocusInitial
+              type="submit">Update</button>
+    </mat-dialog-actions>
+  </form>
+</mat-card>

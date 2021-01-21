@@ -1,0 +1,48 @@
+.headerMenu {
+    width: 130px;
+}
+
+.toolbar {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    background-color: #222831;
+    color: #e7ecef;
+    font-weight: 600;
+}
+
+.rightHeader {
+    margin-right: 10px;
+    color: #e7ecef;
+    text-decoration: none;
+    position: absolute;
+    right: 0px;
+}
+
+.signup-identity {
+    margin-right: 10px;
+    color: #e7ecef;
+    text-decoration: none;
+    position: absolute;
+    right: 80px;
+}
+
+.basket {
+  margin-right: 10px;
+  color: #e7ecef;
+  text-decoration: none;
+  position: absolute;
+  right: 160px;
+}
+
+.login-form {
+    background-color: #222831;
+    color: #e7ecef;
+    width: 400px;
+    margin: auto;
+    position: absolute;
+    right: 200px;
+    text-align: center;
+  }
+
+

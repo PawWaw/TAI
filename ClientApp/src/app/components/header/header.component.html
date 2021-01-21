@@ -1,0 +1,55 @@
+<div class="toolbar"
+     role="banner">
+  <button mat-button
+          class="headerMenu"
+          (click)="moveTo('')">
+    Home
+  </button>
+  <button mat-button
+          class="headerMenu"
+          (click)="moveTo('restaurants')">
+    Restaurants
+  </button>
+  <button mat-button
+          class="headerMenu"
+          (click)="moveTo('dishes')">
+    Dishes
+  </button>
+  <button mat-button
+          class="headerMenu"
+          *ngIf="userLoggedin"
+          (click)="moveTo('orders')">
+    Orders
+  </button>
+  <button mat-button
+          class="signup-identity"
+          (click)="moveTo('signup')"
+          *ngIf="!userLoggedin">
+    Sign Up
+  </button>
+  <button mat-button
+          class="rightHeader"
+          (click)="moveTo('signin')"
+          *ngIf="!userLoggedin">
+    Sign In
+  </button>
+  <button mat-button
+          matBadge="{{elementsInBasket}}"
+          class="basket"
+          (click)="showBasket()"
+          *ngIf="userLoggedin">
+    <mat-icon>shopping_cart</mat-icon>
+  </button>
+  <button mat-button
+          class="signup-identity"
+          (click)="showUserData()"
+          *ngIf="userLoggedin">
+    <mat-icon>perm_identity</mat-icon>
+  </button>
+  <button mat-button
+          class="rightHeader"
+          (click)="logout()"
+          *ngIf="userLoggedin">
+    Log out
+  </button>
+</div>

@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>Rate deliverer</h2>
+<mat-card>
+
+  <div class="drop-down-role">
+    <mat-form-field>
+      <mat-label>Rate</mat-label>
+      <mat-select [(value)]="selectedRate">
+        <mat-option [value]="type.value"
+                    *ngFor="let type of ratePick"
+                    [value]="type.value">
+          {{type.typeName}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+</mat-card>
+<mat-dialog-actions align="end">
+  <button mat-button
+          mat-dialog-close>Close</button>
+  <button mat-button
+          [mat-dialog-close]="true"
+          (click)="rateDeliverer()">Rate</button>
+</mat-dialog-actions>

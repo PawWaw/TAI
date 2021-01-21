@@ -1,0 +1,89 @@
+<body>
+  <mat-card>
+    <h1>Dishes:</h1>
+    <br>
+    <mat-form-field>
+      <mat-label>Filter</mat-label>
+      <input matInput
+             (keyup)="applyFilter($event)"
+             placeholder="rosół z kury"
+             #input>
+    </mat-form-field>
+
+    <div class="mat-elevation-z8">
+      <table mat-table
+             [dataSource]="dataSource"
+             matSort>
+
+        <ng-container matColumnDef="restaurantName">
+          <th mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header> Restaurant </th>
+          <td mat-cell
+              *matCellDef="let row"> {{getRestaurantName(row)}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="dishName">
+          <th mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header> Dish </th>
+          <td mat-cell
+              *matCellDef="let row"> {{row.name}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="ingredients">
+          <th mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header> Ingredients </th>
+          <td mat-cell
+              *matCellDef="let row"> {{getIngredients(row)}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="price">
+          <th mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header> Price </th>
+          <td mat-cell
+              *matCellDef="let row"> {{row.price}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="rate">
+          <th mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header> Rate </th>
+          <td mat-cell
+              *matCellDef="let row"> {{row.rate}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="addToBasket">
+          <th mat-header-cell
+              [hidden]="!userLoggedin"
+              *matHeaderCellDef></th>
+          <td mat-cell
+              [hidden]="!userLoggedin"
+              *matCellDef="let element">
+            <button mat-icon-button
+                    color="primary">
+              <mat-icon (click)="addToBasket(element)"
+                        mat-button>add_shopping_cart</mat-icon>
+            </button>
+
+          </td>
+        </ng-container>
+
+        <tr mat-header-row
+            *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row
+            *matRowDef="let row; columns: displayedColumns;"></tr>
+
+        <tr class="mat-row"
+            *matNoDataRow>
+          <td class="mat-cell"
+              colspan="4">No data matching the filter "{{input.value}}"</td>
+        </tr>
+      </table>
+
+      <mat-paginator [pageSizeOptions]="[5, 10, 25]"></mat-paginator>
+    </div>
+  </mat-card>
+</body>
