@@ -54,7 +54,11 @@ namespace Backend.Controllers
         {
             var ownerId = (long)HttpContext.Items["ownerId"];
 
-            var authUser = await _context.Owners.Include(o => o.City).Include(o=>o.Restaurant.OrderStation.City).FirstAsync(o => o.Id == ownerId);
+            var authUser = await _context.Owners.Include(o => o.City).Include(o=>o.Restaurant.OrderStation.City).FirstOrDefaultAsync(o => o.Id == ownerId);
+            if(authUser==null)
+            {
+                return NotFound();
+            }
             wsUser.FIllPutUser(authUser);
 
             _context.Entry(authUser).State = EntityState.Modified;
@@ -84,7 +88,11 @@ namespace Backend.Controllers
         {
             var ownerId = (long)HttpContext.Items["ownerId"];
 
-            var authUser = await _context.Owners.Include(o=>o.Restaurant.OrderStation).FirstAsync(o => o.Id == ownerId);
+            var authUser = await _context.Owners.Include(o=>o.Restaurant.OrderStation).FirstOrDefaultAsync(o => o.Id == ownerId);
+            if(authUser == null)
+            {
+                return NotFound();
+            }
             if (authUser.Password != passwordPut.OldPassword.Password)
             {
                 return ValidationProblem();

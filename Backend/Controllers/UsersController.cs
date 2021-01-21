@@ -35,7 +35,11 @@ namespace Backend.Controllers
         {
             var userId = (long)HttpContext.Items["userId"];
 
-            var user = await _context.Users.Include(u => u.City).FirstAsync(u => u.Id == userId);
+            var user = await _context.Users.Include(u => u.City).FirstOrDefaultAsync(u => u.Id == userId);
+            if(user == null)
+            {
+                return NotFound();
+            }
             WsLoginResponse loginResponse = new WsLoginResponse
             {
                 Token = JwtService.GenerateUserJwtToken(user),

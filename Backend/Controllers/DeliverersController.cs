@@ -37,6 +37,10 @@ namespace Backend.Controllers
             var delivererId = (long)HttpContext.Items["delivererId"];
 
             var deliverer = _context.Deliverers.Include(d=>d.DelivererRates).Include(d=>d.Orders).FirstOrDefault(o => o.Id == delivererId);
+            if(deliverer == null)
+            {
+                return NotFound();
+            }
             WsStatistics statistics = new WsStatistics
             {
                 ClientRate = deliverer.DelivererRates.Average(d => d.Value),
@@ -86,7 +90,11 @@ namespace Backend.Controllers
         {
             var delivererId = (long)HttpContext.Items["delivererId"];
 
-            var authUser = await _context.Deliverers.Include(d => d.City).FirstAsync(d => d.Id == delivererId);
+            var authUser = await _context.Deliverers.Include(d => d.City).FirstOrDefaultAsync(d => d.Id == delivererId);
+            if(authUser == null)
+            {
+                return NotFound();
+            }
             wsUser.FIllPutUser(authUser);
             _context.Entry(authUser).State = EntityState.Modified;
 
@@ -116,7 +124,11 @@ namespace Backend.Controllers
         {
             var delivererId = (long)HttpContext.Items["delivererId"];
 
-            var authUser = await _context.Deliverers.FirstAsync(d => d.Id == delivererId);
+            var authUser = await _context.Deliverers.FirstOrDefaultAsync(d => d.Id == delivererId);
+            if(authUser == null)
+            {
+                return NotFound();
+            }
             if (authUser.Password != passwordPut.OldPassword.Password)
             {
                 return ValidationProblem();

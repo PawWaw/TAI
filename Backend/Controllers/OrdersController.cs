@@ -114,6 +114,11 @@ namespace Backend.Controllers
         public async Task<ActionResult<Order>> PostOrder_User(UserOrder userOrder)
         {
             long id = (long)HttpContext.Items["userId"];
+            User user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if(user == null)
+            {
+                return NotFound();
+            }
             foreach (DishOrder tempDishOrder in userOrder.dishes)
             {
                 Order order = new Order();
@@ -165,6 +170,11 @@ namespace Backend.Controllers
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders_Deliverer([FromQuery] bool current)
         {
             long id = (long)HttpContext.Items["delivererId"];
+            Deliverer deliverer = await _context.Deliverers.FirstOrDefaultAsync(d => d.Id == id);
+            if(deliverer==null)
+            {
+                return NotFound();
+            }
             if (current)
             {
                 return await _context.Orders.Where(e => e.Status != "ENDED" && e.DelivererId == id)
@@ -184,6 +194,11 @@ namespace Backend.Controllers
         public async Task<ActionResult<IEnumerable<BodyUserOrder>>> GetUserOrders_User()
         {
             long id = (long)HttpContext.Items["userId"];
+            User user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if (user == null)
+            {
+                return NotFound();
+            }
             IEnumerable<Order> orders = await _context.Orders.Where(e => e.UserId == id).Where(e => e.Status == "ENDED" || e.Status == "REALIZE").Include(e => e.OrderStation).Include(e => e.FoodOrders).Include(e => e.OrderStation.Restaurant).ToListAsync();
             List<BodyUserOrder> bodyUserOrder = new List<BodyUserOrder>();
             
@@ -277,12 +292,18 @@ namespace Backend.Controllers
         [HttpPost("take")]
         public async Task<ActionResult<Order>> RealizeOrder_Deliverer(Data data)
         {
+            long delivererId = (long)HttpContext.Items["delivererId"];
+            Deliverer deliverer = await _context.Deliverers.FirstOrDefaultAsync(d => d.Id == delivererId);
+            if(deliverer == null)
+            {
+                return NotFound();
+            }
             var order = await _context.Orders.FindAsync(data.id);
             if (order == null)
             {
                 return NotFound();
             }
-            order.DelivererId = (long)HttpContext.Items["delivererId"];
+            order.DelivererId = delivererId;
             order.Status = "REALIZE";
             await _context.SaveChangesAsync();
 

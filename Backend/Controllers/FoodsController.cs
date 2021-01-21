@@ -64,6 +64,10 @@ namespace Backend.Controllers
         {
             long ownerId = (long)HttpContext.Items["ownerId"];
             Owner user = await _context.Owners.Include(o=>o.Restaurant.Foods).FirstOrDefaultAsync(o=>o.Id == ownerId);
+            if(user == null)
+            {
+                return NotFound();
+            }
             Food foodNoIngredients = user.Restaurant.Foods.FirstOrDefault(f => f.Id == id && f.IsActive == true);
             if (foodNoIngredients == null || await _context.Foods.ContainsAsync(foodNoIngredients) == false)
             {
@@ -128,11 +132,16 @@ namespace Backend.Controllers
         public async Task<ActionResult<Food>> PostFood_Owner(Dish dish)
         {
             long ownerId = (long)HttpContext.Items["ownerId"];
+
             Food food = new Food();
             food.inject_data(dish);
             Ingredient temp_ingredient;
             food.IsActive = true;
             Owner user = await _context.Owners.Include(o=>o.Restaurant).Where(f => f.Id == ownerId).FirstOrDefaultAsync();
+            if(user == null)
+            {
+                return NotFound();
+            }
             food.IdRestaurant = user.Restaurant.Id;
             _context.Foods.Add(food);
             await _context.SaveChangesAsync();

@@ -88,12 +88,18 @@ namespace Backend.Controllers
         [HttpPost("RateFood")]
         public async Task<ActionResult<FoodRate>> PostFoodRate_User(BodyFoodRates bodyFoodRate)
         {
+            long userId = (long)HttpContext.Items["userId"];
+            User user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if(user == null)
+            {
+                return NotFound();
+            }
             FoodRate foodRate = new FoodRate
             {
                 Date = DateTime.Now,
                 FoodId = bodyFoodRate.id,
                 Value = bodyFoodRate.rate,
-                UserId = (long)HttpContext.Items["userId"]
+                UserId = userId
             };
             _context.FoodRates.Add(foodRate);
             await _context.SaveChangesAsync();

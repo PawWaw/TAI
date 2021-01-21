@@ -149,11 +149,13 @@ namespace Backend.Controllers
             {
                 return StatusCode(409);
             }
-            var authUser = await _context.OrderStations.Include(o => o.City).FirstAsync(o => o.Id == stationId);
+            var authUser = await _context.OrderStations.Include(o => o.City).FirstOrDefaultAsync(o => o.Id == stationId);
+            if(authUser == null)
+            {
+                return NotFound();
+            }
             wsUser.FIllPutUser(authUser);
             _context.Entry(authUser).State = EntityState.Modified;
-
-
             try
             {
 
@@ -187,7 +189,11 @@ namespace Backend.Controllers
 
                 return StatusCode(409);
             }
-            var authUser = await _context.OrderStations.FirstAsync(o => o.Id == stationId);
+            var authUser = await _context.OrderStations.FirstOrDefaultAsync(o => o.Id == stationId);
+            if(authUser == null)
+            {
+                return NotFound();
+            }
             if (authUser.Password != passwordPut.OldPassword.Password)
             {
                 return ValidationProblem();
@@ -302,6 +308,7 @@ namespace Backend.Controllers
             if (HttpContext.Items["stationId"] != null)
             {
                 stationId = (long)HttpContext.Items["stationId"];
+                OrderStation station = _context.OrderStations.FirstOrDefault(s => s.Id == stationId);
             }
             return stationId;
         }

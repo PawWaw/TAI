@@ -90,11 +90,13 @@ namespace Backend.Controllers
         [HttpPost("RateDeliverer")]
         public async Task<ActionResult<DelivererRate>> PostRate_User(BaseDelivererRate baseDelivererRate)
         {
+            long userId = (long)HttpContext.Items["userId"];
+            User user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             DelivererRate delivererRate = new DelivererRate();
             delivererRate.Date = DateTime.Now;
             delivererRate.DelivererId = baseDelivererRate.id;
             delivererRate.Value = baseDelivererRate.rate;
-            delivererRate.UserId = (long)HttpContext.Items["userId"];
+            delivererRate.UserId = userId;
             _context.DelivererRates.Add(delivererRate);
             await _context.SaveChangesAsync();
 
