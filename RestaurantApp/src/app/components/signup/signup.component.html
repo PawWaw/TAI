@@ -24,6 +24,9 @@
           <input matInput placeholder="Last name" formControlName="lastName">
         </mat-form-field>
         <mat-form-field class="register-full-width">
+          <input matInput placeholder="Restaurant name" formControlName="restaurant">
+        </mat-form-field>
+        <mat-form-field class="register-full-width">
           <input matInput type="city" placeholder="City" formControlName="city">
           <mat-error *ngIf="city.hasError('required')">City is <strong>required</strong></mat-error>
         </mat-form-field>

@@ -16,19 +16,20 @@ export class DishService {
   }
 
   httpHeader = new HttpHeaders({
+    'Authorization': 'Bearer ' + localStorage.getItem('auth_token'),
     'Content-Type': 'application/json'
   });
 
   public getDishes(): Observable<Dish[]> {
-    return this.http.get<Dish[]>(this.dishUrl + "/" + localStorage.getItem('username'), {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
+    return this.http.get<Dish[]>(this.dishUrl, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
   }
 
-  public getSingleDish(id: number): Observable<Dish> {
-    return this.http.get<Dish>(this.dishUrl + "/" + localStorage.getItem('username') + "/" + id, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
-  }
+  // public getSingleDish(id: number): Observable<Dish> {
+  //   return this.http.get<Dish>(this.dishUrl + "/" + localStorage.getItem('username') + "/" + id, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
+  // }
 
   public postDish(dish: Dish) {
-    return this.http.post<Dish>(this.dishUrl + "/" + localStorage.getItem('username'), dish, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
+    return this.http.post<Dish>(this.dishUrl, dish, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
   }
 
   public modifyDish(dish: Dish) {

@@ -7,4 +7,5 @@ export class User {
     lastName: string;
     city: string;
     address: string;
+    restaurant: string;
   }

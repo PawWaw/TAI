@@ -55,7 +55,8 @@ export class SignupComponent implements OnInit {
       firstName: '',
       lastName: '',
       city: '',
-      address: ''
+      address: '',
+      restaurant: ''
     }, {validator: passwordMatchValidator});
   }
 
@@ -83,6 +84,10 @@ export class SignupComponent implements OnInit {
     return this.formGroup.get('address');
   }
 
+  get restaurant() {
+    return this.formGroup.get('restaurant');
+  }
+
   onPasswordInput() {
     if (this.formGroup.hasError('passwordMismatch'))
       this.password2.setErrors([{'passwordMismatch': true}]);
@@ -100,6 +105,7 @@ export class SignupComponent implements OnInit {
 
     this.userService.postUser(this.formGroup.value).pipe(first()).subscribe(
       data => {
+        console.log(this.formGroup.value)
         this.router.navigate(['/signin']);
       },
       error => {

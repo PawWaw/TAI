@@ -1,15 +1,17 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams, HttpResponse} from "@angular/common/http";
 import * as moment from "moment";
-import {catchError, map} from "rxjs/operators";
-import {throwError} from "rxjs";
+import {catchError, map, retry} from "rxjs/operators";
+import {Observable, throwError} from "rxjs";
+import { AuthResponse } from '../_models/AuthResponse';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  baseurl = 'https://localhost:44308/api/users/auth'; 
+
+  baseurl = 'https://localhost:44308/api/owners/auth'; 
   constructor(private http: HttpClient) { }
   httpOptions = {
     headers: new HttpHeaders({
@@ -17,23 +19,20 @@ export class AuthService {
     })
   };
 
-  authenticate(value: string, username: string){
-    return this.http.post(this.baseurl,value, {responseType: 'text'}).pipe(map(token => {
-      localStorage.setItem('auth_token', token);
-      localStorage.setItem('username', username);
-      return token;
-  }), catchError(this.errorHandler));
+  authenticate(value: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(this.baseurl, value).pipe(retry(1), catchError(this.errorHandler));
   }
 
-  saveSession(data: HttpResponse<any>){
-    const expiresAt = moment().add(data.headers.get("Expiration"));
-    localStorage.setItem('auth_token',data.headers.get("Authorization"));
-    localStorage.setItem('token_exp_time', JSON.stringify(expiresAt.valueOf()));
-    localStorage.setItem('current_user',data.headers.get("Username"));
-    if (data.headers.get("Household")!=null) {
-      localStorage.setItem('current_household', data.headers.get("Household"));
-    }
-  }
+  // saveSession(data: HttpResponse<any>){
+  //   const expiresAt = moment().add(data.headers.get("Expiration"));
+  //   console.log(data.headers.get("token"))
+  //   localStorage.setItem('auth_token',data.headers.get("token"));
+  //   localStorage.setItem('token_exp_time', JSON.stringify(expiresAt.valueOf()));
+  //   localStorage.setItem('current_user',data.headers.get("Username"));
+  //   if (data.headers.get("Household")!=null) {
+  //     localStorage.setItem('current_household', data.headers.get("Household"));
+  //   }
+  // }
 
   logout(){
     localStorage.removeItem('auth_token');

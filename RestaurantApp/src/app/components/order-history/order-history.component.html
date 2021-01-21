@@ -20,7 +20,7 @@
 
                 <ng-container matColumnDef="deliverer">
                   <th mat-header-cell *matHeaderCellDef> Deliverer </th>
-                  <td mat-cell *matCellDef="let data"> {{data.deliverer.firstName}} {{data.deliverer.lastName}}</td>
+                  <td mat-cell *matCellDef="let data"> {{data.deliverer?.firstName}} {{data.deliverer?.lastName}}</td>
                 </ng-container>
             
                 <ng-container matColumnDef="startTime">

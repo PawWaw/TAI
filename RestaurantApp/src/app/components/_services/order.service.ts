@@ -19,26 +19,28 @@ export class OrderService {
   }
 
   httpHeader = new HttpHeaders({
+    'Authorization': 'Bearer ' + localStorage.getItem('auth_token'),
     'Content-Type': 'application/json'
   });
 
     public getDeliverers(): Observable<Deliverer[]> {
-    return this.http.get<Deliverer[]>(this.delivererUrl + "/" + localStorage.getItem('username'), {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
+    return this.http.get<Deliverer[]>(this.delivererUrl, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
   }
 
   public getOrders(): Observable<Order[]> {
-    return this.http.get<Order[]>(this.orderUrl + "/" + localStorage.getItem('username') + "/isCurrent?current=true", {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
+    return this.http.get<Order[]>(this.orderUrl + "/isActive?current=true", {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
   }
 
-  public getSingleOrder(code: string): Observable<Order> {
-    return this.http.get<Order>(this.orderUrl + "/" + code, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
-  }
+  // public getSingleOrder(code: string): Observable<Order> {
+  //   return this.http.get<Order>(this.orderUrl + "/" + code, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
+  // }
 
-  public postOrder(order: Order) {
-    this.http.post<Order>(this.orderUrl, order, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
-  }
+  // public postOrder(order: Order) {
+  //   this.http.post<Order>(this.orderUrl, order, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
+  // }
 
   public modifyOrder(order: Order) {
+    order.orderStation = null
     return this.http.patch(this.orderUrl + "/" + order.id, order, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
   }
 

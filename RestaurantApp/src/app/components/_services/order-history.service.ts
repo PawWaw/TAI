@@ -17,15 +17,12 @@ export class OrderHistoryService {
   }
 
   httpHeader = new HttpHeaders({
+    'Authorization': 'Bearer ' + localStorage.getItem('auth_token'),
     'Content-Type': 'application/json'
   });
 
   public getOrders(): Observable<Order[]> {
-    return this.http.get<Order[]>(this.orderUrl + "/" + localStorage.getItem('username') + "/isCurrent?current=false", {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
-  }
-
-  public getSingleOrder(code: string): Observable<Order> {
-    return this.http.get<Order>(this.orderUrl + "/" + code, {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
+    return this.http.get<Order[]>(this.orderUrl + "/isActive?current=false", {headers: this.httpHeader}).pipe(retry(1), catchError(this.errorHandler));
   }
 
   errorHandler(error: HttpErrorResponse) {
