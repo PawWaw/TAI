@@ -22,7 +22,7 @@ namespace Backend.Model
         public void FillProperties(WsStation user)
         {
             this.Address = user.Address;
-            this.password = user.Value;
+            this.password = user.Password;
             this.Username = user.Username;
         }
         [Key]

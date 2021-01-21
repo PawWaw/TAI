@@ -188,11 +188,11 @@ namespace Backend.Controllers
                 return StatusCode(409);
             }
             var authUser = await _context.OrderStations.FirstAsync(o => o.Id == stationId);
-            if (authUser.Password != passwordPut.OldPassword.Value)
+            if (authUser.Password != passwordPut.OldPassword.Password)
             {
                 return ValidationProblem();
             }
-            authUser.InsertHashedPassword(passwordPut.NewPassword.Value);
+            authUser.InsertHashedPassword(passwordPut.NewPassword.Password);
             _context.Entry(authUser).State = EntityState.Modified;
 
 
@@ -258,7 +258,7 @@ namespace Backend.Controllers
             if (ModelState.IsValid)
             {
                 var findUser = await _context.OrderStations.Include(u => u.City)
-                    .FirstOrDefaultAsync(m => m.Username == user.Username && m.Password == user.Value);
+                    .FirstOrDefaultAsync(m => m.Username == user.Username && m.Password == user.Password);
                 if (findUser != null)
                 {
                     WsStationLoginResponse loginResponse = new WsStationLoginResponse

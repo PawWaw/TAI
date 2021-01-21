@@ -87,11 +87,11 @@ namespace Backend.Controllers
             var userId = (long)HttpContext.Items["userId"];
 
             var authUser = await _context.Users.FirstAsync(u=>u.Id == userId);
-            if (authUser.Password != passwordPut.OldPassword.Value)
+            if (authUser.Password != passwordPut.OldPassword.Password)
             {
                 return ValidationProblem();
             }
-            authUser.InsertHashedPassword(passwordPut.NewPassword.Value);
+            authUser.InsertHashedPassword(passwordPut.NewPassword.Password);
             _context.Entry(authUser).State = EntityState.Modified;
 
             try
@@ -151,7 +151,7 @@ namespace Backend.Controllers
             if(ModelState.IsValid)
             {
                 var findUser = await _context.Users.Include(u=>u.City)
-                    .FirstOrDefaultAsync(m => m.Username == user.Username && m.Password == user.Value);
+                    .FirstOrDefaultAsync(m => m.Username == user.Username && m.Password == user.Password);
                 if (findUser != null)
                 {
                     WsLoginResponse loginResponse = new WsLoginResponse

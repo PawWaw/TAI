@@ -27,7 +27,7 @@ namespace Backend.Model
             this.Email = user.Email;
             this.FirstName = user.FirstName;
             this.LastName = user.LastName;
-            this.password = user.Value;
+            this.password = user.Password;
             this.Username = user.Username;
         }
         public void InsertHashedPassword(string password)

@@ -85,12 +85,12 @@ namespace Backend.Controllers
             var ownerId = (long)HttpContext.Items["ownerId"];
 
             var authUser = await _context.Owners.Include(o=>o.Restaurant.OrderStation).FirstAsync(o => o.Id == ownerId);
-            if (authUser.Password != passwordPut.OldPassword.Value)
+            if (authUser.Password != passwordPut.OldPassword.Password)
             {
                 return ValidationProblem();
             }
-            authUser.InsertHashedPassword(passwordPut.NewPassword.Value);
-            authUser.Restaurant.OrderStation.InsertHashedPassword(passwordPut.NewPassword.Value);
+            authUser.InsertHashedPassword(passwordPut.NewPassword.Password);
+            authUser.Restaurant.OrderStation.InsertHashedPassword(passwordPut.NewPassword.Password);
             _context.Entry(authUser).State = EntityState.Modified;
             _context.Entry(authUser.Restaurant.OrderStation).State = EntityState.Modified;
             try
@@ -163,7 +163,7 @@ namespace Backend.Controllers
             if (ModelState.IsValid)
             {
                 var findUser = await _context.Owners.Include(u => u.City).Include(u=>u.Restaurant)
-                    .FirstOrDefaultAsync(m => m.Username == user.Username && m.Password == user.Value);
+                    .FirstOrDefaultAsync(m => m.Username == user.Username && m.Password == user.Password);
                 if (findUser != null)
                 {
                     WsOwnerLoginResponse loginResponse = new WsOwnerLoginResponse
