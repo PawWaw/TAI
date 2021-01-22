@@ -286,23 +286,21 @@ namespace Backend.Controllers
 
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet("find")]
         public async Task<ActionResult<WsOrderResponse_Deliverer>> GetOrderToRealise_Deliverer()
         {
             var order = await _context.Orders.Include(o => o.OrderStation.City)
                                             .Include(o => o.User.City).Where(e => e.Status == "STARTED")
-                                            .OrderBy(e => e.StartTime.Date.ToString("d")).FirstOrDefaultAsync();
+                                            .OrderBy(e => e.StartTime.Date.Day).FirstOrDefaultAsync();
             if(order == null)
             {
                 return NotFound();
             }
             WsOrderResponse_Deliverer response = new WsOrderResponse_Deliverer();
+            response.ClientAddress = new WsAddress { Address = order.User.Address, City = order.User.City.Name };
+            response.RestaurantAddress = new WsAddress { Address = order.OrderStation.Address, City = order.OrderStation.City.Name };
             response.Id = order.Id;
-            response.ClientAddress.Address = order.User.Address;
-            response.ClientAddress.City = order.User.City.Name;
-            response.RestaurantAddress.Address = order.OrderStation.Address;
-            response.RestaurantAddress.City = order.OrderStation.City.Name;
             return Ok(response);
         }
 
