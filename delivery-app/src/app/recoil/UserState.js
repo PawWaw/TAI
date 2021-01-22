@@ -1,26 +1,59 @@
 import { toast } from "react-toastify";
-import { atom, selector } from "recoil";
+import { atom, selector, useRecoilCallback } from "recoil";
 import { history } from "../..";
+import agent from "../api/agent";
 
 export const userState = atom({
   key: "userState",
   default: null,
 });
 
-export const loginSelector = selector({
-  key: "login",
-  set: async ({ set }, formValues) => {
+export const loadingState = atom({
+  key: "loadingState",
+  default: false,
+});
+
+export const tokenSelector = selector({
+  key: "tokenSelector",
+  get: () => {
+    return window.localStorage.getItem("jwt");
+  },
+});
+
+export const currentUserSelector = selector({
+  key: "currentUserSelector",
+  set: async ({ set }) => {
     try {
-      set(userState, {
-        email: "anthony@gmai.com",
-        radius: 10,
-        city: "Katowice",
-        address: "Polna 20",
-      });
-      history.push("/dashboard");
+      const user = await agent.User.current();
+      console.log(user);
+      set(userState, user);
     } catch (error) {
-      toast.error("Invalid username or password.");
+      toast.error("Could not get user from token.");
     }
+  },
+});
+
+// export const loginSelector = selector({
+//   key: "login",
+//   set: async ({ set }, formValues) => {
+//     try {
+//       set(loadingState, true)
+//       const user = await agent.User.login(formValues)
+//       set(userState, user);
+//       set(loadingState, false)
+//       history.push("/dashboard");
+//     } catch (error) {
+
+//       toast.error("Invalid username or password.");
+//     }
+//     set(loadingState, false)
+//   },
+// });
+export const loginSelector = selector({
+  key: "loginSelector",
+  get: (formValues) => async () => {
+    const user = await agent.User.login(formValues);
+    return user;
   },
 });
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Route, Switch } from "react-router-dom";
 import HomeLogin from "../../features/home/HomeLogin";
 import Modal from "../common/Modal";
@@ -10,6 +10,8 @@ import OrderList from "../../features/order/OrderList";
 import Settings from "../../features/settings/Settings";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { currentUserSelector, tokenSelector } from "../recoil/UserState";
 
 const MainContainer = styled.div`
   position: relative;
@@ -39,7 +41,22 @@ const AppContainer = styled.div`
 `;
 
 const App = () => {
+
+  const [appLoaded, setAppLoaded] = useState(false)
+  const token = useRecoilValue(tokenSelector)
+  const currentUser = useSetRecoilState(currentUserSelector)
+
+  useEffect(() => {
+    if(token) {
+      currentUser().finally(() => setAppLoaded(true))
+    }
+    setAppLoaded(true)
+  }, [])
   
+  if(!appLoaded) {
+    return <h1>Loading...</h1>
+  }
+
   return (
     <>
       <Modal />

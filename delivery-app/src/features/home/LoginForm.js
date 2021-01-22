@@ -1,22 +1,23 @@
 import React, { useRef, useState } from "react";
-import { useSetRecoilState } from "recoil";
+import { toast } from "react-toastify";
+import { useRecoilCallback, useRecoilValue, useSetRecoilState } from "recoil";
 import { history } from "../..";
+import agent from "../../app/api/agent";
 import Button from "../../app/common/Button";
 import { Field, Form, Input, Label } from "../../app/common/Form";
-import { loginSelector } from "../../app/recoil/UserState";
+import { loadingState, loginCallback, loginSelector, userState } from "../../app/recoil/UserState";
 
 const LoginForm = (e) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const login = useSetRecoilState(loginSelector);
+//  const login = useSetRecoilState(loginSelector);
+  const setUser = useSetRecoilState(userState)
+
 
   const handleLogin = () => {
-    // console.log({
-    //   username,
-    //   password
-    // })
     const values = { username, password };
-    login(values);
+    loginCallback(values)
+  //  login(values);
   };
 
   return (
@@ -38,7 +39,13 @@ const LoginForm = (e) => {
           onChange={(e) => setPassword(e.target.value)}
         />
       </Field>
-      <Button type="submit" fluid style={{ marginTop: "20px" }} onClick={handleLogin}>
+      <Button
+        type="submit"
+        fluid
+        style={{ marginTop: "20px" }}
+        onClick={handleLogin}
+        loading={loading ? 1 : 0}
+      >
         Login
       </Button>
     </Form>

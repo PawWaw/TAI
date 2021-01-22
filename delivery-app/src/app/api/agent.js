@@ -1,6 +1,6 @@
 import Axios from "axios";
 
-Axios.defaults.baseURL = "http://localhost:5000/deliveryapi";
+Axios.defaults.baseURL = "https://localhost:44308/api";
 
 // Axios.interceptors.request.use(
 //     (config) => {
@@ -42,23 +42,30 @@ const requests = {
   delete: (url) => Axios.delete(url).then(responseBody),
 };
 
-
 const User = {
-    login: (values) => requests.post("/user/login", values),
-    register: (values) => requests.post("/user/register", values),
-    current: () => requests.get("/user"),
-    updateSettings: (values) => requests.put("/user", values),
-    updatePassword: values => requests.put("/user/password", values),
-}
+  login: (values) => requests.post("/deliverers/user/login", values),
+  register: (values) => requests.post("/deliverers/user/register", values),
+  current: () => requests.get("/deliverers/user"),
+  updateSettings: (values) => requests.put("/deliverers/user", values),
+  updatePassword: (values) => requests.put("/deliverers/user/password", values),
+};
 
 const Orders = {
-    list: (param) => requests.get(`/orders?current=${param}`),
-    details: (id) => requests.get(`/orders/${id}`),
-    find: ({latitude, longitude}) => requests.get(`/orders/find?latitude=${latitude}&longitude=${longitude}`),
-    take: (id) => requests.post("/orders/take", {id}),
-    delivered: (id) => requests.post("/orders/delivered", {id}),
-}
+  list: (param) => requests.get(`/orders/isCurrent?current=${param}`),
+  details: (id) => requests.get(`/orders/${id}`),
+  find: ({ latitude, longitude }) =>
+    requests.get(`/orders/find?latitude=${latitude}&longitude=${longitude}`),
+  take: (id) => requests.post("/orders/take", { id }),
+  delivered: (id) => requests.post("/orders/delivered", { id }),
+};
 
 const Dashboard = {
-    statisticts: () => requests.get("/statistics"),
-}
+  statisticts: () => requests.get("/deliverers/statistics"),
+};
+
+
+export default {
+  User,
+  Dashboard,
+  Orders
+};
