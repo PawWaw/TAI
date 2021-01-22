@@ -74,7 +74,7 @@ namespace Backend.Controllers
         // Information about current logged in user
         [Authorize]
         [HttpGet("user")]
-        public ActionResult<WsLoginResponse> GetDeliverer_Deliverer()
+        public ActionResult<WsDelivererLoginResponse> GetDeliverer_Deliverer()
         {
             var delivererId = (long)HttpContext.Items["delivererId"];
 
@@ -84,7 +84,7 @@ namespace Backend.Controllers
                 return NotFound();
             }
 
-            WsLoginResponse loginResponse = new WsLoginResponse
+            WsDelivererLoginResponse loginResponse = new WsDelivererLoginResponse
             {
                 Token = JwtService.GenerateDelivererJwtToken(user),
                 Username = user.Username,
@@ -92,7 +92,8 @@ namespace Backend.Controllers
                 City = user.City.Name,
                 Email = user.Email,
                 FirstName = user.FirstName,
-                LastName = user.LastName
+                LastName = user.LastName,
+                DragonCoinBalance = user.DragonCoinBalance
             };
             return Ok(loginResponse);
         }
@@ -207,7 +208,7 @@ namespace Backend.Controllers
         // POST: api/Deliverers/auth
         // Authorization
         [HttpPost("user/login")]
-        public async Task<ActionResult<WsLoginResponse>> Login(LoginRequest user)
+        public async Task<ActionResult<WsDelivererLoginResponse>> Login(LoginRequest user)
         {
             if (ModelState.IsValid)
             {
@@ -215,7 +216,7 @@ namespace Backend.Controllers
                     .FirstOrDefaultAsync(m => m.Username == user.Username && m.Password == user.Password);
                 if (findUser != null)
                 {
-                    WsLoginResponse loginResponse = new WsLoginResponse
+                    WsDelivererLoginResponse loginResponse = new WsDelivererLoginResponse
                     {
                         Token = JwtService.GenerateDelivererJwtToken(findUser),
                         Username = findUser.Username,
@@ -223,7 +224,8 @@ namespace Backend.Controllers
                         City = findUser.City.Name,
                         Email = findUser.Email,
                         FirstName = findUser.FirstName,
-                        LastName = findUser.LastName
+                        LastName = findUser.LastName,
+                        DragonCoinBalance = findUser.DragonCoinBalance
                     };
                     return Ok(loginResponse);
                 }
