@@ -56,7 +56,7 @@ namespace Backend.Controllers
             if (deliverer.Orders.Where(o => o.Status.TrimEnd() == "ENDED").Count() != 0) 
             {
                 tempMaxDailyOrders = deliverer.Orders.Where(o => o.Status.TrimEnd() == "ENDED")
-                                    .GroupBy(o => o.EndTime.Value.Date.ToString("d"))
+                                    .GroupBy(o => o.EndTime.Value.Date.Day)
                                     .Max(gr => gr.Count());
             }
             WsStatistics statistics = new WsStatistics
