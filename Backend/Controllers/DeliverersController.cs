@@ -35,20 +35,36 @@ namespace Backend.Controllers
         public ActionResult<WsStatistics> GetStatistics_Deliverer()
         {
             var delivererId = (long)HttpContext.Items["delivererId"];
-
             var deliverer = _context.Deliverers.Include(d=>d.DelivererRates).Include(d=>d.Orders).FirstOrDefault(o => o.Id == delivererId);
             if(deliverer == null)
             {
                 return NotFound();
             }
+            double tempClientRate = 0;
+            int tempTotalDelivery = 0;
+            int tempCurrentOrders = 0;
+            int tempMaxDailyOrders = 0;
+            if (deliverer.DelivererRates.Count() != 0)
+            {
+                tempClientRate = deliverer.DelivererRates.Average(d => d.Value);
+            }
+            if (deliverer.Orders.Where(o => o.Status.TrimEnd() != "ENDED").Count() != 0)
+            {
+                tempTotalDelivery = deliverer.Orders.Count;
+                tempCurrentOrders = deliverer.Orders.Where(o => o.Status.TrimEnd() != "ENDED").Count();
+            }
+            if (deliverer.Orders.Where(o => o.Status.TrimEnd() == "ENDED").Count() != 0) 
+            {
+                tempMaxDailyOrders = deliverer.Orders.Where(o => o.Status.TrimEnd() == "ENDED")
+                                    .GroupBy(o => o.EndTime.Value.Date.ToString("d"))
+                                    .Max(gr => gr.Count());
+            }
             WsStatistics statistics = new WsStatistics
             {
-                ClientRate = deliverer.DelivererRates.Average(d => d.Value),
-                TotalDelivery = deliverer.Orders.Count,
-                CurrentOrders = deliverer.Orders.Where(o => o.Status.TrimEnd() != "ENDED").Count(),
-                MaxDailyOrders = deliverer.Orders.Where(o => o.Status.TrimEnd() == "ENDED")
-                                    .GroupBy(o => o.EndTime.Value.Date.ToString("d"))
-                                    .Max(gr => gr.Count())
+                ClientRate = tempClientRate,
+                TotalDelivery = tempTotalDelivery,
+                CurrentOrders = tempCurrentOrders,
+                MaxDailyOrders = tempMaxDailyOrders
             };
             return Ok(statistics); 
         }
