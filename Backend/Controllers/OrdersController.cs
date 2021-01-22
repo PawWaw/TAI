@@ -286,7 +286,7 @@ namespace Backend.Controllers
 
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpGet("find")]
         public async Task<ActionResult<WsOrderResponse_Deliverer>> GetOrderToRealise_Deliverer()
         {
