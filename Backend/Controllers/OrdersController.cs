@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Backend.Model;
 using Backend.Helpers;
 using Backend.RestModel;
+using Backend.RestModel.ForDeliverer;
 
 namespace Backend.Controllers
 {
@@ -61,16 +62,31 @@ namespace Backend.Controllers
         // GET: api/Orders/5 
         [Authorize]
         [HttpGet("{id}")]
-        public async Task<ActionResult<Order>> GetOrder_OwnerDeliverer(long id)
+        public async Task<ActionResult<WsExtendedDateWsOrderResponse>> GetOrder_Deliverer(long id)
         {
-            var order = await _context.Orders.Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).SingleOrDefaultAsync(e => e.Id == id); ;
+            var order = await _context.Orders.Include(e => e.OrderStation.City).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).SingleOrDefaultAsync(e => e.Id == id); ;
 
             if (order == null)
             {
                 return NotFound();
             }
 
-            return Ok(order);
+            return Ok(new WsExtendedDateWsOrderResponse {
+                Id = order.Id,
+                Status = order.Status,
+                StartDate = order.StartTime.ToString("s"),
+                EndDate = order.EndTime?.ToString("s"),
+                ClientAddress = new WsAddress
+                {
+                    Address = order.User.Address,
+                    City = order.User.City.Name
+                },
+                RestaurantAddress = new WsAddress
+                {
+                    Address = order.OrderStation.Address,
+                    City = order.OrderStation.City.Name
+                }
+            });
         }
 
         // PUT: api/Orders/5
@@ -141,7 +157,7 @@ namespace Backend.Controllers
                         {
                             FoodId = tempFoodOrdered.dishId,
                             OrderId = order.Id
-                        };//Do przetestowania
+                        };
                         tempList.Add(tempFoodOrder);
                         _context.FoodOrders.Add(tempFoodOrder);
                     }
@@ -171,7 +187,7 @@ namespace Backend.Controllers
 
         [Authorize]
         [HttpGet("isCurrent")]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders_Deliverer([FromQuery] bool current)
+        public async Task<ActionResult<IEnumerable<WsEndDateWsOrderResponse>>> GetOrders_Deliverer([FromQuery] bool current)
         {
             long id = (long)HttpContext.Items["delivererId"];
             Deliverer deliverer = await _context.Deliverers.FirstOrDefaultAsync(d => d.Id == id);
@@ -179,18 +195,38 @@ namespace Backend.Controllers
             {
                 return NotFound();
             }
+            List<Order> orders;
             if (current)
             {
-                return await _context.Orders.Where(e => e.Status.Trim() != "ENDED" && e.DelivererId == id)
+                 orders = await _context.Orders.Where(e => e.Status.Trim() != "ENDED" && e.DelivererId == id)
                     .Include(e => e.OrderStation).Include(e => e.Deliverer)
                     .Include(e => e.User).Include(e => e.User.City).ToListAsync();
             }
             else
             {
-                return await _context.Orders.Where(e => e.Status.Trim() == "ENDED" && e.DelivererId == id)
+                orders = await _context.Orders.Where(e => e.Status.Trim() == "ENDED" && e.DelivererId == id)
                     .Include(e => e.OrderStation).Include(e => e.Deliverer)
                     .Include(e => e.User).Include(e => e.User.City).ToListAsync();
             }
+            List<WsEndDateWsOrderResponse> result = new List<WsEndDateWsOrderResponse>();
+            orders.ForEach(o =>
+                result.Add(new WsEndDateWsOrderResponse
+                {
+                    Id = o.Id,
+                    ClientAddress = new WsAddress
+                    {
+                        Address = o.User.Address,
+                        City = o.User.City.Name
+                    },
+                    RestaurantAddress = new WsAddress
+                    {
+                        Address = o.OrderStation.Address,
+                        City = o.OrderStation.City.Name
+                    },
+                    EndDate = o.EndTime?.ToString("s")
+                })
+            );
+            return result;
         }
 
         [Authorize]
@@ -292,7 +328,7 @@ namespace Backend.Controllers
 
         [Authorize]
         [HttpGet("find")]
-        public async Task<ActionResult<WsOrderResponse_Deliverer>> GetOrderToRealise_Deliverer()
+        public async Task<ActionResult<WsOrderResponse>> GetOrderToRealise_Deliverer()
         {
             var order = await _context.Orders.Include(o => o.OrderStation.City)
                                             .Include(o => o.User.City).Where(e => e.Status.Trim() == "STARTED")
@@ -301,7 +337,7 @@ namespace Backend.Controllers
             {
                 return NotFound();
             }
-            WsOrderResponse_Deliverer response = new WsOrderResponse_Deliverer
+            WsOrderResponse response = new WsOrderResponse
             {
                 ClientAddress = new WsAddress { Address = order.User.Address, City = order.User.City.Name },
                 RestaurantAddress = new WsAddress { Address = order.OrderStation.Address, City = order.OrderStation.City.Name },

@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Backend.RestModel
+namespace Backend.RestModel.ForDeliverer
 {
-    public class WsOrderResponse_Deliverer
+    public class WsOrderResponse
     {
         public long Id { get; set; }
         [JsonProperty("restaurant")]
