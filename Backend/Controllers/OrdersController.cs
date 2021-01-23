@@ -64,7 +64,7 @@ namespace Backend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<WsExtendedDateWsOrderResponse>> GetOrder_Deliverer(long id)
         {
-            var order = await _context.Orders.Include(e => e.OrderStation.City).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).SingleOrDefaultAsync(e => e.Id == id); ;
+            var order = await _context.Orders.Include(e => e.OrderStation).Include(e => e.OrderStation.City).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).SingleOrDefaultAsync(e => e.Id == id); ;
 
             if (order == null)
             {
@@ -199,13 +199,13 @@ namespace Backend.Controllers
             if (current)
             {
                  orders = await _context.Orders.Where(e => e.Status.Trim() != "ENDED" && e.DelivererId == id)
-                    .Include(e => e.OrderStation).Include(e => e.Deliverer)
+                    .Include(e => e.OrderStation).Include(e=> e.OrderStation.City).Include(e => e.Deliverer)
                     .Include(e => e.User).Include(e => e.User.City).ToListAsync();
             }
             else
             {
                 orders = await _context.Orders.Where(e => e.Status.Trim() == "ENDED" && e.DelivererId == id)
-                    .Include(e => e.OrderStation).Include(e => e.Deliverer)
+                    .Include(e => e.OrderStation).Include(e=> e.OrderStation.City).Include(e => e.Deliverer)
                     .Include(e => e.User).Include(e => e.User.City).ToListAsync();
             }
             List<WsEndDateWsOrderResponse> result = new List<WsEndDateWsOrderResponse>();
