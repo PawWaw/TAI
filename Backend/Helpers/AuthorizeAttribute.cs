@@ -12,11 +12,10 @@ namespace Backend.Helpers
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var id = 0L;
-            string action = "";
             var actionSplit = context.ActionDescriptor.RouteValues["action"].Split("_");
             if(actionSplit.Length==2)
             {
-                action = actionSplit[1];
+                string action = actionSplit[1];
                 if (action.Contains("User"))
                 {
                     if (context.HttpContext.Items["userId"] != null)
@@ -24,21 +23,21 @@ namespace Backend.Helpers
                         id = (long)context.HttpContext.Items["userId"];
                     }
                 }
-                else if (action.Contains("Order") || action.Contains("Station") || action.Contains("OrderStation"))
+                if (action.Contains("Order") || action.Contains("Station") || action.Contains("OrderStation"))
                 {
                     if (context.HttpContext.Items["stationId"] != null)
                     {
                         id = (long)context.HttpContext.Items["stationId"];
                     }
                 }
-                else if (action.Contains("Deliverer"))
+                if (action.Contains("Deliverer"))
                 {
                     if (context.HttpContext.Items["delivererId"] != null)
                     {
                         id = (long)context.HttpContext.Items["delivererId"];
                     }
                 }
-                else if (action.Contains("Owner"))
+                if (action.Contains("Owner"))
                 {
                     if (context.HttpContext.Items["ownerId"] != null)
                     {

@@ -188,17 +188,21 @@ namespace Backend.Controllers
                 var ingredient = await _context.Ingredients.FirstOrDefaultAsync(e => e.Name.Trim() == temp_ingredient_name.Trim());
                 if(ingredient == null)
                 {
-                    Ingredient temp_ingredient = new Ingredient();
-                    temp_ingredient.Name = temp_ingredient_name;
+                    Ingredient temp_ingredient = new Ingredient
+                    {
+                        Name = temp_ingredient_name
+                    };
                     _context.Ingredients.Add(temp_ingredient);
                     await _context.SaveChangesAsync();
                     ingredient = temp_ingredient;
                 }
                 if (await _context.FoodIngredients.FirstOrDefaultAsync(e => e.FoodId == food.Id && e.IngredientId == ingredient.Id) == null)
                 {
-                    FoodIngredient temp_foodIngredient = new FoodIngredient();
-                    temp_foodIngredient.FoodId = food.Id;
-                    temp_foodIngredient.IngredientId = ingredient.Id;
+                    FoodIngredient temp_foodIngredient = new FoodIngredient
+                    {
+                        FoodId = food.Id,
+                        IngredientId = ingredient.Id
+                    };
                     _context.FoodIngredients.Add(temp_foodIngredient);
                     await _context.SaveChangesAsync();
                 }

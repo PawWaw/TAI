@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using System.Text.Json.Serialization;
 using Backend.RestModel;
 
 #nullable disable
@@ -45,6 +46,7 @@ namespace Backend.Model
         [StringLength(50)]
         public string Username { get; set; }
         [Required]
+        [JsonIgnore]
         [Column("password")]
         public string Password { get { return password; } set { password = GenerateHash(value); } }
         [Required]

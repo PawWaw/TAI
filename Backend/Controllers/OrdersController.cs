@@ -121,13 +121,15 @@ namespace Backend.Controllers
             }
             foreach (DishOrder tempDishOrder in userOrder.dishes)
             {
-                Order order = new Order();
-                order.DelivererId = null;
-                order.EndTime = null;
-                order.StartTime = DateTime.Now;
-                order.Status = "STARTED";
-                order.OrderStationId = tempDishOrder.orderStationId;
-                order.UserId = id;
+                Order order = new Order
+                {
+                    DelivererId = null,
+                    EndTime = null,
+                    StartTime = DateTime.Now,
+                    Status = "STARTED",
+                    OrderStationId = tempDishOrder.orderStationId,
+                    UserId = id
+                };
                 _context.Orders.Add(order);
                 await _context.SaveChangesAsync();
                 foreach (FoodOrdered tempFoodOrdered in tempDishOrder.foods)
@@ -135,9 +137,11 @@ namespace Backend.Controllers
                     List<FoodOrder> tempList = new List<FoodOrder>();
                     for (int i = 0; i < tempFoodOrdered.count; ++i)
                     {
-                        FoodOrder tempFoodOrder = new FoodOrder();//Do przetestowania
-                        tempFoodOrder.FoodId = tempFoodOrdered.dishId;
-                        tempFoodOrder.OrderId = order.Id;
+                        FoodOrder tempFoodOrder = new FoodOrder
+                        {
+                            FoodId = tempFoodOrdered.dishId,
+                            OrderId = order.Id
+                        };//Do przetestowania
                         tempList.Add(tempFoodOrder);
                         _context.FoodOrders.Add(tempFoodOrder);
                     }
@@ -177,13 +181,13 @@ namespace Backend.Controllers
             }
             if (current)
             {
-                return await _context.Orders.Where(e => e.Status != "ENDED" && e.DelivererId == id)
+                return await _context.Orders.Where(e => e.Status.Trim() != "ENDED" && e.DelivererId == id)
                     .Include(e => e.OrderStation).Include(e => e.Deliverer)
                     .Include(e => e.User).Include(e => e.User.City).ToListAsync();
             }
             else
             {
-                return await _context.Orders.Where(e => e.Status == "ENDED" && e.DelivererId == id)
+                return await _context.Orders.Where(e => e.Status.Trim() == "ENDED" && e.DelivererId == id)
                     .Include(e => e.OrderStation).Include(e => e.Deliverer)
                     .Include(e => e.User).Include(e => e.User.City).ToListAsync();
             }
@@ -199,7 +203,7 @@ namespace Backend.Controllers
             {
                 return NotFound();
             }
-            IEnumerable<Order> orders = await _context.Orders.Where(e => e.UserId == id).Where(e => e.Status == "ENDED" || e.Status == "REALIZE").Include(e => e.OrderStation).Include(e => e.FoodOrders).Include(e => e.OrderStation.Restaurant).ToListAsync();
+            IEnumerable<Order> orders = await _context.Orders.Where(e => e.UserId == id).Where(e => e.Status.Trim() == "ENDED" || e.Status.Trim() == "REALIZE").Include(e => e.OrderStation).Include(e => e.FoodOrders).Include(e => e.OrderStation.Restaurant).ToListAsync();
             List<BodyUserOrder> bodyUserOrder = new List<BodyUserOrder>();
             
             foreach(Order tempOrder in orders)
@@ -237,7 +241,7 @@ namespace Backend.Controllers
                 }
                 if (current)
                 {
-                    orders = owner.Restaurant.OrderStation.Orders.Where(s => s.Status != "ENDED").ToList();
+                    orders = owner.Restaurant.OrderStation.Orders.Where(s => s.Status.Trim() != "ENDED").ToList();
                     foreach(Order order in orders)
                     {
                         Deliverer deliverer = await _context.Deliverers.FirstOrDefaultAsync(d => d.Id == order.DelivererId);
@@ -245,7 +249,7 @@ namespace Backend.Controllers
                 }
                 else
                 {
-                    orders = owner.Restaurant.OrderStation.Orders.Where(s => s.Status == "ENDED").ToList();
+                    orders = owner.Restaurant.OrderStation.Orders.Where(s => s.Status.Trim() == "ENDED").ToList();
                     foreach (Order order in orders)
                     {
                         Deliverer deliverer = await _context.Deliverers.FirstOrDefaultAsync(d => d.Id == order.DelivererId);
@@ -263,7 +267,7 @@ namespace Backend.Controllers
                 }
                 if (current)
                 {
-                    orders = station.Orders.Where(s => s.Status != "ENDED").ToList();
+                    orders = station.Orders.Where(s => s.Status.Trim() != "ENDED").ToList();
                     foreach (Order order in orders)
                     {
                         Deliverer deliverer = await _context.Deliverers.FirstOrDefaultAsync(d => d.Id == order.DelivererId);
@@ -271,7 +275,7 @@ namespace Backend.Controllers
                 }
                 else
                 {
-                    orders = station.Orders.Where(s => s.Status == "ENDED").ToList();
+                    orders = station.Orders.Where(s => s.Status.Trim() == "ENDED").ToList();
                     foreach (Order order in orders)
                     {
                         Deliverer deliverer = await _context.Deliverers.FirstOrDefaultAsync(d => d.Id == order.DelivererId);
@@ -291,16 +295,18 @@ namespace Backend.Controllers
         public async Task<ActionResult<WsOrderResponse_Deliverer>> GetOrderToRealise_Deliverer()
         {
             var order = await _context.Orders.Include(o => o.OrderStation.City)
-                                            .Include(o => o.User.City).Where(e => e.Status == "STARTED")
+                                            .Include(o => o.User.City).Where(e => e.Status.Trim() == "STARTED")
                                             .OrderBy(e => e.StartTime.Date.Day).FirstOrDefaultAsync();
             if(order == null)
             {
                 return NotFound();
             }
-            WsOrderResponse_Deliverer response = new WsOrderResponse_Deliverer();
-            response.ClientAddress = new WsAddress { Address = order.User.Address, City = order.User.City.Name };
-            response.RestaurantAddress = new WsAddress { Address = order.OrderStation.Address, City = order.OrderStation.City.Name };
-            response.Id = order.Id;
+            WsOrderResponse_Deliverer response = new WsOrderResponse_Deliverer
+            {
+                ClientAddress = new WsAddress { Address = order.User.Address, City = order.User.City.Name },
+                RestaurantAddress = new WsAddress { Address = order.OrderStation.Address, City = order.OrderStation.City.Name },
+                Id = order.Id
+            };
             return Ok(response);
         }
 

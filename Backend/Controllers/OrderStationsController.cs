@@ -22,6 +22,30 @@ namespace Backend.Controllers
         public List<AverageRateFood> foods { get; set; }
     }
 
+    public class WsOrderStation
+    {
+        public long id { get; set; }
+        public string city { get; set; }
+        public string address { get; set; }
+        public WsRestaurant wsRestaurant { get; set; }
+    }
+
+    public class WsRestaurant
+    {
+        public long id { get; set; }
+        public string name { get; set; }
+        public List<WsDishWithRate> wsDishWithRates { get; set; }
+    }
+
+    public class WsDishWithRate
+    {
+        public long id { get; set; }
+        public string name { get; set; }
+        public double price { get; set; }
+        public List<string> ingredients { get; set; }
+        public double rate { get; set; }
+    }
+
     [Route("api/[controller]")]
     [ApiController]
     public class OrderStationsController : ControllerBase
@@ -33,7 +57,7 @@ namespace Backend.Controllers
             _context = context;
         }
 
-        [Authorize]
+        [Microsoft.AspNetCore.Authorization.AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderStation>>> GetOrderStations_User()
         {
@@ -66,31 +90,33 @@ namespace Backend.Controllers
             return Ok(loginResponse);
         }
 
-        [Authorize]
-        [HttpGet("DishesFromOrderStations")]
-        public async Task<ActionResult<IEnumerable<BodyOrderStation>>> GetDishOrderStations_User()
+        [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+        [HttpGet("DishFromOrderStations")]
+        public async Task<ActionResult<IEnumerable<WsOrderStation>>> GetDishesFromOrderStations_User()
         {
-            IEnumerable<OrderStation> orderStations = await _context.OrderStations.Include(e => e.Restaurant).Include(e =>e.Restaurant.Foods).ToListAsync();
+            IEnumerable<OrderStation> orderStations = await _context.OrderStations.Include(o => o.City).ToListAsync();
             List<BodyOrderStation> bodyOrderStations = new List<BodyOrderStation>();
-            foreach(OrderStation orderStation in orderStations)
+            foreach (OrderStation orderStation in orderStations)
             {
                 BodyOrderStation temp = new BodyOrderStation();
                 temp.foods = new List<AverageRateFood>();
                 temp.orderStation = orderStation;
-                foreach(Food food in orderStation.Restaurant.Foods)
+                Restaurant restaurant = await _context.Restaurants.Where(f => f.Id == orderStation.RestaurantId).Include(e => e.Foods).FirstOrDefaultAsync();
+                orderStation.Restaurant = restaurant;
+                foreach (Food food in orderStation.Restaurant.Foods)
                 {
                     AverageRateFood tempFood = new AverageRateFood();
                     tempFood.food = await _context.Foods.Include(e => e.FoodRates).Include(e => e.FoodIngredients).FirstOrDefaultAsync(e => e.Id == food.Id);
                     List<FoodIngredient> tempIngredient = new List<FoodIngredient>();
                     foreach (FoodIngredient foodIngredient in tempFood.food.FoodIngredients)
                     {
-                         FoodIngredient ingredient = await _context.FoodIngredients.Include(e => e.Ingredient).SingleOrDefaultAsync(e => e.Id == foodIngredient.Id);
-                         tempIngredient.Add(ingredient);
+                        FoodIngredient ingredient = await _context.FoodIngredients.Include(e => e.Ingredient).SingleOrDefaultAsync(e => e.Id == foodIngredient.Id);
+                        tempIngredient.Add(ingredient);
                     }
                     tempFood.food.FoodIngredients = tempIngredient;
                     double i = 0;
                     double sum = 0;
-                    foreach(FoodRate tempRate in tempFood.food.FoodRates)
+                    foreach (FoodRate tempRate in tempFood.food.FoodRates)
                     {
                         i++;
                         sum += tempRate.Value;
@@ -101,22 +127,29 @@ namespace Backend.Controllers
                 temp.orderStation.Restaurant.Foods = null;
                 bodyOrderStations.Add(temp);
             }
-            return bodyOrderStations;
+
+            var result = MapOrderStationsToWsOrderStations(bodyOrderStations);
+
+            return result;
         }
 
-        [Authorize]
-        [HttpGet("DishesFromOrderStations/{id}")]
-        public async Task<ActionResult<BodyOrderStation>> GetDishOrderStations_User([FromQuery]long OrderStationId)
+        [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+        [HttpGet("DishesFromOrderStation")]
+        public async Task<ActionResult<WsOrderStation>> GetDishesFromOrderStation_User([FromQuery] long OrderStationId)
         {
-            OrderStation orderStation = await _context.OrderStations.Include(e => e.Restaurant).Include(e => e.Restaurant.Foods).FirstOrDefaultAsync(e => e.Id == OrderStationId);
+            //OrderStation orderStation = await _context.OrderStations.Include(e => e.Restaurant).Include(e => e.Restaurant.Foods).FirstOrDefaultAsync(e => e.Id == OrderStationId);
+            OrderStation orderStation = await _context.OrderStations.Include(o => o.City).FirstOrDefaultAsync(e => e.Id == OrderStationId);
             BodyOrderStation bodyOrderStations = new BodyOrderStation();
             bodyOrderStations.foods = new List<AverageRateFood>();
             bodyOrderStations.orderStation = orderStation;
+            Restaurant restaurant = await _context.Restaurants.Where(f => f.Id == orderStation.RestaurantId).Include(e => e.Foods).FirstOrDefaultAsync();
+            orderStation.Restaurant = restaurant;
             foreach (Food food in orderStation.Restaurant.Foods)
             {
                 AverageRateFood tempFood = new AverageRateFood();
                 tempFood.food = await _context.Foods.Include(e => e.FoodRates).Include(e => e.FoodIngredients).FirstOrDefaultAsync(e => e.Id == food.Id);
                 List<FoodIngredient> tempIngredient = new List<FoodIngredient>();
+
                 foreach (FoodIngredient foodIngredient in tempFood.food.FoodIngredients)
                 {
                     FoodIngredient ingredient = await _context.FoodIngredients.Include(e => e.Ingredient).SingleOrDefaultAsync(e => e.Id == foodIngredient.Id);
@@ -134,7 +167,10 @@ namespace Backend.Controllers
                 bodyOrderStations.foods.Add(tempFood);
             }
             bodyOrderStations.orderStation.Restaurant.Foods = null;
-            return bodyOrderStations;
+
+            var result = MapOrderStationsToWsOrderStations(new List<BodyOrderStation>() { bodyOrderStations });
+
+            return result.FirstOrDefault();
         }
 
         // PUT: api/OrderStations/user
@@ -311,6 +347,46 @@ namespace Backend.Controllers
                 OrderStation station = _context.OrderStations.FirstOrDefault(s => s.Id == stationId);
             }
             return stationId;
+        }
+        private List<WsOrderStation> MapOrderStationsToWsOrderStations(List<BodyOrderStation> bodyOrderStation)
+        {
+            var wsOrderStations = new List<WsOrderStation>();
+
+            bodyOrderStation.ForEach(bos =>
+            {
+                var mywsDishWithRates = new List<WsDishWithRate>();
+                bos.foods.ForEach(f =>
+                {
+                    var myDish = new WsDishWithRate()
+                    {
+                        id = f.food.Id,
+                        name = f.food.Name.Trim(),
+                        price = f.food.Price,
+                        ingredients = f.food.FoodIngredients.Select(fi => fi.Ingredient.Name.Trim()).ToList(),
+                        rate = f.averageRate
+                    };
+                    mywsDishWithRates.Add(myDish);
+                });
+
+
+                var wsos = new WsOrderStation()
+                {
+                    id = bos.orderStation.Id,
+                    address = bos.orderStation.Address.Trim(),
+                    city = bos.orderStation.City.Name.Trim(),
+                    wsRestaurant = new WsRestaurant()
+                    {
+                        id = bos.orderStation.Restaurant.Id,
+                        name = bos.orderStation.Restaurant.Name.Trim(),
+                        wsDishWithRates = mywsDishWithRates,
+                    }
+                };
+
+                wsOrderStations.Add(wsos);
+            });
+
+
+            return wsOrderStations;
         }
     }
 }
