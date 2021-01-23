@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Button from "../../app/common/Button";
 import { Form, IconInput } from "../../app/common/Form";
 import styled from "styled-components";
-import { useSetRecoilState } from "recoil";
-import { registerSelector } from "../../app/recoil/UserState";
+import { useDispatch, useSelector } from "react-redux";
+import { register, selectUserState } from "../../app/redux/userSlice";
 
 const Header = styled.h1`
   font-size: 1.3em;
@@ -21,7 +21,8 @@ const Register = () => {
   const [city, setCity] = useState("");
   const [address, setAddress] = useState("");
 
-  const register = useSetRecoilState(registerSelector)
+  const dispatch = useDispatch();
+  const { loading } = useSelector(selectUserState);
 
   const handleRegister = () => {
     const values = {
@@ -33,7 +34,7 @@ const Register = () => {
       city,
       address,
     };
-    register(values)
+    dispatch(register(values));
   };
 
   return (
@@ -83,7 +84,9 @@ const Register = () => {
           value={address}
           onChange={(e) => setAddress(e.target.value)}
         />
-        <Button onClick={handleRegister}>Sign Up</Button>
+        <Button onClick={handleRegister} loading={loading ? 1 : 0}>
+          Sign Up
+        </Button>
       </Form>
     </>
   );

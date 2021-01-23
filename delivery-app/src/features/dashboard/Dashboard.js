@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { useSetRecoilState } from "recoil";
+import { useDispatch } from "react-redux";
 import styled from "styled-components";
-import { fetchInfoSelector } from "../../app/recoil/DashboardState";
+import { fetchInfo } from "../../app/redux/dashboardSlice";
 import OrderInfo from "./OrderInfo";
 import Statistics from "./Statistics";
 
@@ -14,9 +14,9 @@ const Wrapper = styled.div`
 `;
 
 const Dashboard = () => {
-  const fetchInfo = useSetRecoilState(fetchInfoSelector);
+  const dispatch = useDispatch()
   useEffect(() => {
-    fetchInfo();
+    dispatch(fetchInfo())
   }, []);
   return (
     <Wrapper>

@@ -1,4 +1,5 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { useRecoilState, useRecoilValue, useRecoilValueLoadable, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { history } from "../..";
@@ -7,6 +8,7 @@ import { PageHeader } from "../../app/common/PageHeader";
 import { infoState, ordersCountSelector } from "../../app/recoil/DashboardState";
 import { modalState } from "../../app/recoil/ModalState";
 import { findOrderSelector } from "../../app/recoil/NewOrderState";
+import { selectOrdersCount } from "../../app/redux/dashboardSlice";
 import OrderPopup from "../order/OrderPopup";
 
 const Wrapper = styled.div`
@@ -32,7 +34,8 @@ const Order = styled.h1`
 
 const OrderInfo = () => {
   const [, setModal] = useRecoilState(modalState)
-  const ordersCount = useRecoilValue(ordersCountSelector)
+  const ordersCount = useSelector(selectOrdersCount)
+  //console.log(ordersCount)
   const findOrder = useSetRecoilState(findOrderSelector)
 
   const handleOrderClick = () => {

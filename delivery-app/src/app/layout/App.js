@@ -8,10 +8,11 @@ import Navbar from "../../features/nav/Navbar";
 import OrderDetails from "../../features/order/OrderDetails";
 import OrderList from "../../features/order/OrderList";
 import Settings from "../../features/settings/Settings";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { currentUserSelector, tokenSelector } from "../recoil/UserState";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { history } from "../..";
+import { useDispatch } from "react-redux";
+import { getCurrentUser } from "../redux/userSlice";
 
 const MainContainer = styled.div`
   position: relative;
@@ -41,26 +42,21 @@ const AppContainer = styled.div`
 `;
 
 const App = () => {
-
-  const [appLoaded, setAppLoaded] = useState(false)
-  const token = useRecoilValue(tokenSelector)
-  const currentUser = useSetRecoilState(currentUserSelector)
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if(token) {
-      currentUser().finally(() => setAppLoaded(true))
+    const jwt = window.localStorage.getItem("jwt");
+    if (jwt) {
+      dispatch(getCurrentUser())
+        .then(() => history.push("/dashboard"))
+        .catch(() => history.push("/"));
     }
-    setAppLoaded(true)
-  }, [])
-  
-  if(!appLoaded) {
-    return <h1>Loading...</h1>
-  }
+  }, []);
 
   return (
     <>
       <Modal />
-      <ToastContainer/>
+      <ToastContainer />
       <MainContainer>
         <AppContainer>
           <Route exact path="/" component={HomeLogin} />

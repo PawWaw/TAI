@@ -5,6 +5,8 @@ import CashBalance from "./CashBalance";
 import Button from "../../app/common/Button";
 import { history } from "../..";
 import { SvgIcon } from "../../app/common/SvgIcon";
+import { useDispatch } from "react-redux";
+import { logout } from "../../app/redux/userSlice";
 
 const Bar = styled.nav`
   display: flex;
@@ -40,6 +42,7 @@ const MenuItem = styled.h1`
 `;
 
 const Navbar = () => {
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
   const toggleMenu = () => {
     setOpen(!open);
@@ -75,7 +78,7 @@ const Navbar = () => {
           <MenuItem key="settings" onClick={() => handleRoute("/settings")}>
             Settings
           </MenuItem>
-          <Button secondary onClick={() => handleRoute("/")}>
+          <Button secondary onClick={() => dispatch(logout())}>
             Logout
           </Button>
         </Menu>

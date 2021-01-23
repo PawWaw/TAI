@@ -8,11 +8,6 @@ export const userState = atom({
   default: null,
 });
 
-export const loadingState = atom({
-  key: "loadingState",
-  default: false,
-});
-
 export const tokenSelector = selector({
   key: "tokenSelector",
   get: () => {
@@ -44,7 +39,6 @@ export const currentUserSelector = selector({
 //       history.push("/dashboard");
 //     } catch (error) {
 
-//       toast.error("Invalid username or password.");
 //     }
 //     set(loadingState, false)
 //   },

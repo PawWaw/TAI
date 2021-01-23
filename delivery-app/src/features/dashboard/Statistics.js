@@ -1,7 +1,9 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { infoSelector } from "../../app/recoil/DashboardState";
+import { selectStatistics } from "../../app/redux/dashboardSlice";
 import StatisticItem from "./StatisticItem";
 
 const Wrapper = styled.div`
@@ -10,8 +12,10 @@ const Wrapper = styled.div`
 `;
 
 const Statistics = () => {
-  const stats = useRecoilValue(infoSelector)
-    
+ 
+  //const stats = []
+  const stats = useSelector(selectStatistics);
+
   return (
     <Wrapper>
       {stats.map((s) => (
