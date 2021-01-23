@@ -81,7 +81,6 @@ export class DishModifyComponent implements OnInit {
     this.modifiedDish.price = this.dish.price;
     this.modifiedDish.name = this.formGroup.get('name').value;
     this.modifiedDish.ingredients = this.ingredients;
-    console.log(this.modifiedDish);
     this.dishService.modifyDish(this.modifiedDish).subscribe(
       data=>{
         this.router.navigate(['/dish']);

@@ -22,7 +22,6 @@ export class DishDetailsComponent implements OnInit {
 
   ngOnInit() {
     this.dish = JSON.parse(localStorage.getItem('row'));
-    console.log(this.dish);
     this.ingredients = this.dish.ingredients;
   }
 

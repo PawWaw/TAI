@@ -105,7 +105,6 @@ export class SignupComponent implements OnInit {
 
     this.userService.postUser(this.formGroup.value).pipe(first()).subscribe(
       data => {
-        console.log(this.formGroup.value)
         this.router.navigate(['/signin']);
       },
       error => {

@@ -47,7 +47,6 @@ export class AddDishComponent implements OnInit {
   }
 
   addIngredient(ingredient: String) {
-    console.log(this.ingredients);''
     if (this.formGroup.get('ingredient').value != "") {
       this.ingredients.push(this.formGroup.get('ingredient').value);
       this.formGroup.get('ingredient').setValue("");
@@ -72,7 +71,6 @@ export class AddDishComponent implements OnInit {
     this.dish.name = this.formGroup.get('name').value;
     this.dish.ingredients = this.ingredients;
     this.dish.price = this.formGroup.get('price').value;
-    console.log(this.dish);
     this.dishService.postDish(this.dish).subscribe(
       data=>{
         this.router.navigate(['/dish']);

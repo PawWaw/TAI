@@ -35,6 +35,7 @@ export class SigninComponent implements OnInit {
   get password() { return this.formGroup.get('password'); }
 
   onSubmit(){
+    localStorage.clear()
     this.loading=true;
 
     this.formGroup.patchValue({username: this.username.value.toString().toLowerCase()});
@@ -43,8 +44,8 @@ export class SigninComponent implements OnInit {
       data=>{
         this.token = data
         localStorage.setItem('auth_token', this.token.token);
-        console.log(localStorage.getItem('auth_token'))
         this.router.navigate(['/history']);
+        
         this.dataSharingService.isLogged.next(true);
       },
       error=>{
