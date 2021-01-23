@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
+import { history } from "../..";
 import { ModalHeader } from "../../app/common/ModalHeader";
 import { SvgIcon } from "../../app/common/SvgIcon";
-import { acceptOrderSelector, declineOrderSelector, newOrderState } from "../../app/recoil/NewOrderState";
+import { modalState } from "../../app/recoil/ModalState";
+import {
+  declineOrder,
+  selectDashboardState,
+  takeOrder,
+} from "../../app/redux/dashboardSlice";
 import { findCoordinatesByAddress } from "../../app/util/util";
 import TomTomMap from "../map/TomTomMap";
 
@@ -37,9 +44,10 @@ const ButtonsWrapper = styled.div`
 `;
 
 const OrderPopup = () => {
-  const order = useRecoilValue(newOrderState)
-  const declineOrder = useSetRecoilState(declineOrderSelector)
-  const acceptOrder = useSetRecoilState(acceptOrderSelector)
+  const dispatch = useDispatch();
+  const { currentOrder } = useSelector(selectDashboardState);
+  const setModal = useSetRecoilState(modalState);
+
   const [distance, setDistance] = useState(0);
   const [ready, setReady] = useState(false);
   const [restaurantCoords, setRestaurantCoords] = useState(undefined);
@@ -47,10 +55,10 @@ const OrderPopup = () => {
 
   useEffect(() => {
     const runSync = () => {
-      findCoordinatesByAddress(order.restaurant).then((c) =>
+      findCoordinatesByAddress(currentOrder.restaurant).then((c) =>
         setRestaurantCoords(c.results[0].position)
       );
-      findCoordinatesByAddress(order.client).then((c) =>
+      findCoordinatesByAddress(currentOrder.client).then((c) =>
         setClientCoords(c.results[0].position)
       );
       setReady(true);
@@ -58,21 +66,36 @@ const OrderPopup = () => {
     runSync();
   }, []);
 
+  const handleTakeOrder = () => {
+    dispatch(takeOrder(currentOrder.id)).then(() => {
+      setModal({
+        opened: false,
+        body: null,
+      });
+    });
+}
+
+  const handleDeclineOrder = () => {
+    setModal({
+      opened: false,
+      body: null,
+    });
+    dispatch(declineOrder());
+  };
 
   if (!ready) {
     return <h2>Loading</h2>;
   } else
     return (
       <>
-        {console.log(clientCoords)}
         <ModalHeader>Found order!</ModalHeader>
         <Field>
           <LabelHeader>Restaurant:</LabelHeader>
-          <LabelData>{order.restaurant}</LabelData>
+          <LabelData>{currentOrder?.restaurant}</LabelData>
         </Field>
         <Field>
           <LabelHeader>Client:</LabelHeader>
-          <LabelData>{order.client}</LabelData>
+          <LabelData>{currentOrder?.client}</LabelData>
         </Field>
         <Field>
           <LabelHeader>Distance:</LabelHeader>
@@ -80,21 +103,26 @@ const OrderPopup = () => {
         </Field>
         <Field>
           <LabelHeader>Map:</LabelHeader>
-          {console.log(restaurantCoords)}
           <MapWrapper>
-            {
-              clientCoords && restaurantCoords && (
-                <TomTomMap
-                  locations={`${restaurantCoords?.lon},${restaurantCoords?.lat}:${clientCoords?.lon},${clientCoords?.lat}`}
-                  setDistance={(distance) => setDistance(distance)}
-                />
-              )
-            }
+            {clientCoords && restaurantCoords && (
+              <TomTomMap
+                locations={`${restaurantCoords?.lon},${restaurantCoords?.lat}:${clientCoords?.lon},${clientCoords?.lat}`}
+                setDistance={(distance) => setDistance(distance)}
+              />
+            )}
           </MapWrapper>
         </Field>
         <ButtonsWrapper>
-          <SvgIcon src="assets/svg/tick.svg" height="30px" onClick={acceptOrder} />
-          <SvgIcon src="assets/svg/reject.svg" height="30px" onClick={declineOrder} />
+          <SvgIcon
+            src="assets/svg/tick.svg"
+            height="30px"
+            onClick={handleTakeOrder}
+          />
+          <SvgIcon
+            src="assets/svg/reject.svg"
+            height="30px"
+            onClick={handleDeclineOrder}
+          />
         </ButtonsWrapper>
       </>
     );

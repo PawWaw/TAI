@@ -1,6 +1,8 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { SvgIcon } from "../../app/common/SvgIcon";
+import { selectUserState, selectDragonCoinBalance } from "../../app/redux/userSlice";
 
 const HorizontalWrapper = styled.div`
   display: flex;
@@ -17,10 +19,13 @@ const CashText = styled.h1`
 `;
 
 const CashBalance = () => {
+  
+  const dragonCoinBalance  = useSelector(selectDragonCoinBalance);
+  
   return (
     <HorizontalWrapper>
       <SvgIcon src="assets/svg/coin.svg" alt="cash" height="20px" />
-      <CashText>231123</CashText>
+      <CashText>{dragonCoinBalance}</CashText>
     </HorizontalWrapper>
   );
 };

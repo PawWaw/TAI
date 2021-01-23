@@ -1,14 +1,18 @@
 import React from "react";
-import { useSelector } from "react-redux";
-import { useRecoilState, useRecoilValue, useRecoilValueLoadable, useSetRecoilState } from "recoil";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  useRecoilState,
+} from "recoil";
 import styled from "styled-components";
 import { history } from "../..";
 import Button from "../../app/common/Button";
 import { PageHeader } from "../../app/common/PageHeader";
-import { infoState, ordersCountSelector } from "../../app/recoil/DashboardState";
 import { modalState } from "../../app/recoil/ModalState";
-import { findOrderSelector } from "../../app/recoil/NewOrderState";
-import { selectOrdersCount } from "../../app/redux/dashboardSlice";
+import {
+  findOrder,
+  selectDashboardState,
+  selectOrdersCount,
+} from "../../app/redux/dashboardSlice";
 import OrderPopup from "../order/OrderPopup";
 
 const Wrapper = styled.div`
@@ -24,7 +28,6 @@ const Text = styled.div`
   align-items: center;
 `;
 
-
 const Order = styled.h1`
   margin-top: -0.6em;
   cursor: pointer;
@@ -33,10 +36,10 @@ const Order = styled.h1`
 `;
 
 const OrderInfo = () => {
-  const [, setModal] = useRecoilState(modalState)
-  const ordersCount = useSelector(selectOrdersCount)
-  //console.log(ordersCount)
-  const findOrder = useSetRecoilState(findOrderSelector)
+  const [, setModal] = useRecoilState(modalState);
+  const ordersCount = useSelector(selectOrdersCount);
+  const dispatch = useDispatch();
+  const { loading } = useSelector(selectDashboardState);
 
   const handleOrderClick = () => {
     if (ordersCount > 0) {
@@ -45,13 +48,15 @@ const OrderInfo = () => {
   };
 
   const handleFindOrder = () => {
-      navigator.geolocation.getCurrentPosition((position) => {
-        console.log(position.coords)
-   
-      })
-  }
-
-  
+    dispatch(findOrder()).then((r) => {
+      if (r?.payload !== undefined) {
+        setModal({
+          opened: true,
+          body: <OrderPopup />,
+        });
+      }
+    });
+  };
 
   return (
     <Wrapper>
@@ -61,7 +66,9 @@ const OrderInfo = () => {
           {ordersCount > 0 ? `${ordersCount}` : "None"}
         </Order>
       </Text>
-      <Button secondary onClick={findOrder}>Find order</Button>
+      <Button secondary onClick={handleFindOrder} loading={loading ? 1 : 0}>
+        Find order
+      </Button>
     </Wrapper>
   );
 };

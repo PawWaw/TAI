@@ -3,8 +3,6 @@ import styled from "styled-components";
 import { history } from "../..";
 import { SvgIcon } from "../../app/common/SvgIcon";
 import { format } from "date-fns";
-import { useSetRecoilState } from "recoil";
-import { selectOrderSelector } from "../../app/recoil/SelectedOrderState";
 
 const Wrapper = styled.div`
   display: flex;
@@ -47,12 +45,12 @@ const DataText = styled.h3`
 
 
 
-const OrderShortDetails = ({ id, endDate, restaurant, client }) => {
+const OrderShortDetails = ({ order }) => {
   return (
-    <Wrapper onClick={() => history.push(`/orders/${id}`)}>
+    <Wrapper onClick={() => history.push(`/orders/${order?.id}`)}>
       <FirstLine>
-        <DateText>{!endDate ? "Order"  : format(new Date(endDate), "HH:mm dd-MM-yyy")}</DateText>
-        <IdText>#{id}</IdText>
+        <DateText>{!order?.endDate ? "Order"  : format(new Date(order?.endDate), "HH:mm dd-MM-yyy")}</DateText>
+        <IdText>#{order?.id}</IdText>
       </FirstLine>
       <DataWrapper>
         <SvgIcon
@@ -60,11 +58,11 @@ const OrderShortDetails = ({ id, endDate, restaurant, client }) => {
           src="assets/svg/restaurant.svg"
           height="16px"
         />
-        <DataText>{restaurant}</DataText>
+        <DataText>{order?.restaurant}</DataText>
       </DataWrapper>
       <DataWrapper>
         <SvgIcon alt="restaurant" src="assets/svg/home.svg" height="16px" />
-        <DataText>{client}</DataText>
+        <DataText>{order?.client}</DataText>
       </DataWrapper>
     </Wrapper>
   );

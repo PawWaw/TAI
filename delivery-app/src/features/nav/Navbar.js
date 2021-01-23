@@ -52,6 +52,11 @@ const Navbar = () => {
     setOpen(!open);
     history.push(path);
   };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    history.push("/");
+  };
   return (
     <>
       <Bar>
@@ -78,7 +83,7 @@ const Navbar = () => {
           <MenuItem key="settings" onClick={() => handleRoute("/settings")}>
             Settings
           </MenuItem>
-          <Button secondary onClick={() => dispatch(logout())}>
+          <Button secondary onClick={handleLogout}>
             Logout
           </Button>
         </Menu>

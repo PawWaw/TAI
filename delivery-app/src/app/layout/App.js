@@ -11,8 +11,8 @@ import Settings from "../../features/settings/Settings";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { history } from "../..";
-import { useDispatch } from "react-redux";
-import { getCurrentUser } from "../redux/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { getCurrentUser, selectUserState } from "../redux/userSlice";
 
 const MainContainer = styled.div`
   position: relative;
@@ -43,6 +43,7 @@ const AppContainer = styled.div`
 
 const App = () => {
   const dispatch = useDispatch();
+  const { user } = useSelector(selectUserState);
 
   useEffect(() => {
     const jwt = window.localStorage.getItem("jwt");
@@ -50,6 +51,8 @@ const App = () => {
       dispatch(getCurrentUser())
         .then(() => history.push("/dashboard"))
         .catch(() => history.push("/"));
+    } else {
+      history.push("/");
     }
   }, []);
 

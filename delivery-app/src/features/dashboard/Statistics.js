@@ -1,8 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { useRecoilValue } from "recoil";
 import styled from "styled-components";
-import { infoSelector } from "../../app/recoil/DashboardState";
 import { selectStatistics } from "../../app/redux/dashboardSlice";
 import StatisticItem from "./StatisticItem";
 
@@ -18,7 +16,7 @@ const Statistics = () => {
 
   return (
     <Wrapper>
-      {stats.map((s) => (
+      {stats?.map((s) => (
         <StatisticItem key={s.name} statistic={s} />
       ))}
     </Wrapper>

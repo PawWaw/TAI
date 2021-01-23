@@ -1,15 +1,14 @@
 import { format } from "date-fns/esm";
 import React, { useEffect, useState } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import Button from "../../app/common/Button";
 import { PageHeader } from "../../app/common/PageHeader";
-import { SvgIcon } from "../../app/common/SvgIcon";
 import {
-  delieveredOrderSelector,
-  selectedOrderState,
-  selectOrderSelector,
-} from "../../app/recoil/SelectedOrderState";
+  deliverOrderById,
+  fetchOrderById,
+  selectOrdersManagerState,
+} from "../../app/redux/ordersManagerSlice";
 import { findCoordinatesByAddress } from "../../app/util/util";
 import TomTomMap from "../map/TomTomMap";
 
@@ -57,31 +56,34 @@ const statusColors = {
 
 const OrderDetails = ({ match }) => {
   const [distance, setDistance] = useState(0);
-  const order = useRecoilValue(selectedOrderState);
-  const selectOrder = useSetRecoilState(selectOrderSelector);
-  const deliveredOrder = useSetRecoilState(delieveredOrderSelector)
+  const dispatch = useDispatch();
+  const { detailedOrder, loading } = useSelector(selectOrdersManagerState);
   const [restaurantCoords, setRestaurantCoords] = useState(undefined);
   const [clientCoords, setClientCoords] = useState(undefined);
 
+  const handleDeliverOrder = () => {
+    dispatch(deliverOrderById(detailedOrder?.id));
+  };
+
   useEffect(() => {
-    selectOrder(match.params.id);
+    dispatch(fetchOrderById(match.params.id));
   }, []);
 
   useEffect(() => {
     const runSync = () => {
-      if (order !== null) {
-        findCoordinatesByAddress(order.restaurant).then((c) =>
+      if (detailedOrder !== null) {
+        findCoordinatesByAddress(detailedOrder?.restaurant).then((c) =>
           setRestaurantCoords(c.results[0].position)
         );
-        findCoordinatesByAddress(order.client).then((c) =>
+        findCoordinatesByAddress(detailedOrder?.client).then((c) =>
           setClientCoords(c.results[0].position)
         );
       }
     };
     runSync();
-  }, [order]);
+  }, [detailedOrder]);
 
-  if (order === null) {
+  if (detailedOrder === null) {
     return <h2>Loading...</h2>;
   }
   return (
@@ -90,29 +92,31 @@ const OrderDetails = ({ match }) => {
       <Field>
         <FirstLine>
           <HeaderLabel>Status:</HeaderLabel>
-          <Order>#{order.id}</Order>
+          <Order>#{detailedOrder?.id}</Order>
         </FirstLine>
-        <DataLabel color={statusColors[order.status]}>In progress</DataLabel>
+        <DataLabel color={statusColors[detailedOrder?.status]}>
+          In progress
+        </DataLabel>
       </Field>
       <Field>
         <HeaderLabel>Start time:</HeaderLabel>
         <DataLabel>
-          {format(new Date(order?.startDate), "HH:mm dd-MM-yyy")}
+          {format(new Date(detailedOrder?.startDate), "HH:mm dd-MM-yyy")}
         </DataLabel>
       </Field>
       <Field>
         <HeaderLabel>End time:</HeaderLabel>
         <DataLabel>
-          {format(new Date(order?.endDate), "HH:mm dd-MM-yyy")}
+          {format(new Date(detailedOrder?.endDate), "HH:mm dd-MM-yyy")}
         </DataLabel>
       </Field>
       <Field>
         <HeaderLabel>Restaurant:</HeaderLabel>
-        <DataLabel>{order?.restaurant}</DataLabel>
+        <DataLabel>{detailedOrder?.restaurant}</DataLabel>
       </Field>
       <Field>
         <HeaderLabel>Client:</HeaderLabel>
-        <DataLabel>{order?.client}</DataLabel>
+        <DataLabel>{detailedOrder?.client}</DataLabel>
       </Field>
       <Field>
         <HeaderLabel>Distance:</HeaderLabel>
@@ -121,11 +125,16 @@ const OrderDetails = ({ match }) => {
       <MapField>
         <HeaderLabel>Map:</HeaderLabel>
         <TomTomMap
-             locations={`${restaurantCoords?.lon},${restaurantCoords?.lat}:${clientCoords?.lon},${clientCoords?.lat}`}
+          locations={`${restaurantCoords?.lon},${restaurantCoords?.lat}:${clientCoords?.lon},${clientCoords?.lat}`}
           setDistance={(distance) => setDistance(distance)}
         />
       </MapField>
-      <Button secondary margin="0.5em 0 0 0" onClick={deliveredOrder}>
+      <Button
+        secondary
+        margin="0.5em 0 0 0"
+        onClick={handleDeliverOrder}
+        loading={loading ? 1 : 0}
+      >
         Delivered
       </Button>
     </Wrapper>

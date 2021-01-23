@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { history } from "../..";
 import Button from "../../app/common/Button";
 import { Field, Form, Input, Label } from "../../app/common/Form";
 import { login, selectUserState } from "../../app/redux/userSlice";
@@ -8,14 +9,17 @@ const LoginForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const {loading} = useSelector(selectUserState)
-
   const dispatch = useDispatch();
-  // console.log(loading)
+  const { loading, user } = useSelector(selectUserState);
 
   const handleLogin = () => {
     const values = { username, password };
-    dispatch(login(values));
+    dispatch(login(values))
+      .then((r) => {
+        if(r.payload != undefined) {
+          history.push("/dashboard")
+        }
+      })
   };
 
   return (

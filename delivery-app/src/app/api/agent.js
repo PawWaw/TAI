@@ -19,13 +19,15 @@ Axios.interceptors.request.use(
 
 Axios.interceptors.response.use(undefined, (error) => {
   const { status, headers } = error.response;
-  if (status === 401 && headers["www-authenticate"].includes("Bearer error")) {
-    window.localStorage.removeItem("jwt");
-    history.push("/");
-    toast.info("Your session has expired. Please login again");
+  if (status === 401) {
+    if( headers["www-authenticate"].includes("Bearer error")) {
+      window.localStorage.removeItem("jwt");
+      //history.push("/");
+    }
   }
-
-  throw error.response
+  else {
+    throw error.response
+  }
 });
 
 const responseBody = (response) => response.data;
@@ -48,8 +50,7 @@ const User = {
 const Orders = {
   list: (param) => requests.get(`/orders/isCurrent?current=${param}`),
   details: (id) => requests.get(`/orders/${id}`),
-  find: ({ latitude, longitude }) =>
-    requests.get(`/orders/find?latitude=${latitude}&longitude=${longitude}`),
+  find: ()  => requests.get("/orders/find"),
   take: (id) => requests.post("/orders/take", { id }),
   delivered: (id) => requests.post("/orders/delivered", { id }),
 };

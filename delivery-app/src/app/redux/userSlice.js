@@ -72,7 +72,6 @@ export const userSlice = createSlice({
     logout: (state) => {
       window.localStorage.removeItem("jwt");
       state.user = null;
-      history.push("/")
     },
   },
   extraReducers: {
@@ -93,7 +92,6 @@ export const userSlice = createSlice({
       state.user = action.payload;
       window.localStorage.setItem("jwt", action.payload?.token);
       state.loading = false;
-      history.push("/dashboard");
     },
     [login.rejected]: (state, action) => {
       state.loading = false;
@@ -130,5 +128,6 @@ export const userSlice = createSlice({
 });
 
 export const selectUserState = (state) => state.user;
+export const selectDragonCoinBalance = (state) => state.user?.user?.dragonCoinBalance;
 export const { logout } = userSlice.actions;
 export default userSlice.reducer;

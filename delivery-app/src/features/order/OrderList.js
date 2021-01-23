@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useRecoilValue, useRecoilValueLoadable, useSetRecoilState } from "recoil";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { PageHeader } from "../../app/common/PageHeader";
-import { fetchOrdersHistorySelector, ordersHistoryState } from "../../app/recoil/OrderHistoryState";
-import { selectOrderSelector } from "../../app/recoil/SelectedOrderState";
+import { fetchOrders, selectOrdersManagerState } from "../../app/redux/ordersManagerSlice";
 import OrderShortDetails from "./OrderShortDetails";
 
 const Wrapper = styled.div`
@@ -53,11 +52,11 @@ const OrdersWrapper = styled.div`
 
 const OrderList = () => {
   const [activeTab, setActiveTab] = useState("current");
-  const orders = useRecoilValue(ordersHistoryState)
-  const fetchOrders = useSetRecoilState(fetchOrdersHistorySelector)
+  const {orders} = useSelector(selectOrdersManagerState)
+  const dispatch = useDispatch()
 
   useEffect(() => {
-    fetchOrders(activeTab === "current")
+    dispatch(fetchOrders(activeTab === "current"))
   }, [activeTab])
 
   return (
@@ -78,13 +77,10 @@ const OrderList = () => {
         </MenuItem>
       </MenuWrapper>
       <OrdersWrapper>
-        {orders.map((order, i) => (
+        {orders?.map((order, i) => (
           <OrderShortDetails
             key={i}
-            id={order.id}
-            date={order.endDate}
-            restaurant={order.restaurant}
-            client={order.client}
+            order={order}
           />
         ))}
       </OrdersWrapper>

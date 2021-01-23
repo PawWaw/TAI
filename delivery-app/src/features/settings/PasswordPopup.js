@@ -1,22 +1,27 @@
 import React, { useState } from "react";
-import { useSetRecoilState } from "recoil";
+import { useDispatch, useSelector } from "react-redux";
 import Button from "../../app/common/Button";
 import { Field, Form, Input, Label } from "../../app/common/Form";
 import { ModalHeader } from "../../app/common/ModalHeader";
-import { updatePasswordSelector } from "../../app/recoil/UserState";
+import { selectUserState, updatePassword } from "../../app/redux/userSlice";
 
 const PasswordPopup = () => {
-  const changePassword = useSetRecoilState(updatePasswordSelector);
+  const dispatch = useDispatch()
+  const {loading} = useSelector(selectUserState)
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
   const handlePasswordChange = () => {
     const formValues = {
-      oldPassword: oldPassword,
-      newPassword: newPassword,
+      oldPassword: {
+        password: oldPassword,
+      },
+      newPassword: {
+        password: newPassword,
+      }
     };
-    changePassword(formValues);
+    dispatch(updatePassword(formValues));
   };
 
   return (
@@ -49,6 +54,7 @@ const PasswordPopup = () => {
         </Field>
         <Button
           margin="20px 0 0 0"
+          loading = {loading ? 1 : 0}
           disabled={newPassword !== confirmNewPassword}
           onClick={handlePasswordChange}
         >

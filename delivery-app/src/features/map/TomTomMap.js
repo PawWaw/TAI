@@ -7,9 +7,7 @@ const TomTomMap = ({ locations, setDistance }) => {
     
   
     useEffect(() => {
-      console.log("lul")
       const tt = window.tt;
-      console.log(window.tt)
       const map = tt.map({
         key: process.env.REACT_APP_TOM_TOM_API_KEY,
         container: "map",
