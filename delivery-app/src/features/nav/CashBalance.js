@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { SvgIcon } from "../../app/common/SvgIcon";
-import { selectUserState, selectDragonCoinBalance } from "../../app/redux/userSlice";
+import { selectDragonCoinBalance } from "../../app/redux/userSlice";
 
 const HorizontalWrapper = styled.div`
   display: flex;

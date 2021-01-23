@@ -10,13 +10,13 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
 
   const dispatch = useDispatch();
-  const { loading, user } = useSelector(selectUserState);
+  const { loading } = useSelector(selectUserState);
 
   const handleLogin = () => {
     const values = { username, password };
     dispatch(login(values))
       .then((r) => {
-        if(r.payload != undefined) {
+        if(r.payload !== undefined) {
           history.push("/dashboard")
         }
       })

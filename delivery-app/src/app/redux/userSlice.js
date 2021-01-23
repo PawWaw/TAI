@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
-import { history } from "../..";
 import agent from "../api/agent";
 
 export const getCurrentUser = createAsyncThunk(
@@ -75,17 +74,17 @@ export const userSlice = createSlice({
     },
   },
   extraReducers: {
-    [getCurrentUser.pending]: (state, action) => {
+    [getCurrentUser.pending]: (state) => {
       state.loading = true;
     },
     [getCurrentUser.fulfilled]: (state, action) => {
       state.user = action.payload;
       state.loading = false;
     },
-    [getCurrentUser.rejected]: (state, action) => {
+    [getCurrentUser.rejected]: (state) => {
       state.loading = false;
     },
-    [login.pending]: (state, action) => {
+    [login.pending]: (state) => {
       state.loading = true;
     },
     [login.fulfilled]: (state, action) => {
@@ -93,35 +92,35 @@ export const userSlice = createSlice({
       window.localStorage.setItem("jwt", action.payload?.token);
       state.loading = false;
     },
-    [login.rejected]: (state, action) => {
+    [login.rejected]: (state) => {
       state.loading = false;
     },
-    [register.pending]: (state, action) => {
+    [register.pending]: (state) => {
       state.loading = true;
     },
-    [register.fulfilled]: (state, action) => {
+    [register.fulfilled]: (state) => {
       state.loading = false;
     },
-    [register.rejected]: (state, action) => {
+    [register.rejected]: (state) => {
       state.loading = false;
     },
-    [updateSettings.pending]: (state, action) => {
+    [updateSettings.pending]: (state) => {
       state.loading = true;
     },
     [updateSettings.fulfilled]: (state, action) => {
       state.user = { ...state.user, ...action.payload };
       state.loading = false;
     },
-    [updateSettings.rejected]: (state, action) => {
+    [updateSettings.rejected]: (state) => {
       state.loading = false;
     },
-    [updatePassword.pending]: (state, action) => {
+    [updatePassword.pending]: (state) => {
       state.loading = true;
     },
-    [updatePassword.fulfilled]: (state, action) => {
+    [updatePassword.fulfilled]: (state) => {
       state.loading = false;
     },
-    [updatePassword.rejected]: (state, action) => {
+    [updatePassword.rejected]: (state) => {
       state.loading = false;
     },
   },

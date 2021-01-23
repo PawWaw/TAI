@@ -1,6 +1,4 @@
 import Axios from "axios";
-import { toast } from "react-toastify";
-import { history } from "../..";
 
 Axios.defaults.baseURL = "https://localhost:44308/api";
 

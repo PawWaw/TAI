@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Route, Switch } from "react-router-dom";
 import HomeLogin from "../../features/home/HomeLogin";
 import Modal from "../common/Modal";
@@ -11,8 +11,8 @@ import Settings from "../../features/settings/Settings";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { history } from "../..";
-import { useDispatch, useSelector } from "react-redux";
-import { getCurrentUser, selectUserState } from "../redux/userSlice";
+import { useDispatch } from "react-redux";
+import { getCurrentUser } from "../redux/userSlice";
 
 const MainContainer = styled.div`
   position: relative;
@@ -43,7 +43,6 @@ const AppContainer = styled.div`
 
 const App = () => {
   const dispatch = useDispatch();
-  const { user } = useSelector(selectUserState);
 
   useEffect(() => {
     const jwt = window.localStorage.getItem("jwt");

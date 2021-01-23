@@ -96,7 +96,7 @@ export const selectDashboardState = (state) => state.dashboard;
 export const { declineOrder } = dashboardSlice.actions;
 
 export const selectOrdersCount = (state) => {
-  return state.dashboard?.info["Current Orders"];
+  return state.dashboard?.info["Current orders"];
 };
 export const selectStatistics = (state) => {
   return Object.keys(state.dashboard.info)

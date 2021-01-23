@@ -58,11 +58,11 @@ const OrderShortDetails = ({ order }) => {
           src="assets/svg/restaurant.svg"
           height="16px"
         />
-        <DataText>{order?.restaurant}</DataText>
+        <DataText>{order?.restaurant?.address + " " + order?.restaurant?.city}</DataText>
       </DataWrapper>
       <DataWrapper>
-        <SvgIcon alt="restaurant" src="assets/svg/home.svg" height="16px" />
-        <DataText>{order?.client}</DataText>
+        <SvgIcon alt="home" src="assets/svg/home.svg" height="16px" />
+        <DataText>{order?.client?.address + " " + order?.client?.city}</DataText>
       </DataWrapper>
     </Wrapper>
   );

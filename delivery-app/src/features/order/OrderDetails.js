@@ -2,6 +2,7 @@ import { format } from "date-fns/esm";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+import { history } from "../..";
 import Button from "../../app/common/Button";
 import { PageHeader } from "../../app/common/PageHeader";
 import {
@@ -48,11 +49,11 @@ const DataLabel = styled.h4`
   color: ${(props) => (props.color ? props.color : "#9A9A9A")};
 `;
 
-const statusColors = {
-  Completed: "#70FF00",
-  "In progress": "#FFE600",
-  Rejected: "#FF0000",
-};
+// const statusColors = {
+//   Completed: "#70FF00",
+//   "In progress": "#FFE600",
+//   Rejected: "#FF0000",
+// };
 
 const OrderDetails = ({ match }) => {
   const [distance, setDistance] = useState(0);
@@ -62,7 +63,9 @@ const OrderDetails = ({ match }) => {
   const [clientCoords, setClientCoords] = useState(undefined);
 
   const handleDeliverOrder = () => {
-    dispatch(deliverOrderById(detailedOrder?.id));
+    dispatch(deliverOrderById(detailedOrder?.id)).then(() =>
+      history.push("/dashboard")
+    );
   };
 
   useEffect(() => {
@@ -72,12 +75,14 @@ const OrderDetails = ({ match }) => {
   useEffect(() => {
     const runSync = () => {
       if (detailedOrder !== null) {
-        findCoordinatesByAddress(detailedOrder?.restaurant).then((c) =>
-          setRestaurantCoords(c.results[0].position)
-        );
-        findCoordinatesByAddress(detailedOrder?.client).then((c) =>
-          setClientCoords(c.results[0].position)
-        );
+        findCoordinatesByAddress(
+          detailedOrder?.restaurant?.address +
+            " " +
+            detailedOrder?.restaurant?.city
+        ).then((c) => setRestaurantCoords(c.results[0].position));
+        findCoordinatesByAddress(
+          detailedOrder?.client?.address + " " + detailedOrder?.client?.city
+        ).then((c) => setClientCoords(c.results[0].position));
       }
     };
     runSync();
@@ -94,9 +99,7 @@ const OrderDetails = ({ match }) => {
           <HeaderLabel>Status:</HeaderLabel>
           <Order>#{detailedOrder?.id}</Order>
         </FirstLine>
-        <DataLabel color={statusColors[detailedOrder?.status]}>
-          In progress
-        </DataLabel>
+        <DataLabel color="#FFE600">{detailedOrder?.status}</DataLabel>
       </Field>
       <Field>
         <HeaderLabel>Start time:</HeaderLabel>
@@ -107,16 +110,24 @@ const OrderDetails = ({ match }) => {
       <Field>
         <HeaderLabel>End time:</HeaderLabel>
         <DataLabel>
-          {format(new Date(detailedOrder?.endDate), "HH:mm dd-MM-yyy")}
+          {detailedOrder?.endDate ? (
+            format(new Date(detailedOrder?.endDate), "HH:mm dd-MM-yyy")
+          ) : ("-")}
         </DataLabel>
       </Field>
       <Field>
         <HeaderLabel>Restaurant:</HeaderLabel>
-        <DataLabel>{detailedOrder?.restaurant}</DataLabel>
+        <DataLabel>
+          {detailedOrder?.restaurant?.address +
+            " " +
+            detailedOrder?.restaurant?.city}
+        </DataLabel>
       </Field>
       <Field>
         <HeaderLabel>Client:</HeaderLabel>
-        <DataLabel>{detailedOrder?.client}</DataLabel>
+        <DataLabel>
+          {detailedOrder?.client?.address + " " + detailedOrder?.client?.city}
+        </DataLabel>
       </Field>
       <Field>
         <HeaderLabel>Distance:</HeaderLabel>
@@ -124,19 +135,23 @@ const OrderDetails = ({ match }) => {
       </Field>
       <MapField>
         <HeaderLabel>Map:</HeaderLabel>
-        <TomTomMap
-          locations={`${restaurantCoords?.lon},${restaurantCoords?.lat}:${clientCoords?.lon},${clientCoords?.lat}`}
-          setDistance={(distance) => setDistance(distance)}
-        />
+        {clientCoords && restaurantCoords && (
+          <TomTomMap
+            locations={`${restaurantCoords?.lon},${restaurantCoords?.lat}:${clientCoords?.lon},${clientCoords?.lat}`}
+            setDistance={(distance) => setDistance(distance)}
+          />
+        )}
       </MapField>
-      <Button
-        secondary
-        margin="0.5em 0 0 0"
-        onClick={handleDeliverOrder}
-        loading={loading ? 1 : 0}
-      >
-        Delivered
-      </Button>
+      {detailedOrder?.status !== "ENDED" && (
+        <Button
+          secondary
+          margin="0.5em 0 0 0"
+          onClick={handleDeliverOrder}
+          loading={loading ? 1 : 0}
+        >
+          Delivered
+        </Button>
+      )}
     </Wrapper>
   );
 };

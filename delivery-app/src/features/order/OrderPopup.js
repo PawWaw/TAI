@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { history } from "../..";
 import { ModalHeader } from "../../app/common/ModalHeader";
 import { SvgIcon } from "../../app/common/SvgIcon";
 import { modalState } from "../../app/recoil/ModalState";
@@ -55,16 +54,17 @@ const OrderPopup = () => {
 
   useEffect(() => {
     const runSync = () => {
-      findCoordinatesByAddress(currentOrder.restaurant).then((c) =>
+      
+      findCoordinatesByAddress(currentOrder?.restaurant?.address + " " + currentOrder?.restaurant?.city).then((c) =>
         setRestaurantCoords(c.results[0].position)
       );
-      findCoordinatesByAddress(currentOrder.client).then((c) =>
+      findCoordinatesByAddress(currentOrder?.client?.address + " " + currentOrder?.client?.city).then((c) =>
         setClientCoords(c.results[0].position)
       );
       setReady(true);
     };
     runSync();
-  }, []);
+  }, [currentOrder]);
 
   const handleTakeOrder = () => {
     dispatch(takeOrder(currentOrder.id)).then(() => {
@@ -91,11 +91,11 @@ const OrderPopup = () => {
         <ModalHeader>Found order!</ModalHeader>
         <Field>
           <LabelHeader>Restaurant:</LabelHeader>
-          <LabelData>{currentOrder?.restaurant}</LabelData>
+          <LabelData>{currentOrder?.restaurant?.address + " " + currentOrder?.restaurant?.city}</LabelData>
         </Field>
         <Field>
           <LabelHeader>Client:</LabelHeader>
-          <LabelData>{currentOrder?.client}</LabelData>
+          <LabelData>{currentOrder?.client?.address + " " + currentOrder?.client?.city}</LabelData>
         </Field>
         <Field>
           <LabelHeader>Distance:</LabelHeader>
