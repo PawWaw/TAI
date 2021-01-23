@@ -7,6 +7,7 @@ using Backend.Model;
 using Backend.Helpers;
 using Backend.RestModel;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Backend.Controllers
 {
@@ -22,28 +23,31 @@ namespace Backend.Controllers
         public List<AverageRateFood> foods { get; set; }
     }
 
+    [JsonObject("OrderStation")]
     public class WsOrderStation
     {
-        public long id { get; set; }
-        public string city { get; set; }
-        public string address { get; set; }
-        public WsRestaurant wsRestaurant { get; set; }
+        public long Id { get; set; }
+        public string City { get; set; }
+        public string Address { get; set; }
+        public WsRestaurant WsRestaurant { get; set; }
     }
 
+    [JsonObject("Restaurant")]
     public class WsRestaurant
     {
-        public long id { get; set; }
-        public string name { get; set; }
-        public List<WsDishWithRate> wsDishWithRates { get; set; }
+        public long Id { get; set; }
+        public string Name { get; set; }
+        public List<WsDishWithRate> WsDishWithRates { get; set; }
     }
 
+    [JsonObject("DishWithRate")]
     public class WsDishWithRate
     {
-        public long id { get; set; }
-        public string name { get; set; }
-        public double price { get; set; }
-        public List<string> ingredients { get; set; }
-        public double rate { get; set; }
+        public long Id { get; set; }
+        public string Name { get; set; }
+        public double Price { get; set; }
+        public List<string> Ingredients { get; set; }
+        public double Rate { get; set; }
     }
 
     [Route("api/[controller]")]
@@ -98,15 +102,19 @@ namespace Backend.Controllers
             List<BodyOrderStation> bodyOrderStations = new List<BodyOrderStation>();
             foreach (OrderStation orderStation in orderStations)
             {
-                BodyOrderStation temp = new BodyOrderStation();
-                temp.foods = new List<AverageRateFood>();
-                temp.orderStation = orderStation;
+                BodyOrderStation temp = new BodyOrderStation
+                {
+                    foods = new List<AverageRateFood>(),
+                    orderStation = orderStation
+                };
                 Restaurant restaurant = await _context.Restaurants.Where(f => f.Id == orderStation.RestaurantId).Include(e => e.Foods).FirstOrDefaultAsync();
                 orderStation.Restaurant = restaurant;
                 foreach (Food food in orderStation.Restaurant.Foods)
                 {
-                    AverageRateFood tempFood = new AverageRateFood();
-                    tempFood.food = await _context.Foods.Include(e => e.FoodRates).Include(e => e.FoodIngredients).FirstOrDefaultAsync(e => e.Id == food.Id);
+                    AverageRateFood tempFood = new AverageRateFood
+                    {
+                        food = await _context.Foods.Include(e => e.FoodRates).Include(e => e.FoodIngredients).FirstOrDefaultAsync(e => e.Id == food.Id)
+                    };
                     List<FoodIngredient> tempIngredient = new List<FoodIngredient>();
                     foreach (FoodIngredient foodIngredient in tempFood.food.FoodIngredients)
                     {
@@ -137,17 +145,20 @@ namespace Backend.Controllers
         [HttpGet("DishesFromOrderStation")]
         public async Task<ActionResult<WsOrderStation>> GetDishesFromOrderStation_User([FromQuery] long OrderStationId)
         {
-            //OrderStation orderStation = await _context.OrderStations.Include(e => e.Restaurant).Include(e => e.Restaurant.Foods).FirstOrDefaultAsync(e => e.Id == OrderStationId);
             OrderStation orderStation = await _context.OrderStations.Include(o => o.City).FirstOrDefaultAsync(e => e.Id == OrderStationId);
-            BodyOrderStation bodyOrderStations = new BodyOrderStation();
-            bodyOrderStations.foods = new List<AverageRateFood>();
-            bodyOrderStations.orderStation = orderStation;
+            BodyOrderStation bodyOrderStations = new BodyOrderStation
+            {
+                foods = new List<AverageRateFood>(),
+                orderStation = orderStation
+            };
             Restaurant restaurant = await _context.Restaurants.Where(f => f.Id == orderStation.RestaurantId).Include(e => e.Foods).FirstOrDefaultAsync();
             orderStation.Restaurant = restaurant;
             foreach (Food food in orderStation.Restaurant.Foods)
             {
-                AverageRateFood tempFood = new AverageRateFood();
-                tempFood.food = await _context.Foods.Include(e => e.FoodRates).Include(e => e.FoodIngredients).FirstOrDefaultAsync(e => e.Id == food.Id);
+                AverageRateFood tempFood = new AverageRateFood
+                {
+                    food = await _context.Foods.Include(e => e.FoodRates).Include(e => e.FoodIngredients).FirstOrDefaultAsync(e => e.Id == food.Id)
+                };
                 List<FoodIngredient> tempIngredient = new List<FoodIngredient>();
 
                 foreach (FoodIngredient foodIngredient in tempFood.food.FoodIngredients)
@@ -359,32 +370,30 @@ namespace Backend.Controllers
                 {
                     var myDish = new WsDishWithRate()
                     {
-                        id = f.food.Id,
-                        name = f.food.Name.Trim(),
-                        price = f.food.Price,
-                        ingredients = f.food.FoodIngredients.Select(fi => fi.Ingredient.Name.Trim()).ToList(),
-                        rate = f.averageRate
+                        Id = f.food.Id,
+                        Name = f.food.Name.Trim(),
+                        Price = f.food.Price,
+                        Ingredients = f.food.FoodIngredients.Select(fi => fi.Ingredient.Name.Trim()).ToList(),
+                        Rate = f.averageRate
                     };
                     mywsDishWithRates.Add(myDish);
                 });
 
-
                 var wsos = new WsOrderStation()
                 {
-                    id = bos.orderStation.Id,
-                    address = bos.orderStation.Address.Trim(),
-                    city = bos.orderStation.City.Name.Trim(),
-                    wsRestaurant = new WsRestaurant()
+                    Id = bos.orderStation.Id,
+                    Address = bos.orderStation.Address.Trim(),
+                    City = bos.orderStation.City.Name.Trim(),
+                    WsRestaurant = new WsRestaurant()
                     {
-                        id = bos.orderStation.Restaurant.Id,
-                        name = bos.orderStation.Restaurant.Name.Trim(),
-                        wsDishWithRates = mywsDishWithRates,
+                        Id = bos.orderStation.Restaurant.Id,
+                        Name = bos.orderStation.Restaurant.Name.Trim(),
+                        WsDishWithRates = mywsDishWithRates,
                     }
                 };
 
                 wsOrderStations.Add(wsos);
             });
-
 
             return wsOrderStations;
         }
