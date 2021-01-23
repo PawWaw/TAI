@@ -28,6 +28,8 @@ namespace Backend
                 options.AddPolicy(
                   "CorsPolicy",
                   builder => builder.WithOrigins("http://localhost:4200")
+                  .WithOrigins("http://localhost:3000")
+                  .WithOrigins("http://localhost:4401")
                   .AllowAnyMethod()
                   .AllowAnyHeader()
                   .AllowCredentials());

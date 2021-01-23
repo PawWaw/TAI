@@ -8,7 +8,7 @@ namespace Backend.RestModel
         public int CurrentOrders { get; set; }
         [JsonProperty(PropertyName = "Client rate")]
         public double ClientRate { get; set; }
-        [JsonProperty(PropertyName = "Total delivary")]
+        [JsonProperty(PropertyName = "Total delivery")]
         public int TotalDelivery { get; set; }
         [JsonProperty(PropertyName = "Max Daily Orders")]
         public int MaxDailyOrders { get; set; }

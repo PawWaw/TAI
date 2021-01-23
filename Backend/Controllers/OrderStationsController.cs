@@ -23,7 +23,6 @@ namespace Backend.Controllers
         public List<AverageRateFood> foods { get; set; }
     }
 
-    [JsonObject("OrderStation")]
     public class WsOrderStation
     {
         public long Id { get; set; }
@@ -32,7 +31,6 @@ namespace Backend.Controllers
         public WsRestaurant WsRestaurant { get; set; }
     }
 
-    [JsonObject("Restaurant")]
     public class WsRestaurant
     {
         public long Id { get; set; }
@@ -40,7 +38,6 @@ namespace Backend.Controllers
         public List<WsDishWithRate> WsDishWithRates { get; set; }
     }
 
-    [JsonObject("DishWithRate")]
     public class WsDishWithRate
     {
         public long Id { get; set; }

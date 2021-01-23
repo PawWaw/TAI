@@ -35,6 +35,24 @@ namespace Backend.Controllers
         public int count { get; set; }
     }
 
+    public class WsOrder
+    {
+        public long Id { get; set; }
+        public long DelivererId { get; set; }
+        public WsOrderStation WsOrderStation { get; set; }
+        public string Status { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public WsFood WsFood { get; set; }
+    }
+
+    public class WsFood
+    {
+        public long Id { get; set; }
+        public string Name { get; set; }
+        public double Price { get; set; }
+    }
+
     [Route("api/[controller]")]
     [ApiController]
     public class OrdersController : ControllerBase
@@ -64,28 +82,28 @@ namespace Backend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<WsExtendedDateWsOrderResponse>> GetOrder_Deliverer(long id)
         {
-            var order = await _context.Orders.Include(e => e.OrderStation).Include(e => e.OrderStation.City).Include(e => e.Deliverer).Include(e => e.User).Include(e => e.User.City).SingleOrDefaultAsync(e => e.Id == id); ;
+            var order = await _context.Orders.Include(e => e.OrderStation).ThenInclude(e => e.City)
+                .Include(e => e.Deliverer)
+                .Include(e => e.User).ThenInclude(e => e.City)
+                .SingleOrDefaultAsync(e => e.Id == id);
 
-            if (order == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(new WsExtendedDateWsOrderResponse {
-                Id = order.Id,
-                Status = order.Status,
-                StartDate = order.StartTime.ToString("s"),
-                EndDate = order.EndTime?.ToString("s"),
-                ClientAddress = new WsAddress
-                {
-                    Address = order.User.Address,
-                    City = order.User.City.Name
-                },
-                RestaurantAddress = new WsAddress
-                {
-                    Address = order.OrderStation.Address,
-                    City = order.OrderStation.City.Name
-                }
+            return order == null
+                ? NotFound()
+                : (ActionResult<WsExtendedDateWsOrderResponse>)Ok(new WsExtendedDateWsOrderResponse {
+                    Id = order.Id,
+                    Status = order.Status,
+                    StartDate = order.StartTime.ToString("s"),
+                    EndDate = order.EndTime?.ToString("s"),
+                    ClientAddress = new WsAddress
+                    {
+                        Address = order.User.Address,
+                        City = order.User.City.Name
+                    },
+                    RestaurantAddress = new WsAddress
+                    {
+                        Address = order.OrderStation.Address,
+                        City = order.OrderStation.City.Name
+                    }
             });
         }
 
@@ -173,7 +191,7 @@ namespace Backend.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Order>> DeleteOrder(long id)
         {
-            var order = await _context.Orders.Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e=>e.User).Include(e=>e.User.City).SingleOrDefaultAsync(e=> e.Id == id);
+            var order = await _context.Orders.Include(e => e.OrderStation).Include(e => e.Deliverer).Include(e=>e.User).ThenInclude(e=>e.City).SingleOrDefaultAsync(e=> e.Id == id);
             if (order == null)
             {
                 return NotFound();
@@ -199,14 +217,14 @@ namespace Backend.Controllers
             if (current)
             {
                  orders = await _context.Orders.Where(e => e.Status.Trim() != "ENDED" && e.DelivererId == id)
-                    .Include(e => e.OrderStation).Include(e=> e.OrderStation.City).Include(e => e.Deliverer)
-                    .Include(e => e.User).Include(e => e.User.City).ToListAsync();
+                    .Include(e => e.OrderStation).ThenInclude(e=> e.City).Include(e => e.Deliverer)
+                    .Include(e => e.User).ThenInclude(e => e.City).ToListAsync();
             }
             else
             {
                 orders = await _context.Orders.Where(e => e.Status.Trim() == "ENDED" && e.DelivererId == id)
-                    .Include(e => e.OrderStation).Include(e=> e.OrderStation.City).Include(e => e.Deliverer)
-                    .Include(e => e.User).Include(e => e.User.City).ToListAsync();
+                    .Include(e => e.OrderStation).ThenInclude(e=> e.City).Include(e => e.Deliverer)
+                    .Include(e => e.User).ThenInclude(e => e.City).ToListAsync();
             }
             List<WsEndDateWsOrderResponse> result = new List<WsEndDateWsOrderResponse>();
             orders.ForEach(o =>
@@ -239,7 +257,14 @@ namespace Backend.Controllers
             {
                 return NotFound();
             }
-            IEnumerable<Order> orders = await _context.Orders.Where(e => e.UserId == id).Where(e => e.Status.Trim() == "ENDED" || e.Status.Trim() == "REALIZE").Include(e => e.OrderStation).Include(e => e.FoodOrders).Include(e => e.OrderStation.Restaurant).ToListAsync();
+            var orders = await _context.Orders.Where(e => e.UserId == id)
+                .Where(e => e.Status.Trim() == "ENDED" || e.Status.Trim() == "REALIZE" || e.Status.Trim() == "STARTED")
+                .Include(e => e.OrderStation).Include(e => e.FoodOrders).ToListAsync();
+
+            orders.ForEach(o =>
+            {
+                o.OrderStation.Restaurant = _context.Restaurants.Single(r => r.Id == o.OrderStation.RestaurantId);
+            });
             List<BodyUserOrder> bodyUserOrder = new List<BodyUserOrder>();
             
             foreach(Order tempOrder in orders)

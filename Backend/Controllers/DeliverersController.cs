@@ -48,17 +48,21 @@ namespace Backend.Controllers
             {
                 tempClientRate = deliverer.DelivererRates.Average(d => d.Value);
             }
-            if (deliverer.Orders.Where(o => o.Status.TrimEnd() != "ENDED").Count() != 0)
+            if(deliverer.Orders != null)
             {
                 tempTotalDelivery = deliverer.Orders.Count;
-                tempCurrentOrders = deliverer.Orders.Where(o => o.Status.TrimEnd() != "ENDED").Count();
+                if (deliverer.Orders.Where(o => o.Status.TrimEnd() != "ENDED").Count() != 0)
+                {
+                    tempCurrentOrders = deliverer.Orders.Where(o => o.Status.TrimEnd() != "ENDED").Count();
+                }
+                if (deliverer.Orders.Where(o => o.Status.TrimEnd() == "ENDED").Count() != 0)
+                {
+                    tempMaxDailyOrders = deliverer.Orders.Where(o => o.Status.TrimEnd() == "ENDED")
+                                        .GroupBy(o => o.EndTime.Value.ToString("s"))
+                                        .Max(gr => gr.Count());
+                }
             }
-            if (deliverer.Orders.Where(o => o.Status.TrimEnd() == "ENDED").Count() != 0) 
-            {
-                tempMaxDailyOrders = deliverer.Orders.Where(o => o.Status.TrimEnd() == "ENDED")
-                                    .GroupBy(o => o.EndTime.Value.ToString("s"))
-                                    .Max(gr => gr.Count());
-            }
+            
             WsStatistics statistics = new WsStatistics
             {
                 ClientRate = tempClientRate,
