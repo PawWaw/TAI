@@ -32,7 +32,6 @@ export class OrderDetailsComponent implements OnInit {
   ngOnInit() {
     this.deliverers = this.orderService.getDeliverers();
     this.order = JSON.parse(localStorage.getItem('row'));
-    console.log(this.deliverers);
     if (this.order.deliverer == null) {
       this.isDelivered = false;
     } else {
@@ -74,7 +73,11 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   modifyItem() {
-    this.order.delivererId = Number(this.selectedData);
+    if (!this.isDelivered) {
+      this.order.delivererId = Number(this.selectedData);
+    } else {
+      this.order.deliverer = null;
+    }
     this.order.status = this.status;
     this.orderService.modifyOrder(this.order).subscribe(
       data=>{
