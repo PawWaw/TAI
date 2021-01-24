@@ -22,7 +22,7 @@ const Caption = styled.h2`
 const StatisticItem = ({ statistic }) => {
   return (
     <Wrapper>
-      <Value>{statistic.value}</Value>
+      <Value>{statistic.value.toFixed(2)}</Value>
       <Caption>{statistic.name}</Caption>
     </Wrapper>
   );

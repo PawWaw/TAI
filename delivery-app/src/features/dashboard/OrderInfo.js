@@ -1,8 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  useRecoilState,
-} from "recoil";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { history } from "../..";
 import Button from "../../app/common/Button";
@@ -66,7 +64,12 @@ const OrderInfo = () => {
           {ordersCount > 0 ? `${ordersCount}` : "None"}
         </Order>
       </Text>
-      <Button secondary onClick={handleFindOrder} loading={loading ? 1 : 0}>
+      <Button
+        secondary
+        onClick={handleFindOrder}
+        loading={loading ? 1 : 0}
+        fluid
+      >
         Find order
       </Button>
     </Wrapper>
