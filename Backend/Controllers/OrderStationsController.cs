@@ -104,13 +104,21 @@ namespace Backend.Controllers
                     foods = new List<AverageRateFood>(),
                     orderStation = orderStation
                 };
-                Restaurant restaurant = await _context.Restaurants.Where(f => f.Id == orderStation.RestaurantId).Include(e => e.Foods).FirstOrDefaultAsync();
+                Restaurant restaurant = await _context.Restaurants
+                    .Where(f => f.Id == orderStation.RestaurantId)
+                    .Include(e => e.Foods).FirstOrDefaultAsync();
                 orderStation.Restaurant = restaurant;
                 foreach (Food food in orderStation.Restaurant.Foods)
                 {
+                    if(!food.IsActive.HasValue || !food.IsActive.Value)
+                        continue;
+
                     AverageRateFood tempFood = new AverageRateFood
                     {
-                        food = await _context.Foods.Include(e => e.FoodRates).Include(e => e.FoodIngredients).FirstOrDefaultAsync(e => e.Id == food.Id)
+                        food = await _context.Foods
+                        .Include(e => e.FoodRates)
+                        .Include(e => e.FoodIngredients)
+                        .FirstOrDefaultAsync(e => e.Id == food.Id)
                     };
                     List<FoodIngredient> tempIngredient = new List<FoodIngredient>();
                     foreach (FoodIngredient foodIngredient in tempFood.food.FoodIngredients)
@@ -152,9 +160,15 @@ namespace Backend.Controllers
             orderStation.Restaurant = restaurant;
             foreach (Food food in orderStation.Restaurant.Foods)
             {
+                if (!food.IsActive.HasValue || !food.IsActive.Value)
+                    continue;
+
                 AverageRateFood tempFood = new AverageRateFood
                 {
-                    food = await _context.Foods.Include(e => e.FoodRates).Include(e => e.FoodIngredients).FirstOrDefaultAsync(e => e.Id == food.Id)
+                    food = await _context.Foods
+                    .Include(e => e.FoodRates)
+                    .Include(e => e.FoodIngredients)
+                    .FirstOrDefaultAsync(e => e.Id == food.Id)
                 };
                 List<FoodIngredient> tempIngredient = new List<FoodIngredient>();
 
