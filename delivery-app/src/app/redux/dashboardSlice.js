@@ -24,7 +24,7 @@ export const findOrder = createAsyncThunk(
       // };
       return order;
     } catch (error) {
-      console.log(error);
+     // console.log(error);
       toast.info("There are not available orders.");
       throw error;
     }
