@@ -41,9 +41,9 @@ namespace Backend.Controllers
         public long DelivererId { get; set; }
         public WsOrderStation WsOrderStation { get; set; }
         public string Status { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public WsFood WsFood { get; set; }
+        public string StartTime { get; set; }
+        public string EndTime { get; set; }
+        public List<WsFood> WsFood { get; set; }
     }
 
     public class WsFood
@@ -249,7 +249,7 @@ namespace Backend.Controllers
 
         [Authorize]
         [HttpGet("UserOrders")]
-        public async Task<ActionResult<IEnumerable<BodyUserOrder>>> GetUserOrders_User()
+        public async Task<ActionResult<IEnumerable<WsOrder>>> GetUserOrders_User()
         {
             long id = (long)HttpContext.Items["userId"];
             User user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
@@ -259,7 +259,7 @@ namespace Backend.Controllers
             }
             var orders = await _context.Orders.Where(e => e.UserId == id)
                 .Where(e => e.Status.Trim() == "ENDED" || e.Status.Trim() == "REALIZE" || e.Status.Trim() == "STARTED")
-                .Include(e => e.OrderStation).Include(e => e.FoodOrders).ToListAsync();
+                .Include(e => e.OrderStation).ThenInclude(os => os.City).Include(e => e.FoodOrders).Include(e => e.Deliverer).ToListAsync();
 
             orders.ForEach(o =>
             {
@@ -276,14 +276,16 @@ namespace Backend.Controllers
                 };
                 foreach (FoodOrder foodOrder in tempOrder.FoodOrders)
                 {
-                    FoodOrder tempFoodOrder = await _context.FoodOrders.Include(e => e.Food).FirstOrDefaultAsync(e => e.Id == tempOrder.Id);
+                    FoodOrder tempFoodOrder = await _context.FoodOrders.Include(e => e.Food).FirstOrDefaultAsync(e => e.FoodId == foodOrder.FoodId);
                     tempBody.food.Add(tempFoodOrder.Food);
                 }
                 tempBody.orderStation = tempOrder.OrderStation;
                 tempBody.orderStation.Restaurant.Foods = null;
                 bodyUserOrder.Add(tempBody);
             }
-            return bodyUserOrder;
+
+            var result = MapBodyUserOrderToWsOrder(bodyUserOrder);
+            return result;
         }
 
         [Authorize]
@@ -356,7 +358,7 @@ namespace Backend.Controllers
         public async Task<ActionResult<WsOrderResponse>> GetOrderToRealise_Deliverer()
         {
             var order = await _context.Orders.Include(o => o.OrderStation.City)
-                                            .Include(o => o.User.City).Where(e => e.Status.Trim() == "STARTED")
+                                            .Include(o => o.User.City).Where(e => e.Status.Trim() == "READY")
                                             .OrderBy(e => e.StartTime.Date.Day).FirstOrDefaultAsync();
             if(order == null)
             {
@@ -433,6 +435,52 @@ namespace Backend.Controllers
         private bool OrderExists(long id)
         {
             return _context.Orders.Any(e => e.Id == id);
+        }
+
+        private List<WsOrder> MapBodyUserOrderToWsOrder(List<BodyUserOrder> bodyUserOrder)
+        {
+            var wsOrders = new List<WsOrder>();
+
+            bodyUserOrder.ForEach(b =>
+            {
+                var myWsFood = new List<WsFood>();
+                b.food.ForEach(f =>
+                {
+                    var myFood = new WsFood()
+                    {
+                        Id = f.Id,
+                        Name = f.Name.Trim(),
+                        Price = f.Price
+                    };
+                    myWsFood.Add(myFood);
+                });
+
+                var wso = new WsOrder()
+                {
+                    Id = b.order.Id,
+                    DelivererId = b.order.DelivererId.HasValue ? b.order.DelivererId.Value : -1,
+                    Status = b.order.Status.Trim(),
+                    StartTime = b.order.StartTime.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    EndTime = b.order.EndTime.HasValue ? b.order.EndTime.Value.ToString("yyyy-MM-ddTHH:mm:ss") : null,
+                    WsOrderStation = new WsOrderStation()
+                    {
+                        Id = b.orderStation.Id,
+                        City = b.orderStation.City.Name.Trim(),
+                        Address = b.orderStation.Address.Trim(),
+                        WsRestaurant = new WsRestaurant()
+                        {
+                            Id = b.orderStation.Restaurant.Id,
+                            Name = b.orderStation.Restaurant.Name.Trim(),
+                            WsDishWithRates = null
+                        }
+                    },
+                    WsFood = myWsFood
+                };
+
+                wsOrders.Add(wso);
+            });
+
+            return wsOrders;
         }
     }
 }
