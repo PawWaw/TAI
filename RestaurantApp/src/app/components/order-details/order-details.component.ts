@@ -81,7 +81,7 @@ export class OrderDetailsComponent implements OnInit {
     this.order.status = this.status;
     this.orderService.modifyOrder(this.order).subscribe(
       data=>{
-        this.router.navigate(['']);
+        this.router.navigate(['/order']);
       },
       error=>{
       }

@@ -24,7 +24,6 @@ export class HeaderComponent implements OnInit {
 
   logout(){
     localStorage.removeItem('auth_token');
-    localStorage.clear()
     this.isLogged = false;
   }
 

@@ -35,7 +35,6 @@ export class SigninComponent implements OnInit {
   get password() { return this.formGroup.get('password'); }
 
   onSubmit(){
-    localStorage.clear()
     this.loading=true;
 
     this.formGroup.patchValue({username: this.username.value.toString().toLowerCase()});
