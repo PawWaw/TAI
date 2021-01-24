@@ -3,7 +3,7 @@
     <mat-expansion-panel *ngFor="let item of specialOrder; index as i">
       <mat-expansion-panel-header>
         <mat-panel-title>
-          {{getRestaurantName(item.orderData.orderStation)}}
+          {{getRestaurantName(item.orderData.wsOrderStation)}}
         </mat-panel-title>
         <mat-panel-description>
           {{getOrderInfo(item.orderData)}}
@@ -14,7 +14,7 @@
         </mat-panel-description>
       </mat-expansion-panel-header>
       <button mat-raised-button
-              *ngIf="item.orderData.status === 'ENDED'"
+              *ngIf="showRateDishOrDelivererButton(item.orderData.status)"
               color="primary"
               (click)="rateDeliverer(item.orderData)">Rate deliverer</button>
 
@@ -50,7 +50,7 @@
           <td mat-cell
               *matCellDef="let element">
             <button mat-raised-button
-                    *ngIf="item.orderData.status === 'ENDED'"
+                    *ngIf="showRateDishOrDelivererButton(item.orderData.status)"
                     color="primary"
                     (click)="rateDish(element)">Rate dish</button>
 

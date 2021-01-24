@@ -1,14 +1,14 @@
-import { DishWithRate } from "./dish.interface";
+import { DishWithRate as WsDishWithRates } from "./dish.interface";
 
-export interface Restaurant {
+export interface WsRestaurant {
   id: number;
   name: string;
-  food: DishWithRate[];
+  wsDishWithRates: WsDishWithRates[];
 }
 
-export interface OrderStation {
+export interface WsOrderStation {
   id: number;
   city: string;
   address: string;
-  restaurant: Restaurant;
+  wsRestaurant: WsRestaurant;
 }

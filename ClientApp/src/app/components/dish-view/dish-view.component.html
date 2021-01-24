@@ -52,7 +52,7 @@
               *matHeaderCellDef
               mat-sort-header> Rate </th>
           <td mat-cell
-              *matCellDef="let row"> {{row.rate}} </td>
+              *matCellDef="let row"> {{getRateString(row.rate)}} </td>
         </ng-container>
 
         <ng-container matColumnDef="addToBasket">

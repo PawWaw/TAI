@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Subject } from "rxjs";
+import { ApiToken } from "src/app/shared/models/api-token.interface";
 import { Dish, DishesInBasket } from "src/app/shared/models/dish.interface";
 import { User } from "src/app/shared/models/user.interface";
 
@@ -100,23 +101,28 @@ export class ModelService {
     window.localStorage.setItem("jwtToken", "");
 
     this._dishesBasket = [];
+    this.updateElementIntoBasket();
     this.setStatus(false);
   }
 
+  setApiUser(apiToken: ApiToken): void {
+    this._user = {
+      address: apiToken.address,
+      city: apiToken.city,
+      email: apiToken.email,
+      firstName: apiToken.firstName,
+      lastName: apiToken.lastName,
+      username: apiToken.username
+    }
+  }
+
   setUser(user: User): void {
-    this._user = user;
+    this._user = user
   }
 
   // start user getter
   getUser(): User {
     return this._user;
-  }
-
-  getUserId(): number {
-    if (this._user !== null) {
-      return this._user.id;
-    }
-    return -1;
   }
 
   getUserUsername(): string {

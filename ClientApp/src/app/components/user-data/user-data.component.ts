@@ -14,7 +14,6 @@ import { UserDataService } from "./user-data.service";
 export class UserDataComponent {
 
   userDataForm = this._fb.group({
-    id: [null],
     username: [null],
     email: [null],
     firstName: [null],
@@ -30,7 +29,6 @@ export class UserDataComponent {
     public dialogRef: MatDialogRef<UserDataComponent>,
     @Inject(MAT_DIALOG_DATA) public data: User) {
     this.userDataForm.patchValue({
-      id: data.id,
       username: data.username,
       email: data.email,
       firstName: data.firstName,
@@ -41,10 +39,7 @@ export class UserDataComponent {
   }
 
   updateUser(): void {
-    console.log("aktualizacja");
-
     const user: User = {
-      id: this.userDataForm.value.id,
       username: this.userDataForm.value.username,
       email: this.userDataForm.value.email,
       firstName: this.userDataForm.value.firstName,
@@ -53,7 +48,7 @@ export class UserDataComponent {
       address: this.userDataForm.value.address
     }
 
-    // this._userDataService.updateUser(user);
+    this._userDataService.updateUser(user);
     this._modelService.setUser(user);
   }
 }

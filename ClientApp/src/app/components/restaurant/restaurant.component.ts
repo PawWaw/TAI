@@ -3,7 +3,7 @@ import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
 import { Router } from "@angular/router";
-import { OrderStation } from "src/app/shared/models/restaurant.interface";
+import { WsOrderStation } from "src/app/shared/models/restaurant.interface";
 
 import { RestaurantViewService } from "./restaurant-view.service";
 
@@ -16,22 +16,32 @@ export class RestaurantComponent {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  private _restaurantsData: OrderStation[];
+  private _restaurantsData: WsOrderStation[];
 
   displayedColumns: string[] = ["name", "city", "address", "menu"];
-  dataSource: MatTableDataSource<OrderStation>;
+  dataSource: MatTableDataSource<WsOrderStation>;
 
-  constructor(private _restaurantViewService: RestaurantViewService, private _router: Router) {
-    this._restaurantViewService.getRestaurantsMock().subscribe((restaurants: OrderStation[]) => {
+  constructor(
+    private _restaurantViewService: RestaurantViewService,
+    private _router: Router) {
+    // let test: WsOrderStation[] = [];
+
+    // this.dataSource = new MatTableDataSource(test);
+    this._restaurantViewService.getRestaurants().subscribe((restaurants: WsOrderStation[]): void => {
       this._restaurantsData = restaurants;
+      this.dataSource = new MatTableDataSource(restaurants);
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
     });
 
-    this.dataSource = new MatTableDataSource(this._restaurantsData);
+
   }
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+
+    // this.dataSource.paginator = this.paginator;
+    // this.dataSource.sort = this.sort;
+
   }
 
   applyFilter(event: Event) {
@@ -43,9 +53,7 @@ export class RestaurantComponent {
     }
   }
 
-  viewRestaurantDishes(element: OrderStation): void {
-    console.log(element);
-
+  viewRestaurantDishes(element: WsOrderStation): void {
     this._router.navigate(["restaurant", element.id]);
   }
 

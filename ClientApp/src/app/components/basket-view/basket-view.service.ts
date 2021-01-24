@@ -18,7 +18,7 @@ export class BasketViewService {
       if (elem.length === 0) {
         order.dishes.push({
           orderStationId: d.dish.orderStationId,
-          food: [
+          foods: [
             {
               dishId: d.dish.id,
               count: d.count
@@ -28,9 +28,9 @@ export class BasketViewService {
       }
       else {
         let index = order.dishes.indexOf(elem[0]);
-        order.dishes[index].food.push({dishId: d.dish.id, count: d.count});
+        order.dishes[index].foods.push({dishId: d.dish.id, count: d.count});
       }
     });
-    this._orderService.submitOrder(order);
+    this._orderService.submitOrder(order).subscribe(() => {});
   }
 }

@@ -15,10 +15,10 @@ export class AuthService {
   constructor(private _apiClientService: ApiClientService, private _config: ConfigService) { }
 
   loginUser(auth: UserAuth): Observable<ApiToken> {
-    return this._apiClientService.post(`${this._config.ApiUrl}/ClientApi/Login`, { queryParams: auth });
+    return this._apiClientService.post(`${this._config.ApiUrl}/api/Users/login`, { queryParams: auth });
   }
 
   registerUser(user: User){
-    return this._apiClientService.post(`${this._config.ApiUrl}/ClientApi/RegisterUser`, { queryParams: user });
+    return this._apiClientService.post(`${this._config.ApiUrl}/api/Users/user/register`, { queryParams: user });
   }
 }

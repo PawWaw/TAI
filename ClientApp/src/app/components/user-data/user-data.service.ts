@@ -10,6 +10,6 @@ export class UserDataService {
   constructor(private _userService: UserService) { }
 
   updateUser(user: User): void {
-    this._userService.updateUser(user);
+    this._userService.updateUser(user).subscribe(() => {});
   }
 }

@@ -35,8 +35,6 @@ export class RateDishViewComponent {
         id: this.food.id,
         rate: this.selectedRate
       }
-      console.log("wysyłam ocene:");
-      console.log(dishRate);
       this._orderViewService.rateDish(dishRate);
     }
   }

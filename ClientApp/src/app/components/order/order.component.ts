@@ -5,8 +5,8 @@ import { MatTableDataSource } from "@angular/material/table";
 import { Router } from "@angular/router";
 import { ModelService } from "src/app/core/services/model.service";
 import { Food } from "src/app/shared/models/dish.interface";
-import { Order } from "src/app/shared/models/order.interface";
-import { OrderStation } from "src/app/shared/models/restaurant.interface";
+import { WsOrder } from "src/app/shared/models/order.interface";
+import { WsOrderStation } from "src/app/shared/models/restaurant.interface";
 
 import { RateDelivererViewComponent } from "../rate-deliverer-view/rate-deliverer-view.component";
 import { RateDishViewComponent } from "../rate-dish-view/rate-dish-view.component";
@@ -23,7 +23,7 @@ export interface SpecialFood {
 }
 
 export class SpecialOrder {
-  orderData: Order;
+  orderData: WsOrder;
   dataSource: MatTableDataSource<SpecialFood>;
 }
 
@@ -55,10 +55,11 @@ export class OrderComponent implements OnInit {
       this._router.navigate([""]);
     }
 
-    _orderViewService.getUserOrdersMock().subscribe((x: Order[]) => {
-      x.forEach((o: Order) => {
+    _orderViewService.getUserOrders().subscribe((x: WsOrder[]) => {
+      x.forEach((o: WsOrder) => {
         let foods: SpecialFood[] = [];
-        o.food.forEach((f: Food) => {
+
+        o.wsFood.forEach((f: Food) => {
 
           let dishes = foods.filter(x => x.id === f.id);
           if (dishes.length === 0) {
@@ -67,9 +68,9 @@ export class OrderComponent implements OnInit {
               name: f.name,
               price: f.price,
               count: 1,
-              restaurantName: o.orderStation.restaurant.name,
-              city: o.orderStation.city,
-              address: o.orderStation.address
+              restaurantName: o.wsOrderStation.wsRestaurant.name,
+              city: o.wsOrderStation.city,
+              address: o.wsOrderStation.address
             });
           }
           else {
@@ -91,11 +92,11 @@ export class OrderComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  getRestaurantName(orderStation: OrderStation): string {
-    return orderStation.restaurant.name + ", " + orderStation.city + ", " + orderStation.address;
+  getRestaurantName(orderStation: WsOrderStation): string {
+    return orderStation.wsRestaurant.name + ", " + orderStation.city + ", " + orderStation.address;
   }
 
-  getOrderInfo(order: Order): string {
+  getOrderInfo(order: WsOrder): string {
     return this.getStatus(order.status) + " " + this.dateAsYYYYMMDDHHMM(order.startTime) + " - " + this.dateAsYYYYMMDDHHMM(order.endTime);
   }
 
@@ -110,13 +111,18 @@ export class OrderComponent implements OnInit {
         s = "realize";
         break;
       }
+      case "STARTED": {
+        s = "started";
+        break;
+      }
     }
 
     return s;
   }
 
-  dateAsYYYYMMDDHHMM(date: Date): string {
-    if (date === null) {
+  dateAsYYYYMMDDHHMM(dateString: string): string {
+    let date = new Date(dateString);
+    if (dateString === null || dateString === undefined) {
       return "...";
     }
     return date.getFullYear() + '-' +
@@ -126,7 +132,7 @@ export class OrderComponent implements OnInit {
       ((date.getMinutes() < 10) ? ("0" + date.getMinutes()) : (date.getMinutes()));
   }
 
-  rateDeliverer(order: Order) {
+  rateDeliverer(order: WsOrder) {
 
     const dialogRef = this.dialog.open(RateDelivererViewComponent, {
       width: "40%",
@@ -139,7 +145,6 @@ export class OrderComponent implements OnInit {
   }
 
   rateDish(food: SpecialFood) {
-
     const dialogRef = this.dialog.open(RateDishViewComponent, {
       width: "40%",
       data: food
@@ -148,5 +153,14 @@ export class OrderComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
 
     });
+  }
+
+  showRateDishOrDelivererButton(status: string): boolean {
+    if (status === "STARTED" || status === "REALIZE") {
+      return false;
+    }
+    else {
+      return true;
+    }
   }
 }

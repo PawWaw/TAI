@@ -1,6 +1,9 @@
-import { User } from "./user.interface";
-
 export interface ApiToken {
-  accessToken: string;
-  user: User;
+  token: string;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  city: string;
+  address: string;
 }

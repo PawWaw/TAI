@@ -1,5 +1,5 @@
-import { Food } from "./dish.interface";
-import { OrderStation } from "./restaurant.interface";
+import { Food as WsFood } from "./dish.interface";
+import { WsOrderStation } from "./restaurant.interface";
 
 export class UserOrder {
   dishes: DishOrder[];
@@ -11,7 +11,7 @@ export class UserOrder {
 
 export interface DishOrder {
   orderStationId: number;
-  food: FoodOrdered[];
+  foods: FoodOrdered[];
 }
 
 export interface FoodOrdered {
@@ -19,14 +19,14 @@ export interface FoodOrdered {
   count: number;
 }
 
-export interface Order {
+export interface WsOrder {
   id: number;
   delivererId: number;
-  orderStation: OrderStation;
+  wsOrderStation: WsOrderStation;
   status: string;
-  startTime: Date;
-  endTime: Date;
-  food: Food[];
+  startTime: string;
+  endTime: string;
+  wsFood: WsFood[];
 }
 
 export interface DelivererRate {

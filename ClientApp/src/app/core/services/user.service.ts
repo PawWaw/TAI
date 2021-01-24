@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { Observable } from "rxjs";
 import { User } from "src/app/shared/models/user.interface";
 
 import { ApiClientService } from "./api-client.service";
@@ -12,7 +13,7 @@ export class UserService {
 
   constructor(private _apiClientService: ApiClientService, private _config: ConfigService) { }
 
-  updateUser(user: User): void {
-    this._apiClientService.put(`${this._config.ApiUrl}/ClientApi/User`, { queryParams: user });
+  updateUser(user: User): Observable<void> {
+    return this._apiClientService.put(`${this._config.ApiUrl}/api/Users/user`, { queryParams: user });
   }
 }

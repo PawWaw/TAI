@@ -11,7 +11,6 @@ import {
 } from "@angular/forms";
 import { ErrorStateMatcher } from "@angular/material/core";
 import { Router } from "@angular/router";
-import { first } from "rxjs/operators";
 import { AuthService } from "src/app/core/services/auth.service";
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
@@ -98,7 +97,7 @@ export class SignupComponent implements OnInit {
 
     this.formGroup.patchValue({ username: this.username.value.toString().toLowerCase() });
 
-    this._authService.registerUser(this.formGroup.value).pipe(first()).subscribe(
+    this._authService.registerUser(this.formGroup.value).subscribe(   //.pipe(first())
       data => {
         this._router.navigate(['/signin']);
       },

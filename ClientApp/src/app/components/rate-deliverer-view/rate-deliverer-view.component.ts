@@ -1,6 +1,6 @@
 import { Component, Inject } from "@angular/core";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
-import { DelivererRate, Order, RatePick } from "src/app/shared/models/order.interface";
+import { DelivererRate, RatePick, WsOrder } from "src/app/shared/models/order.interface";
 
 import { OrderViewService } from "../order/order-view.service";
 
@@ -26,7 +26,7 @@ export class RateDelivererViewComponent {
   constructor(
     private _orderViewService: OrderViewService,
     public dialogRef: MatDialogRef<RateDelivererViewComponent>,
-    @Inject(MAT_DIALOG_DATA) public order: Order) { }
+    @Inject(MAT_DIALOG_DATA) public order: WsOrder) { }
 
   rateDeliverer() {
     if (this.selectedRate !== 0) {
@@ -34,8 +34,6 @@ export class RateDelivererViewComponent {
         id: this.order.delivererId,
         rate: this.selectedRate
       }
-      console.log("wysyłam ocene:");
-      console.log(delivererRate);
       this._orderViewService.rateDeliverer(delivererRate);
     }
   }

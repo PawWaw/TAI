@@ -1,10 +1,10 @@
-import { AfterViewInit, Component, Input, OnInit, ViewChild } from "@angular/core";
+import { Component, Input, OnInit, ViewChild } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
 import { ModelService } from "src/app/core/services/model.service";
 import { Dish, DishWithRate } from "src/app/shared/models/dish.interface";
-import { OrderStation } from "src/app/shared/models/restaurant.interface";
+import { WsOrderStation } from "src/app/shared/models/restaurant.interface";
 
 import { DishViewService } from "./dish-view.service";
 
@@ -13,7 +13,7 @@ import { DishViewService } from "./dish-view.service";
   templateUrl: './dish-view.component.html',
   styleUrls: ['./dish-view.component.scss']
 })
-export class DishViewComponent implements OnInit, AfterViewInit {
+export class DishViewComponent implements OnInit {
   @Input() viewType: number;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -30,19 +30,23 @@ export class DishViewComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.getDataOnStart();
+  }
+
+  getDataOnStart(): void {
     if (this.viewType === -1) {
-      this._dishViewService.getDishesMock().subscribe((orderStations: OrderStation[]) => {
+      this._dishViewService.getDishes().subscribe((orderStations: WsOrderStation[]) => {
         let dishes: Dish[] = [];
-        orderStations.forEach((orderStation: OrderStation) => {
-          orderStation.restaurant.food.forEach((x: DishWithRate) => {
+        orderStations.forEach((orderStation: WsOrderStation) => {
+          orderStation.wsRestaurant.wsDishWithRates.forEach((x: DishWithRate) => {
             dishes.push({
               id: x.id,
               orderStationId: orderStation.id,
-              restaurantId: orderStation.restaurant.id,
+              restaurantId: orderStation.wsRestaurant.id,
               name: x.name,
               price: x.price,
               ingredients: x.ingredients,
-              restaurantName: orderStation.restaurant.name,
+              restaurantName: orderStation.wsRestaurant.name,
               city: orderStation.city,
               address: orderStation.address,
               rate: x.rate
@@ -50,35 +54,34 @@ export class DishViewComponent implements OnInit, AfterViewInit {
           });
         });
         this._dishData = dishes
+        this.dataSource = new MatTableDataSource(this._dishData);
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
       });
     }
     else {
-      this._dishViewService.getDishesByRestaurantMock(this.viewType).subscribe((orderStation: OrderStation) => {
+      this._dishViewService.getDishesByRestaurant(this.viewType).subscribe((orderStation: WsOrderStation) => {
         let dishes: Dish[] = [];
-        orderStation.restaurant.food.forEach((x: DishWithRate) => {
+        orderStation.wsRestaurant.wsDishWithRates.forEach((x: DishWithRate) => {
           dishes.push({
             id: x.id,
             orderStationId: orderStation.id,
-            restaurantId: orderStation.restaurant.id,
+            restaurantId: orderStation.wsRestaurant.id,
             name: x.name,
             price: x.price,
             ingredients: x.ingredients,
-            restaurantName: orderStation.restaurant.name,
+            restaurantName: orderStation.wsRestaurant.name,
             city: orderStation.city,
             address: orderStation.address,
             rate: x.rate
           })
         });
         this._dishData = dishes
+        this.dataSource = new MatTableDataSource(this._dishData);
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
       });
     }
-
-    this.dataSource = new MatTableDataSource(this._dishData);
-  }
-
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
   }
 
   applyFilter(event: Event) {
@@ -104,5 +107,14 @@ export class DishViewComponent implements OnInit, AfterViewInit {
       s += x + " "
     });
     return s;
+  }
+
+  getRateString(rate: number): string {
+    if(isNaN(rate)){
+      return "-";
+    }
+    else {
+      return "" + rate;
+    }
   }
 }
