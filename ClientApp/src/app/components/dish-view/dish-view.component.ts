@@ -114,7 +114,7 @@ export class DishViewComponent implements OnInit {
       return "-";
     }
     else {
-      return "" + rate;
+      return "" + rate.toFixed(2);
     }
   }
 }

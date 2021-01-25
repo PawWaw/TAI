@@ -34,7 +34,7 @@ export class RateDelivererViewComponent {
         id: this.order.delivererId,
         rate: this.selectedRate
       }
-      this._orderViewService.rateDeliverer(delivererRate);
+      this._orderViewService.rateDeliverer(delivererRate).subscribe((): void => {});
     }
   }
 

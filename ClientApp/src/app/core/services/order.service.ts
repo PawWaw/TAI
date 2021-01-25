@@ -22,11 +22,11 @@ export class OrderService {
   }
 
   addDishRate(dishRate: DishRate): Observable<void> {
-    return this._apiClientService.post(`${this._config.ApiUrl}/ClientApi/RateDish`, { queryParams: dishRate });
+    return this._apiClientService.post(`${this._config.ApiUrl}/api/FoodRates/RateFood`, { queryParams: dishRate });
   }
 
   addDelivererRate(delivererRate: DelivererRate): Observable<void> {
-    return this._apiClientService.post(`${this._config.ApiUrl}/ClientApi/RateDeliverer`, { queryParams: delivererRate });
+    return this._apiClientService.post(`${this._config.ApiUrl}/api/DelivererRates/RateDeliverer`, { queryParams: delivererRate });
   }
 
 }

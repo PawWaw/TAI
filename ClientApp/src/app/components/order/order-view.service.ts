@@ -18,12 +18,12 @@ export class OrderViewService {
   //   return this.createUserOrdersDataMock();
   // }
 
-  rateDeliverer(delivererRate: DelivererRate): void {
-    this._orderService.addDelivererRate(delivererRate);
+  rateDeliverer(delivererRate: DelivererRate): Observable<void> {
+    return this._orderService.addDelivererRate(delivererRate);
   }
 
-  rateDish(dishRate: DishRate): void {
-    this._orderService.addDishRate(dishRate);
+  rateDish(dishRate: DishRate): Observable<void> {
+    return this._orderService.addDishRate(dishRate);
   }
 
   // createUserOrdersDataMock(): Observable<WsOrder[]> {

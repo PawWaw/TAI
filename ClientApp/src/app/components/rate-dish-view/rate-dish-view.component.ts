@@ -35,7 +35,7 @@ export class RateDishViewComponent {
         id: this.food.id,
         rate: this.selectedRate
       }
-      this._orderViewService.rateDish(dishRate);
+      this._orderViewService.rateDish(dishRate).subscribe((): void => {});
     }
   }
 }

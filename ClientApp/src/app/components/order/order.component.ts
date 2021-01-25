@@ -156,7 +156,7 @@ export class OrderComponent implements OnInit {
   }
 
   showRateDishOrDelivererButton(status: string): boolean {
-    if (status === "STARTED" || status === "REALIZE") {
+    if (status === "STARTED" || status === "REALIZE" || status === "READY") {
       return false;
     }
     else {
