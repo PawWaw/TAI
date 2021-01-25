@@ -56,10 +56,10 @@ const OrderPopup = () => {
     const runSync = () => {
       
       findCoordinatesByAddress(currentOrder?.restaurant?.address + " " + currentOrder?.restaurant?.city).then((c) =>
-        setRestaurantCoords(c.results[0].position)
+        setRestaurantCoords(c.results[0]?.position)
       );
       findCoordinatesByAddress(currentOrder?.client?.address + " " + currentOrder?.client?.city).then((c) =>
-        setClientCoords(c.results[0].position)
+        setClientCoords(c.results[0]?.position)
       );
       setReady(true);
     };

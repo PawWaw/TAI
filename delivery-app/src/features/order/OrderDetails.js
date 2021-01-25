@@ -79,10 +79,10 @@ const OrderDetails = ({ match }) => {
           detailedOrder?.restaurant?.address +
             " " +
             detailedOrder?.restaurant?.city
-        ).then((c) => setRestaurantCoords(c.results[0].position));
+        ).then((c) => setRestaurantCoords(c.results[0]?.position));
         findCoordinatesByAddress(
           detailedOrder?.client?.address + " " + detailedOrder?.client?.city
-        ).then((c) => setClientCoords(c.results[0].position));
+        ).then((c) => setClientCoords(c.results[0]?.position));
       }
     };
     runSync();
